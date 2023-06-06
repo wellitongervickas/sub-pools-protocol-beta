@@ -19,15 +19,7 @@ contract SubPool is Ownable {
 }
 
 contract RouterSubPool {
-    event Created(address indexed subPool);
     event Joined(address indexed parentSubPool, address indexed subPool, uint256 indexed subPoolId);
-
-    function create() external returns (address) {
-        SubPool subPool = new SubPool(msg.sender);
-
-        emit Created(address(subPool));
-        return address(subPool);
-    }
 
     function join(address _parentSubPoolAddress, address _subPoolAddress) external returns (bool) {
         SubPool _parentSubPool = SubPool(_parentSubPoolAddress);
@@ -37,5 +29,24 @@ contract RouterSubPool {
 
         emit Joined(_parentSubPoolAddress, _subPoolAddress, _currentID);
         return true;
+    }
+}
+
+contract FactorySubPool {
+    address routerSubPool;
+    
+    event Created(address indexed subPool);
+
+    constructor(address _routerSubPool) {
+        routerSubPool = _routerSubPool;
+    }
+
+    function create() external returns (address) {
+        SubPool subPool = new SubPool(msg.sender);
+
+        subPool.transferOwnership(routerSubPool);
+
+        emit Created(address(subPool));
+        return address(subPool);
     }
 }
