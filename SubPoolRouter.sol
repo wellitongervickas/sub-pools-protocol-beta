@@ -11,7 +11,7 @@ contract SubPoolRouter is SubPool {
     }
 
     function _checkEmptyParentSubPool() override internal view returns (bool) {
-        return false;
+        return parentSubPool != address(0);
     }
 
     function _initialDeposit(address _subPoolAddress, uint256 _amount) override internal  {
