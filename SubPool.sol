@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-// import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract SubPool {
+contract SubPool is Ownable {
     address public parentSubPool;
     uint256 public nextSubPoolID = 0;
 
@@ -36,8 +36,14 @@ contract SubPool {
     //     });
     // }
 
+    error ParentNotFound();
+
     function _setParentSubPool(address _parentSubPool) external virtual {
         parentSubPool = _parentSubPool;
+    }
+
+    function _checkEmptyParentSubPool() internal view virtual returns (bool) {
+        return parentSubPool == address(0);
     }
 
     // function calculateManagerFee(uint256 _amount) external view returns (uint256) {
@@ -49,6 +55,8 @@ contract SubPool {
     // }
 
     function join(address _subPoolAddress, uint256 _amount) external returns (uint256) {
+        if (_checkEmptyParentSubPool()) revert ParentNotFound();
+
         subPools[_subPoolAddress] = SubPoolInfo({
             id: nextSubPoolID++,
             initialBalance: 0,
@@ -56,12 +64,12 @@ contract SubPool {
         });
 
         SubPool(_subPoolAddress)._setParentSubPool(address(this));
-        SubPool(this).initialDeposit(_subPoolAddress, _amount);
+        _initialDeposit(_subPoolAddress, _amount);
 
         return subPools[_subPoolAddress].id;
     }
     
-    function initialDeposit(address _subPoolAddress, uint256 _amount) external virtual {
+    function _initialDeposit(address _subPoolAddress, uint256 _amount) internal virtual {
         SubPoolInfo storage subPoolInfo = subPools[_subPoolAddress];
         subPoolInfo.initialBalance = _amount;
 
