@@ -12,7 +12,7 @@ contract SubPoolRouter {
     
     event Joined(address indexed parentSubPool, address indexed subPool, uint256 indexed subPoolId);
 
-    function depositAndJoin(address _parentSubPoolAddress, address _subPoolAddress, uint256 _amount) external {
+    function depositAndJoin(address _parentSubPoolAddress, address _subPoolAddress, uint256 _amount) external returns (uint256) {
         SubPool _subPool = SubPool(_subPoolAddress);
         SubPool _parentSubPool = SubPool(_parentSubPoolAddress);
         
@@ -22,9 +22,11 @@ contract SubPoolRouter {
         _subPool.setManagerBalance(managerAmount);
         _subPool.setSubPoolBalance(_subPoolAddress, subPoolAmount);
 
+        uint256 subPoolId = join(_parentSubPool, _subPool);
+
         _parentSubPool.setSubPoolBalance(_subPoolAddress, _amount);
 
-        join(_parentSubPool, _subPool);
+        return subPoolId;
     }
 
     function join(SubPool _parentSubPool, SubPool _subPool) internal returns (uint256) {
