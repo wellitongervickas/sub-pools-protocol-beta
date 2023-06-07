@@ -1,39 +1,33 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// import "@openzeppelin/contracts/access/Ownable.sol";
 import "./SubPool.sol";
 
-contract SubPoolRouter {
-    struct SubPoolInfo {
-        uint256 balance;
-    }
-    
-    mapping(address => SubPoolInfo) public subPools;
-    
-    event Joined(address indexed parentSubPool, address indexed subPool, uint256 indexed subPoolId);
-
-    function depositAndJoin(address _parentSubPoolAddress, address _subPoolAddress, uint256 _amount) external returns (uint256) {
-        SubPool _subPool = SubPool(_subPoolAddress);
-        SubPool _parentSubPool = SubPool(_parentSubPoolAddress);
-        
-        uint256 managerAmount = _subPool.calculateManagerFee(_amount);
-        uint256 subPoolAmount = _amount - managerAmount;
-
-        _subPool.setManagerBalance(managerAmount);
-        _subPool.setSubPoolBalance(_subPoolAddress, subPoolAmount);
-
-        uint256 subPoolId = join(_parentSubPool, _subPool);
-
-        _parentSubPool.setSubPoolBalance(_subPoolAddress, _amount);
-
-        return subPoolId;
+contract SubPoolRouter is SubPool {
+    constructor() {
+        parentSubPool = address(0);
     }
 
-    function join(SubPool _parentSubPool, SubPool _subPool) internal returns (uint256) {
-        uint256 _currentID = _parentSubPool.join(address(_subPool));
-        _subPool.setParentSubPool(address(_parentSubPool));
+    function setParentSubPool(address _parentSubPool) override external {
+        // do not change parent since heres the router
+    }
 
-        emit Joined(address(_parentSubPool), address(_subPool), _currentID);
+    function joinParent(address _parentSubPoolAddress, address _subPoolAddress, uint256 _amount) external returns (uint256) {
+        uint256 _currentID = SubPool(_parentSubPoolAddress).join(_subPoolAddress, _amount);
+
+        SubPool(_subPoolAddress).setParentSubPool(_parentSubPoolAddress);
+
         return _currentID;
+    }
+
+    function initialDeposit(address _subPoolAddress, uint256 _amount) override external  {
+        SubPoolInfo storage subPoolInfo = subPools[_subPoolAddress];
+        subPoolInfo.initialBalance = _amount;
+    }
+
+    function additionalDeposit(address _subPoolAddress, uint256 _amount) override external  {
+        SubPoolInfo storage subPoolInfo = subPools[_subPoolAddress];
+        subPoolInfo.balance += _amount;
     }
 }
