@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.17;
 
 // import "@openzeppelin/contracts/access/Ownable.sol";
 import "./SubPool.sol";
@@ -9,14 +9,16 @@ contract SubPoolRouter is SubPool {
         parentSubPool = address(0);
     }
 
-    function setParentSubPool(address _parentSubPool) override external {
-        // do not change parent since heres the router
+    error NotAllowed();
+
+    function _setParentSubPool(address /* _parentSubPool */) external pure override {
+        revert NotAllowed();
     }
 
     function joinParent(address _parentSubPoolAddress, address _subPoolAddress, uint256 _amount) external returns (uint256) {
         uint256 _currentID = SubPool(_parentSubPoolAddress).join(_subPoolAddress, _amount);
 
-        SubPool(_subPoolAddress).setParentSubPool(_parentSubPoolAddress);
+        SubPool(_subPoolAddress)._setParentSubPool(_parentSubPoolAddress);
 
         return _currentID;
     }

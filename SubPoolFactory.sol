@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.17;
 
 import "./SubPool.sol";
 
@@ -28,7 +28,7 @@ contract SubPoolFactory {
     }
 
     function _setSubPoolRouterAsParent(SubPool subPool) internal {
-        subPool.setParentSubPool(subPoolRouter);
+        subPool._setParentSubPool(subPoolRouter);
     }
 
     // function _setSubPoolRouterAsOwner(SubPool subPool) internal {

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.17;
 
 // import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -36,7 +36,7 @@ contract SubPool {
     //     });
     // }
 
-    function setParentSubPool(address _parentSubPool) external virtual {
+    function _setParentSubPool(address _parentSubPool) external virtual {
         parentSubPool = _parentSubPool;
     }
 
@@ -48,6 +48,19 @@ contract SubPool {
     //     manager.balance += _amount;
     // }
 
+    function join(address _subPoolAddress, uint256 _amount) external returns (uint256) {
+        subPools[_subPoolAddress] = SubPoolInfo({
+            id: nextSubPoolID++,
+            initialBalance: 0,
+            balance: 0
+        });
+
+        SubPool(_subPoolAddress)._setParentSubPool(address(this));
+        SubPool(this).initialDeposit(_subPoolAddress, _amount);
+
+        return subPools[_subPoolAddress].id;
+    }
+    
     function initialDeposit(address _subPoolAddress, uint256 _amount) external virtual {
         SubPoolInfo storage subPoolInfo = subPools[_subPoolAddress];
         subPoolInfo.initialBalance = _amount;
@@ -62,22 +75,5 @@ contract SubPool {
 
         SubPool _parentSubPool = SubPool(parentSubPool);
         _parentSubPool.additionalDeposit(address(this), _amount);
-    }
-
-    function join(address _subPoolAddress, uint256 _amount) external returns (uint256) {
-        SubPoolInfo memory subPoolInfo = SubPoolInfo({
-            id: nextSubPoolID,
-            initialBalance: 0,
-            balance: 0
-        });
-        
-        subPools[_subPoolAddress] = subPoolInfo;
-
-        SubPool(_subPoolAddress).setParentSubPool(address(this));
-        SubPool(this).initialDeposit(_subPoolAddress, _amount);
-
-        nextSubPoolID++;
-
-        return subPoolInfo.id;
     }
 }
