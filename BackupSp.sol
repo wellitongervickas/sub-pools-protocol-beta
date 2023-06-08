@@ -3,7 +3,7 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract SubPool is Ownable {
+contract SubPoolNode is Ownable {
     address public parentSubPool;
     uint256 public nextSubPoolID = 0;
 
