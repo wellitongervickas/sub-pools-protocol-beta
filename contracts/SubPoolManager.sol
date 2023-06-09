@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity =0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./SubPoolNode.sol";
 import "./lib/SubPoolLib.sol";
+
 
 contract SubPoolManager {
     using SubPoolLib for SubPoolLib.SubPoolInfo;
@@ -15,9 +16,8 @@ contract SubPoolManager {
     error NotAllowed();
     
     function createMain(uint256 _amount) external returns (address) {
-        SubPoolNode subPool = new SubPoolNode();
-
-        address _subPoolAddress = address(subPool);
+        SubPoolNode _subPool = new SubPoolNode();
+        address _subPoolAddress = address(_subPool);
 
         subPools[_subPoolAddress] = SubPoolLib.SubPoolInfo({
             id: nextSubPoolID,
@@ -25,38 +25,39 @@ contract SubPoolManager {
             balance: 0
         });
 
-        subPool.setParentSubPool(address(this));
+        _subPool.setParentSubPool(address(this));
         _initialDeposit(_subPoolAddress, _amount);
-
         nextSubPoolID++;
 
-        return address(subPool);
+        return _subPoolAddress;
     }
 
     function createNode(address _parentSubPoolAddress, uint256 _amount) external returns (address, uint256) {
-        SubPoolNode subPool = new SubPoolNode();
-        uint256 subPoolId = join(_parentSubPoolAddress, address(subPool), _amount);
-        return (address(subPool), subPoolId);
+        SubPoolNode _subPool = new SubPoolNode();
+        address _subPoolAddress = address(_subPool);
+        uint256 _subPoolId = _join(_parentSubPoolAddress, _subPoolAddress, _amount);
+
+        return (_subPoolAddress, _subPoolId);
     }
 
-    function join(address _parentSubPoolAddress, address _subPoolAddress, uint256 _amount) internal returns (uint256) {
+    function _join(address _parentSubPoolAddress, address _subPoolAddress, uint256 _amount) internal returns (uint256) {
         SubPoolNode _parentSubPool = SubPoolNode(_parentSubPoolAddress);
         SubPoolNode _subPool = SubPoolNode(_subPoolAddress);
 
-        uint256 subPoolId = _parentSubPool.join(_subPoolAddress, _amount);
+        uint256 _subPoolId = _parentSubPool.join(_subPoolAddress, _amount);
         _subPool.setParentSubPool(_parentSubPoolAddress);
 
-        return subPoolId;
+        return _subPoolId;
     }
 
-    function _initialDeposit(address _subPoolAddress, uint256 _amount) internal  {
-        subPools[_subPoolAddress].initialDeposit(_amount);
+    function _initialDeposit(address _subPoolAddress, uint256 _amount) internal {
+        subPools[_subPoolAddress]._initialDeposit(_amount);
     }
 
     function additionalDeposit(address _subPoolAddress, uint256 _amount) external {
-        bool isNode = subPools[_subPoolAddress].checkSenderIsNode(msg.sender, _subPoolAddress);
+        bool isNode = subPools[_subPoolAddress]._checkSenderIsNode(msg.sender, _subPoolAddress);
         if (!isNode) revert NotAllowed();
 
-        subPools[_subPoolAddress].additionalDeposit(_amount);
+        subPools[_subPoolAddress]._additionalDeposit(_amount);
     }
 }
