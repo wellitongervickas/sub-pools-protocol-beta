@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.17;
 
-
 library SubPoolLib {
     struct SubPoolInfo {
         uint256 id;
@@ -17,7 +16,11 @@ library SubPoolLib {
         _self.balance += _amount;
     }
 
-    function _checkSenderIsNode(SubPoolInfo storage _self, address _sender, address _subPoolAddress) internal view returns (bool) {
+    function _checkSenderIsNode(
+        SubPoolInfo storage _self,
+        address _sender,
+        address _subPoolAddress
+    ) internal view returns (bool) {
         return _sender == _subPoolAddress && _self.id > 0;
     }
 }

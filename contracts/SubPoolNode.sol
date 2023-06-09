@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "./lib/SubPoolLib.sol";
-
+import '@openzeppelin/contracts/access/Ownable.sol';
+import './lib/SubPoolLib.sol';
 
 contract SubPoolNode is Ownable {
     using SubPoolLib for SubPoolLib.SubPoolInfo;
@@ -12,7 +11,7 @@ contract SubPoolNode is Ownable {
     uint256 public nextSubPoolID = 1;
 
     mapping(address => SubPoolLib.SubPoolInfo) public subPools;
-  
+
     error ParentNotFound();
     error NotAllowed();
 
@@ -23,18 +22,14 @@ contract SubPoolNode is Ownable {
     function join(address _subPoolAddress, uint256 _amount) external onlyOwner returns (uint256) {
         if (_checkEmptyParentSubPool()) revert ParentNotFound();
 
-        subPools[_subPoolAddress] = SubPoolLib.SubPoolInfo({
-            id: nextSubPoolID,
-            initialBalance: 0,
-            balance: 0
-        });
+        subPools[_subPoolAddress] = SubPoolLib.SubPoolInfo({id: nextSubPoolID, initialBalance: 0, balance: 0});
 
         _initialDeposit(_subPoolAddress, _amount);
         nextSubPoolID++;
 
         return subPools[_subPoolAddress].id;
     }
-    
+
     function _initialDeposit(address _subPoolAddress, uint256 _amount) internal {
         subPools[_subPoolAddress]._initialDeposit(_amount);
         _updateParentBalance(_amount);
