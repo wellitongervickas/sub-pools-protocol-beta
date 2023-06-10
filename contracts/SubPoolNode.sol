@@ -1,21 +1,38 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.17;
 
+import '@openzeppelin/contracts/access/AccessControl.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import './lib/SubPoolLib.sol';
 
-contract SubPoolNode is Ownable {
-    using SubPoolLib for SubPoolLib.SubPoolInfo;
+contract SubPoolNode is Ownable, AccessControl {
+    using SubPoolLib for SubPoolLib.SubPool;
 
+    // roles
+    bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
+    bytes32 public constant INVITED_ROLE = keccak256('INVITED_ROLE');
+
+    // general state
     address public parentSubPool;
     uint256 public nextSubPoolID = 1;
-    mapping(address => SubPoolLib.SubPoolInfo) public subPools;
 
+    // nodes
+    mapping(address => SubPoolLib.SubPool) public subPools;
+
+    // events and errors
     error ParentNotFound();
     error NotAllowed();
 
+    constructor(address _managerAddress) {
+        _setupRole(MANAGER_ROLE, _managerAddress);
+    }
+
+    function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
+        _setupRole(INVITED_ROLE, _invitedAddress);
+    }
+
     /**
-     * @notice Set the parent subpool
+     * @dev Set the parent subpool
      * @param _parentSubPool The address of the parent subpool
      */
     function setParentSubPool(address _parentSubPool) external onlyOwner {
@@ -23,15 +40,16 @@ contract SubPoolNode is Ownable {
     }
 
     /**
-     * @notice Join the subpool itself
+     * @dev Join the subpool itself as node subpool
      * @param _subPoolAddress The address of the subpool
      * @param _amount The amount of the initial deposit
      * @return The ID of the subpool
      */
     function join(address _subPoolAddress, uint256 _amount) external onlyOwner returns (uint256) {
         if (_checkEmptyParent()) revert ParentNotFound();
+        if (!hasRole(INVITED_ROLE, tx.origin)) revert NotAllowed();
 
-        subPools[_subPoolAddress] = SubPoolLib.SubPoolInfo({id: nextSubPoolID, initialBalance: 0, balance: 0});
+        subPools[_subPoolAddress] = SubPoolLib.SubPool({id: nextSubPoolID, initialBalance: 0, balance: 0});
 
         _initialDeposit(_subPoolAddress, _amount);
         nextSubPoolID++;
@@ -40,7 +58,7 @@ contract SubPoolNode is Ownable {
     }
 
     /**
-     * @notice update the initial deposit and balance on the parent subpool
+     * @dev update the initial deposit and balance on the parent subpool
      * @param _subPoolAddress The address of the subpool
      * @param _amount The amount of the initial deposit
      */
@@ -50,7 +68,7 @@ contract SubPoolNode is Ownable {
     }
 
     /**
-     * @notice Additional deposit of a sub pool and update parent balance
+     * @dev Additional deposit of a sub pool and update parent balance
      * @param _subPoolAddress The address of the sub pool
      * @param _amount The amount of the additional deposit
      */
@@ -63,7 +81,7 @@ contract SubPoolNode is Ownable {
     }
 
     /**
-     * @notice Update the balance of subpool on the parent subpool itself
+     * @dev Update the balance of subpool on the parent subpool itself
      * @param _amount The amount of additional deposit
      */
     function _updateParentBalance(uint256 _amount) internal {
@@ -72,7 +90,7 @@ contract SubPoolNode is Ownable {
     }
 
     /**
-     * @notice Check if the parent subpool is empty
+     * @dev Check if the parent subpool is empty
      */
     function _checkEmptyParent() internal view returns (bool) {
         return parentSubPool == address(0);

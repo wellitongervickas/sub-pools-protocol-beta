@@ -5,25 +5,25 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import './SubPoolNode.sol';
 import './lib/SubPoolLib.sol';
 
-contract SubPoolManager {
-    using SubPoolLib for SubPoolLib.SubPoolInfo;
+contract SubPoolRouter {
+    using SubPoolLib for SubPoolLib.SubPool;
 
     uint256 public nextMainPoolID = 1;
-    mapping(address => SubPoolLib.SubPoolInfo) public subPools;
+    mapping(address => SubPoolLib.SubPool) public subPools;
 
     error NotSubPool();
 
     /**
-     * @notice Create a new main subpool
+     * @dev Create a new main subpool
      * @param _amount The amount of the initial deposit
      * @return The address of the new main subpool
      */
 
     function createMain(uint256 _amount) external returns (address) {
-        SubPoolNode _subPool = new SubPoolNode();
+        SubPoolNode _subPool = new SubPoolNode(msg.sender);
         address _subPoolAddress = address(_subPool);
 
-        subPools[_subPoolAddress] = SubPoolLib.SubPoolInfo({id: nextMainPoolID, initialBalance: 0, balance: 0});
+        subPools[_subPoolAddress] = SubPoolLib.SubPool({id: nextMainPoolID, initialBalance: 0, balance: 0});
 
         _subPool.setParentSubPool(address(this));
         _initialDeposit(_subPoolAddress, _amount);
@@ -34,14 +34,14 @@ contract SubPoolManager {
     }
 
     /**
-     * @notice Create a new subpool node
+     * @dev Create a new subpool node
      * @param _parentSubPoolAddress The address of the parent subpool
      * @param _amount The amount of the initial deposit
      * @return The address of the new subpool node
      * @return The ID of the new subpool node
      */
     function createNode(address _parentSubPoolAddress, uint256 _amount) external returns (address, uint256) {
-        SubPoolNode _subPool = new SubPoolNode();
+        SubPoolNode _subPool = new SubPoolNode(msg.sender);
 
         address _subPoolAddress = address(_subPool);
         uint256 _subPoolId = _join(_parentSubPoolAddress, _subPoolAddress, _amount);
@@ -50,7 +50,7 @@ contract SubPoolManager {
     }
 
     /**
-     * @notice Join a subpool node
+     * @dev Join a subpool node
      * @param _parentSubPoolAddress The address of the parent subpool
      * @param _subPoolAddress The address of the subpool node
      * @param _amount The amount of the initial deposit
@@ -68,7 +68,7 @@ contract SubPoolManager {
     }
 
     /**
-     * @notice Initial deposit of a main sub pool
+     * @dev Initial deposit of a main sub pool
      * @param _subPoolAddress The address of the main sub pool
      * @param _amount The amount of the initial deposit
      */
@@ -77,7 +77,7 @@ contract SubPoolManager {
     }
 
     /**
-     * @notice Additional deposit of a sub pool
+     * @dev Additional deposit of a sub pool
      * @param _subPoolAddress The address of the sub pool
      * @param _amount The amount of the additional deposit
      */
