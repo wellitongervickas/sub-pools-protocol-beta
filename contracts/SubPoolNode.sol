@@ -37,7 +37,7 @@ contract SubPoolNode is Ownable, AccessControl {
      * @param _parentSubPool The address of the parent subpool
      */
     function setParentSubPool(address _parentSubPool) external onlyOwner {
-        if (!_checkEmptyParent()) revert NotAllowed();
+        if (_checkHasParent()) revert NotAllowed();
         parentSubPool = _parentSubPool;
     }
 
@@ -48,8 +48,8 @@ contract SubPoolNode is Ownable, AccessControl {
      * @return The ID of the subpool
      */
     function join(address _subPoolAddress, uint256 _amount) external onlyOwner returns (uint256) {
-        if (_checkEmptyParent()) revert ParentNotFound();
-        if (!hasRole(INVITED_ROLE, tx.origin)) revert NotAllowed();
+        if (!_checkHasParent()) revert ParentNotFound();
+        if (!_checkIsInvited(tx.origin)) revert NotAllowed();
 
         subPools[_subPoolAddress] = SubPoolLib.SubPool({id: nextSubPoolID, initialBalance: 0, balance: 0});
 
@@ -59,6 +59,10 @@ contract SubPoolNode is Ownable, AccessControl {
         nextSubPoolID++;
 
         return subPools[_subPoolAddress].id;
+    }
+
+    function _checkIsInvited(address _nodeManagerAddress) internal view returns (bool) {
+        return hasRole(INVITED_ROLE, _nodeManagerAddress);
     }
 
     function _updateNodeManagerRole(address _nodeManagerAddress) internal {
@@ -101,7 +105,7 @@ contract SubPoolNode is Ownable, AccessControl {
     /**
      * @dev Check if the parent subpool is empty
      */
-    function _checkEmptyParent() internal view returns (bool) {
-        return parentSubPool == address(0);
+    function _checkHasParent() internal view returns (bool) {
+        return parentSubPool != address(0);
     }
 }
