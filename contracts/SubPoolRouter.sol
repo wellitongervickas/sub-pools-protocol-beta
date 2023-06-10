@@ -11,7 +11,7 @@ contract SubPoolRouter {
     uint256 public nextMainPoolID = 1;
     mapping(address => SubPoolLib.SubPool) public subPools;
 
-    error NotSubPool();
+    error NotAllowed();
 
     /**
      * @dev Create a new main subpool
@@ -83,7 +83,7 @@ contract SubPoolRouter {
      */
     function additionalDeposit(address _subPoolAddress, uint256 _amount) external {
         bool isNode = subPools[_subPoolAddress]._checkIsNode(msg.sender, _subPoolAddress);
-        if (!isNode) revert NotSubPool();
+        if (!isNode) revert NotAllowed();
 
         subPools[_subPoolAddress]._additionalDeposit(_amount);
     }
