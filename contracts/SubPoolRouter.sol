@@ -77,12 +77,12 @@ contract SubPoolRouter {
     }
 
     /**
-     * @dev Additional deposit of a sub pool
+     * @dev Additional deposit of subpool node
      * @param _subPoolAddress The address of the sub pool
      * @param _amount The amount of the additional deposit
      */
     function additionalDeposit(address _subPoolAddress, uint256 _amount) external {
-        bool isNode = subPools[_subPoolAddress]._checkSenderIsNode(msg.sender, _subPoolAddress);
+        bool isNode = subPools[_subPoolAddress]._checkIsNode(msg.sender, _subPoolAddress);
         if (!isNode) revert NotSubPool();
 
         subPools[_subPoolAddress]._additionalDeposit(_amount);

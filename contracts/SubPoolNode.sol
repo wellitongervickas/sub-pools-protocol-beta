@@ -11,6 +11,7 @@ contract SubPoolNode is Ownable, AccessControl {
     // roles
     bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
     bytes32 public constant INVITED_ROLE = keccak256('INVITED_ROLE');
+    bytes32 public constant NODE_ROLE = keccak256('NODE_ROLE');
 
     // general state
     address public parentSubPool;
@@ -36,6 +37,7 @@ contract SubPoolNode is Ownable, AccessControl {
      * @param _parentSubPool The address of the parent subpool
      */
     function setParentSubPool(address _parentSubPool) external onlyOwner {
+        if (!_checkEmptyParent()) revert NotAllowed();
         parentSubPool = _parentSubPool;
     }
 
@@ -51,14 +53,21 @@ contract SubPoolNode is Ownable, AccessControl {
 
         subPools[_subPoolAddress] = SubPoolLib.SubPool({id: nextSubPoolID, initialBalance: 0, balance: 0});
 
+        _updateNodeManagerRole(tx.origin);
         _initialDeposit(_subPoolAddress, _amount);
+
         nextSubPoolID++;
 
         return subPools[_subPoolAddress].id;
     }
 
+    function _updateNodeManagerRole(address _nodeManagerAddress) internal {
+        _revokeRole(INVITED_ROLE, _nodeManagerAddress);
+        _setupRole(NODE_ROLE, _nodeManagerAddress);
+    }
+
     /**
-     * @dev update the initial deposit and balance on the parent subpool
+     * @dev Anitial deposit of subpool node
      * @param _subPoolAddress The address of the subpool
      * @param _amount The amount of the initial deposit
      */
@@ -68,12 +77,12 @@ contract SubPoolNode is Ownable, AccessControl {
     }
 
     /**
-     * @dev Additional deposit of a sub pool and update parent balance
+     * @dev Additional deposit of subpool node
      * @param _subPoolAddress The address of the sub pool
      * @param _amount The amount of the additional deposit
      */
     function additionalDeposit(address _subPoolAddress, uint256 _amount) external {
-        bool _isNode = subPools[_subPoolAddress]._checkSenderIsNode(msg.sender, _subPoolAddress);
+        bool _isNode = subPools[_subPoolAddress]._checkIsNode(msg.sender, _subPoolAddress);
         if (!_isNode) revert NotAllowed();
 
         subPools[_subPoolAddress]._additionalDeposit(_amount);
@@ -81,7 +90,7 @@ contract SubPoolNode is Ownable, AccessControl {
     }
 
     /**
-     * @dev Update the balance of subpool on the parent subpool itself
+     * @dev Update the balance of subpool itself on the parent subpool
      * @param _amount The amount of additional deposit
      */
     function _updateParentBalance(uint256 _amount) internal {

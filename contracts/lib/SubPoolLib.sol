@@ -16,7 +16,7 @@ library SubPoolLib {
         _self.balance += _amount;
     }
 
-    function _checkSenderIsNode(
+    function _checkIsNode(
         SubPool storage _self,
         address _sender,
         address _subPoolAddress
