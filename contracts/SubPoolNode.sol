@@ -23,7 +23,7 @@ contract SubPoolNode is Ownable {
     }
 
     /**
-     * @notice Join a subpool
+     * @notice Join the subpool itself
      * @param _subPoolAddress The address of the subpool
      * @param _amount The amount of the initial deposit
      * @return The ID of the subpool
@@ -50,7 +50,7 @@ contract SubPoolNode is Ownable {
     }
 
     /**
-     * @notice Additional deposit of a sub pool
+     * @notice Additional deposit of a sub pool and update parent balance
      * @param _subPoolAddress The address of the sub pool
      * @param _amount The amount of the additional deposit
      */
@@ -63,7 +63,7 @@ contract SubPoolNode is Ownable {
     }
 
     /**
-     * @notice Update the balance of subpool itself on the parent subpool
+     * @notice Update the balance of subpool on the parent subpool itself
      * @param _amount The amount of additional deposit
      */
     function _updateParentBalance(uint256 _amount) internal {
