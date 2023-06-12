@@ -19,8 +19,8 @@ contract SubPoolNode is Ownable, AccessControl {
     bytes32 public constant NODE_ROLE = keccak256('NODE_ROLE');
 
     // general state
-    ManagerLib.Manager public manager;
     address public parentSubPool;
+    ManagerLib.Manager public manager;
     Counters.Counter private nextSubPoolID;
 
     // nodes

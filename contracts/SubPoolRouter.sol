@@ -11,9 +11,11 @@ contract SubPoolRouter {
     using SubPoolLib for SubPoolLib.SubPool;
     using Counters for Counters.Counter;
 
-    Counters.Counter private nextMainPoolID;
+    Counters.Counter public nextMainPoolID;
     mapping(address => SubPoolLib.SubPool) public subPools;
 
+    // events and errors
+    event MainSubPoolCreated(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
     error NotAllowed();
 
     /**
@@ -23,7 +25,15 @@ contract SubPoolRouter {
      */
 
     function createMain(uint256 _amount) external returns (address) {
-        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount);
+        address _subPoolAddress = _setupMainNode(msg.sender, _amount);
+
+        emit MainSubPoolCreated(_subPoolAddress, subPools[_subPoolAddress].id, _amount);
+
+        return _subPoolAddress;
+    }
+
+    function _setupMainNode(address _manager, uint256 _amount) internal returns (address) {
+        SubPoolNode _subPool = new SubPoolNode(_manager, _amount);
         address _subPoolAddress = address(_subPool);
 
         nextMainPoolID.increment();
