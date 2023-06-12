@@ -3,11 +3,12 @@ pragma solidity =0.8.17;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 
 import './SubPoolNode.sol';
 import './lib/SubPoolLib.sol';
 
-contract SubPoolRouter {
+contract SubPoolRouter is Ownable {
     using SubPoolLib for SubPoolLib.SubPool;
     using Counters for Counters.Counter;
 
@@ -24,16 +25,8 @@ contract SubPoolRouter {
      * @return The address of the new main subpool
      */
 
-    function createMain(uint256 _amount) external returns (address) {
-        address _subPoolAddress = _setupMainNode(msg.sender, _amount);
-
-        emit MainSubPoolCreated(_subPoolAddress, subPools[_subPoolAddress].id, _amount);
-
-        return _subPoolAddress;
-    }
-
-    function _setupMainNode(address _manager, uint256 _amount) internal returns (address) {
-        SubPoolNode _subPool = new SubPoolNode(_manager, _amount);
+    function createMain(uint256 _amount) external onlyOwner returns (address) {
+        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount);
         address _subPoolAddress = address(_subPool);
 
         nextMainPoolID.increment();
@@ -41,6 +34,8 @@ contract SubPoolRouter {
 
         _subPool.setParentSubPool(address(this));
         _initialDeposit(_subPoolAddress, _amount);
+
+        emit MainSubPoolCreated(_subPoolAddress, subPools[_subPoolAddress].id, _amount);
 
         return _subPoolAddress;
     }
@@ -52,7 +47,7 @@ contract SubPoolRouter {
      * @return The address of the new subpool node
      * @return The ID of the new subpool node
      */
-    function createNode(address _parentSubPoolAddress, uint256 _amount) external returns (address, uint256) {
+    function createNode(address _parentSubPoolAddress, uint256 _amount) external onlyOwner returns (address, uint256) {
         SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount);
 
         address _subPoolAddress = address(_subPool);
