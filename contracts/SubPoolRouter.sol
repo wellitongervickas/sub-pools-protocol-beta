@@ -2,13 +2,16 @@
 pragma solidity =0.8.17;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/utils/Counters.sol';
+
 import './SubPoolNode.sol';
 import './lib/SubPoolLib.sol';
 
 contract SubPoolRouter {
     using SubPoolLib for SubPoolLib.SubPool;
+    using Counters for Counters.Counter;
 
-    uint256 public nextMainPoolID = 1;
+    Counters.Counter private nextMainPoolID;
     mapping(address => SubPoolLib.SubPool) public subPools;
 
     error NotAllowed();
@@ -20,15 +23,14 @@ contract SubPoolRouter {
      */
 
     function createMain(uint256 _amount) external returns (address) {
-        SubPoolNode _subPool = new SubPoolNode(msg.sender);
+        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount);
         address _subPoolAddress = address(_subPool);
 
-        subPools[_subPoolAddress] = SubPoolLib.SubPool({id: nextMainPoolID, initialBalance: 0, balance: 0});
+        nextMainPoolID.increment();
+        subPools[_subPoolAddress] = SubPoolLib.SubPool({id: nextMainPoolID.current(), initialBalance: 0, balance: 0});
 
         _subPool.setParentSubPool(address(this));
         _initialDeposit(_subPoolAddress, _amount);
-
-        nextMainPoolID++;
 
         return _subPoolAddress;
     }
@@ -41,7 +43,7 @@ contract SubPoolRouter {
      * @return The ID of the new subpool node
      */
     function createNode(address _parentSubPoolAddress, uint256 _amount) external returns (address, uint256) {
-        SubPoolNode _subPool = new SubPoolNode(msg.sender);
+        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount);
 
         address _subPoolAddress = address(_subPool);
         uint256 _subPoolId = _join(_parentSubPoolAddress, _subPoolAddress, _amount);
