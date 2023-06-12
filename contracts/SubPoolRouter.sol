@@ -15,8 +15,11 @@ contract SubPoolRouter is Ownable {
     Counters.Counter public nextMainPoolID;
     mapping(address => SubPoolLib.SubPool) public subPools;
 
-    // events and errors
-    event MainSubPoolCreated(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
+    // events
+    event SubPoolMainCreated(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
+    event SubPoolNodeCreated(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
+
+    // errors
     error NotAllowed();
 
     /**
@@ -35,7 +38,7 @@ contract SubPoolRouter is Ownable {
         _subPool.setParentSubPool(address(this));
         _initialDeposit(_subPoolAddress, _amount);
 
-        emit MainSubPoolCreated(_subPoolAddress, subPools[_subPoolAddress].id, _amount);
+        emit SubPoolMainCreated(_subPoolAddress, subPools[_subPoolAddress].id, _amount);
 
         return _subPoolAddress;
     }
@@ -44,16 +47,17 @@ contract SubPoolRouter is Ownable {
      * @dev Create a new subpool node
      * @param _parentSubPoolAddress The address of the parent subpool
      * @param _amount The amount of the initial deposit
-     * @return The address of the new subpool node
-     * @return The ID of the new subpool node
+     * @return bytes The address and the ID of the new subpool node
      */
-    function createNode(address _parentSubPoolAddress, uint256 _amount) external onlyOwner returns (address, uint256) {
+    function createNode(address _parentSubPoolAddress, uint256 _amount) external onlyOwner returns (bytes memory) {
         SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount);
 
         address _subPoolAddress = address(_subPool);
         uint256 _subPoolId = _join(_parentSubPoolAddress, _subPoolAddress, _amount);
 
-        return (_subPoolAddress, _subPoolId);
+        emit SubPoolNodeCreated(_subPoolAddress, _subPoolId, _amount);
+
+        return abi.encode(_subPoolAddress, _subPoolId);
     }
 
     /**
