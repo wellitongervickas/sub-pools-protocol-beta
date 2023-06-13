@@ -22,6 +22,22 @@ describe('SubPoolNode', () => {
     return { subPoolNode }
   }
 
+  async function deployRountedNodeFixture() {
+    const [manager, other] = await ethers.getSigners()
+
+    const { subPoolRouter } = await loadFixture(deployRounterFixture)
+    const { subPoolNode } = await loadFixture(deployNodeFixture.bind(null, manager.address, 0, []))
+    const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture.bind(null, other.address, 0, []))
+
+    const routerAddress = await subPoolRouter.getAddress()
+
+    await subPoolNode.setParentSubPool(routerAddress)
+    await subPoolNode.invite(other.address)
+    await subPoolNode.transferOwnership(routerAddress)
+
+    return { subPoolRouter, subPoolNode, subPoolNode2 }
+  }
+
   describe('Deploy', () => {
     it('should set the right initial node subpool ID', async function () {
       const [manager] = await ethers.getSigners()
@@ -108,22 +124,14 @@ describe('SubPoolNode', () => {
     })
 
     it('should revert if try to invite an already node manager', async function () {
-      const [manager, other] = await ethers.getSigners()
-
-      const { subPoolRouter } = await loadFixture(deployRounterFixture)
-      const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 0, []))
-      const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture.bind(this, other.address, 0, []))
-
-      const routerAddress = await subPoolRouter.getAddress()
-
-      await subPoolNode.setParentSubPool(routerAddress)
-      await subPoolNode.invite(other.address)
-      await subPoolNode.transferOwnership(routerAddress)
+      const [, other] = await ethers.getSigners()
+      const { subPoolNode2, subPoolNode, subPoolRouter } = await loadFixture(deployRountedNodeFixture)
 
       const subNodeAddress = await subPoolNode.getAddress()
       const subNodeAddress2 = await subPoolNode2.getAddress()
 
       const subPoolRouterNewInstance = subPoolRouter.connect(other) as SubPoolRouter
+      // @dev this last argument has changed to be used as _subPoolAddress and keep the same interface as router
       await subPoolRouterNewInstance.createNode(subNodeAddress, 0, [subNodeAddress2])
 
       await expect(subPoolNode.invite(other.address)).to.be.rejectedWith('NotAllowed()')
@@ -141,5 +149,12 @@ describe('SubPoolNode', () => {
     })
   })
 
-  describe('Events', () => {})
+  describe('Events', () => {
+    it('should emit NodeManagerInvited event when invite a new node manager', async function () {
+      const [manager, other] = await ethers.getSigners()
+      const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 0, []))
+
+      await expect(subPoolNode.invite(other.address)).to.emit(subPoolNode, 'NodeManagerInvited').withArgs(other.address)
+    })
+  })
 })
