@@ -26,7 +26,10 @@ contract SubPoolNode is Ownable, AccessControl {
     // nodes
     mapping(address => SubPoolLib.SubPool) public subPools;
 
-    // events and errors
+    // events
+    event NodeManagerInvited(address indexed _invitedAddress);
+
+    // errors
     error ParentNotFound();
     error NotAllowed();
 
@@ -34,7 +37,7 @@ contract SubPoolNode is Ownable, AccessControl {
         manager = ManagerLib.Manager({managerAddress: _managerAddress, initialBalance: _amount, balance: 0});
 
         _setupInitialInvites(_invitedAddresses);
-        _grantRole(MANAGER_ROLE, manager.managerAddress);
+        _grantRole(MANAGER_ROLE, _managerAddress);
     }
 
     /**
@@ -52,9 +55,13 @@ contract SubPoolNode is Ownable, AccessControl {
      * @param _invitedAddress The address of the invited node manager
      */
     function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
+        if (_checkIsManagerAddress(_invitedAddress)) revert NotAllowed();
         if (_checkIsNodeManagerAddress(_invitedAddress)) revert NotAllowed();
         if (_checkIsInvitedAddress(_invitedAddress)) revert NotAllowed();
+
         _grantRole(INVITED_ROLE, _invitedAddress);
+
+        emit NodeManagerInvited(_invitedAddress);
     }
 
     /**
@@ -140,8 +147,12 @@ contract SubPoolNode is Ownable, AccessControl {
 
     /**
      * @dev Check if the address is node manager
-     * @param _nodeManagerAddress The address of the node manager
+     * @param _address The address of the requester
      */
+    function _checkIsManagerAddress(address _address) internal view returns (bool) {
+        return hasRole(MANAGER_ROLE, _address);
+    }
+
     function _checkIsNodeManagerAddress(address _nodeManagerAddress) internal view returns (bool) {
         return hasRole(NODE_ROLE, _nodeManagerAddress);
     }

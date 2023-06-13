@@ -14,8 +14,8 @@ describe('SubPoolNode', () => {
 
   describe('Deploy', () => {
     it('should set the right initial node subpool ID', async function () {
-      const [, other] = await ethers.getSigners()
-      const { subPoolNode } = await loadFixture(deployRouterFixture.bind(null, other.address, 100, []))
+      const [manager] = await ethers.getSigners()
+      const { subPoolNode } = await loadFixture(deployRouterFixture.bind(null, manager.address, 100, []))
 
       expect(await subPoolNode.nextSubPoolID()).to.equal(0)
     })
@@ -45,5 +45,41 @@ describe('SubPoolNode', () => {
       const [, , managerBlance] = await subPoolNode.manager()
       expect(managerBlance).to.equal(ethers.toBigInt(0))
     })
+
+    it('should set the right role to manager address', async function () {
+      const amount = 100
+      const role = ethers.keccak256(ethers.toUtf8Bytes('MANAGER_ROLE'))
+      const [manager] = await ethers.getSigners()
+      const { subPoolNode } = await loadFixture(deployRouterFixture.bind(null, manager.address, amount, []))
+
+      expect(await subPoolNode.hasRole(role, manager.address)).to.be.true
+    })
+
+    it('should set the right role to invited addresses', async function () {
+      const amount = 100
+      const role = ethers.keccak256(ethers.toUtf8Bytes('INVITED_ROLE'))
+      const [manager, other] = await ethers.getSigners()
+      const { subPoolNode } = await loadFixture(
+        deployRouterFixture.bind(null, manager.address, amount, [other.address])
+      )
+
+      expect(await subPoolNode.hasRole(role, other.address)).to.be.true
+    })
   })
+
+  describe('Validations', () => {
+    it('should revert if manager try to invite himself', async function () {
+      const amount = 100
+      const [manager, other] = await ethers.getSigners()
+      const { subPoolNode } = await loadFixture(deployRouterFixture.bind(null, manager.address, amount, []))
+
+      await subPoolNode.invite(other.address)
+
+      await expect(subPoolNode.invite(other.address)).to.be.rejectedWith('NotAllowed()')
+    })
+
+    it('should revert if try to invite an already node manager address', async function () {})
+  })
+
+  describe('Events', () => {})
 })
