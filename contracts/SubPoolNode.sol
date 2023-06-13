@@ -30,9 +30,21 @@ contract SubPoolNode is Ownable, AccessControl {
     error ParentNotFound();
     error NotAllowed();
 
-    constructor(address _managerAddress, uint256 _amount) {
+    constructor(address _managerAddress, uint256 _amount, address[] memory _invitedAddresses) {
         manager = ManagerLib.Manager({managerAddress: _managerAddress, initialBalance: _amount, balance: 0});
+
+        _setupInitialInvites(_invitedAddresses);
         _grantRole(MANAGER_ROLE, manager.managerAddress);
+    }
+
+    /**
+     * @dev setup the role of invited addressess
+     * @param _invitedAddresses The addresses of the invited node managers
+     */
+    function _setupInitialInvites(address[] memory _invitedAddresses) internal {
+        for (uint256 i = 0; i < _invitedAddresses.length; i++) {
+            _grantRole(INVITED_ROLE, _invitedAddresses[i]);
+        }
     }
 
     /**

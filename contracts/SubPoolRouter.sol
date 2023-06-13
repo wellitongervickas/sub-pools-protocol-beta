@@ -28,8 +28,8 @@ contract SubPoolRouter {
      * @return The address of the new main subpool
      */
 
-    function createMain(uint256 _amount) external returns (address) {
-        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount);
+    function createMain(uint256 _amount, address[] memory _invitedAddresses) external returns (address) {
+        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _invitedAddresses);
         address _subPoolAddress = address(_subPool);
 
         nextMainPoolID.increment();
@@ -49,8 +49,12 @@ contract SubPoolRouter {
      * @param _amount The amount of the initial deposit
      * @return bytes The address and the ID of the new subpool node
      */
-    function createNode(address _parentSubPoolAddress, uint256 _amount) external returns (address) {
-        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount);
+    function createNode(
+        address _parentSubPoolAddress,
+        uint256 _amount,
+        address[] memory _invitedAddresses
+    ) external returns (address) {
+        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _invitedAddresses);
 
         address _subPoolAddress = address(_subPool);
         uint256 _subPoolId = _join(_parentSubPoolAddress, _subPoolAddress, _amount);
