@@ -8,7 +8,7 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import './SubPoolNode.sol';
 import './lib/SubPoolLib.sol';
 
-contract SubPoolRouter is Ownable {
+contract SubPoolRouter {
     using SubPoolLib for SubPoolLib.SubPool;
     using Counters for Counters.Counter;
 
@@ -28,7 +28,7 @@ contract SubPoolRouter is Ownable {
      * @return The address of the new main subpool
      */
 
-    function createMain(uint256 _amount) external onlyOwner returns (address) {
+    function createMain(uint256 _amount) external returns (address) {
         SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount);
         address _subPoolAddress = address(_subPool);
 
@@ -49,7 +49,7 @@ contract SubPoolRouter is Ownable {
      * @param _amount The amount of the initial deposit
      * @return bytes The address and the ID of the new subpool node
      */
-    function createNode(address _parentSubPoolAddress, uint256 _amount) external onlyOwner returns (bytes memory) {
+    function createNode(address _parentSubPoolAddress, uint256 _amount) external returns (address) {
         SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount);
 
         address _subPoolAddress = address(_subPool);
@@ -57,7 +57,7 @@ contract SubPoolRouter is Ownable {
 
         emit SubPoolNodeCreated(_subPoolAddress, _subPoolId, _amount);
 
-        return abi.encode(_subPoolAddress, _subPoolId);
+        return _subPoolAddress;
     }
 
     /**
