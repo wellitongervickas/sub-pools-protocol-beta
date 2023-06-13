@@ -33,6 +33,7 @@ contract SubPoolNode is Ownable, AccessControl {
     // errors
     error ParentNotFound();
     error NotAllowed();
+    error NotInvited();
 
     constructor(address _managerAddress, uint256 _amount, address[] memory _invitedAddresses) {
         manager = ManagerLib.Manager({managerAddress: _managerAddress, initialBalance: _amount, balance: 0});
@@ -82,7 +83,7 @@ contract SubPoolNode is Ownable, AccessControl {
      */
     function join(address _subPoolAddress, uint256 _amount) external onlyOwner returns (uint256) {
         if (!_checkHasParent()) revert ParentNotFound();
-        if (!_checkIsInvitedAddress(tx.origin)) revert NotAllowed();
+        if (!_checkIsInvitedAddress(tx.origin)) revert NotInvited();
 
         nextSubPoolID.increment();
         subPools[_subPoolAddress] = SubPoolLib.SubPool({id: nextSubPoolID.current(), initialBalance: 0, balance: 0});
