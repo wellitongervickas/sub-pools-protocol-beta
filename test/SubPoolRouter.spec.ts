@@ -54,15 +54,7 @@ describe('SubPoolRouter', () => {
         const [subPoolAddress] = receipt.logs[2].args
         const [id, initialBalance, balance] = await subPoolRouter.subPools(subPoolAddress)
 
-        expect({
-          id: id.toString(),
-          initialBalance: initialBalance.toString(),
-          balance: balance.toString(),
-        }).to.deep.equal({
-          id: '1',
-          initialBalance: `${amount}`,
-          balance: '0',
-        })
+        expect([id.toString(), initialBalance.toString(), balance.toString()]).to.deep.equal(['1', `${amount}`, '0'])
       })
     })
 
@@ -100,15 +92,11 @@ describe('SubPoolRouter', () => {
 
         const [id, initialBalance, balance] = await subPoolRouter.subPools(subPoolAddress)
 
-        expect({
-          id: id.toString(),
-          initialBalance: initialBalance.toString(),
-          balance: balance.toString(),
-        }).to.deep.equal({
-          id: '1',
-          initialBalance: `${amount}`,
-          balance: `${amount}`,
-        })
+        expect([id.toString(), initialBalance.toString(), balance.toString()]).to.deep.equal([
+          '1',
+          `${amount}`,
+          `${amount}`,
+        ])
       })
     })
 
