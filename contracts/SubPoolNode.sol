@@ -28,6 +28,7 @@ contract SubPoolNode is Ownable, AccessControl {
 
     // events
     event NodeManagerInvited(address indexed _invitedAddress);
+    event NodeManagerJoined(address indexed _nodeManagerAddress, uint256 indexed _subPoolID);
 
     // errors
     error ParentNotFound();
@@ -56,8 +57,8 @@ contract SubPoolNode is Ownable, AccessControl {
      */
     function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
         if (_checkIsManagerAddress(_invitedAddress)) revert NotAllowed();
-        if (_checkIsNodeManagerAddress(_invitedAddress)) revert NotAllowed();
         if (_checkIsInvitedAddress(_invitedAddress)) revert NotAllowed();
+        if (_checkIsNodeManagerAddress(_invitedAddress)) revert NotAllowed();
 
         _grantRole(INVITED_ROLE, _invitedAddress);
 
@@ -88,6 +89,8 @@ contract SubPoolNode is Ownable, AccessControl {
 
         _updateNodeManagerRole(tx.origin);
         _initialDeposit(_subPoolAddress, _amount);
+
+        emit NodeManagerJoined(tx.origin, subPools[_subPoolAddress].id);
 
         return subPools[_subPoolAddress].id;
     }
