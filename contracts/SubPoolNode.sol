@@ -21,7 +21,7 @@ contract SubPoolNode is Ownable, AccessControl {
     // general state
     address public parentSubPool;
     ManagerLib.Manager public manager;
-    Counters.Counter private nextSubPoolID;
+    Counters.Counter public nextSubPoolID;
 
     // nodes
     mapping(address => SubPoolLib.SubPool) public subPools;
@@ -53,6 +53,7 @@ contract SubPoolNode is Ownable, AccessControl {
      */
     function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
         if (_checkIsNodeManagerAddress(_invitedAddress)) revert NotAllowed();
+        if (_checkIsInvitedAddress(_invitedAddress)) revert NotAllowed();
         _grantRole(INVITED_ROLE, _invitedAddress);
     }
 
@@ -104,11 +105,11 @@ contract SubPoolNode is Ownable, AccessControl {
      * @param _subPoolAddress The address of the sub pool
      * @param _amount The amount of the additional deposit
      */
-    function additionalDeposit(address _subPoolAddress, uint256 _amount) external {
+    function deposit(address _subPoolAddress, uint256 _amount) external {
         bool _isNode = subPools[_subPoolAddress]._checkIsNode(msg.sender, _subPoolAddress);
         if (!_isNode) revert NotAllowed();
 
-        subPools[_subPoolAddress]._additionalDeposit(_amount);
+        subPools[_subPoolAddress]._deposit(_amount);
         _updateParentBalance(_amount);
     }
 
@@ -118,7 +119,7 @@ contract SubPoolNode is Ownable, AccessControl {
      */
     function _updateParentBalance(uint256 _amount) internal {
         SubPoolNode _parentSubPool = SubPoolNode(parentSubPool);
-        _parentSubPool.additionalDeposit(address(this), _amount);
+        _parentSubPool.deposit(address(this), _amount);
     }
 
     /**

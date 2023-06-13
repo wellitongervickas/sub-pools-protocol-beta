@@ -13,13 +13,11 @@ describe('SubPoolRouter', () => {
     return { accounts, subPoolRouter }
   }
 
-  describe('MainSubPool', () => {
-    describe('Deploy', () => {
-      it('should set the right initial main subpool ID', async function () {
-        const { subPoolRouter } = await loadFixture(deployRouterFixture)
+  describe('Deploy', () => {
+    it('should set the right initial main subpool ID', async function () {
+      const { subPoolRouter } = await loadFixture(deployRouterFixture)
 
-        expect(await subPoolRouter.nextMainPoolID()).to.equal(0)
-      })
+      expect(await subPoolRouter.nextMainPoolID()).to.equal(0)
     })
 
     describe('Create Main', () => {
@@ -111,7 +109,7 @@ describe('SubPoolRouter', () => {
         await expect(newInstance.createNode(subPoolAddress, amount, [])).to.be.rejectedWith('NotAllowed()')
       })
 
-      it('should revert if try to call additional deposit if sender is not node', async function () {
+      it('should revert if try to call deposit if sender is not node', async function () {
         const { subPoolRouter } = await loadFixture(deployRouterFixture)
         const amount = 1000
 
@@ -120,7 +118,7 @@ describe('SubPoolRouter', () => {
 
         const [subPoolAddress] = receipt.logs[2].args
 
-        await expect(subPoolRouter.additionalDeposit(subPoolAddress, amount)).to.be.rejectedWith('NotAllowed()')
+        await expect(subPoolRouter.deposit(subPoolAddress, amount)).to.be.rejectedWith('NotAllowed()')
       })
     })
 
