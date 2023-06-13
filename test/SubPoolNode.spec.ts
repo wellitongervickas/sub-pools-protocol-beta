@@ -7,6 +7,8 @@ import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers'
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 
 const MANAGER_ROLE = ethers.keccak256(ethers.toUtf8Bytes('MANAGER_ROLE'))
+const INVITED_ROLE = ethers.keccak256(ethers.toUtf8Bytes('INVITED_ROLE'))
+const NODE_ROLE = ethers.keccak256(ethers.toUtf8Bytes('NODE_ROLE'))
 
 describe('SubPoolNode', () => {
   async function deployRounterFixture() {
@@ -79,15 +81,28 @@ describe('SubPoolNode', () => {
     })
 
     it('should set the right role to invited addresses', async function () {
-      const role = ethers.keccak256(ethers.toUtf8Bytes('INVITED_ROLE'))
       const [manager, other] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 0, [other.address]))
 
-      expect(await subPoolNode.hasRole(role, other.address)).to.be.true
+      expect(await subPoolNode.hasRole(INVITED_ROLE, other.address)).to.be.true
     })
   })
 
-  describe('Invite', () => {})
+  describe('Invite', () => {
+    it('should update from invited role to node role', async function () {
+      const [, other] = await ethers.getSigners()
+      const { subPoolNode, fakeParent } = await loadFixture(deployRountedNodeFixture)
+      const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture.bind(null, other.address, 0, []))
+
+      const subNodeAddress = await subPoolNode.getAddress()
+      const subNodeAddress2 = await subPoolNode2.getAddress()
+
+      const subPoolRouterNewInstance = fakeParent.connect(other) as FakeParent
+      await subPoolRouterNewInstance.join(subNodeAddress, subNodeAddress2)
+
+      expect(await subPoolNode.hasRole(NODE_ROLE, other.address)).to.be.true
+    })
+  })
 
   describe('Join', () => {
     it('should update the nextSubPoolID', async function () {
@@ -103,6 +118,8 @@ describe('SubPoolNode', () => {
 
       expect(await subPoolNode.nextSubPoolID()).to.equal(1)
     })
+
+    // working
   })
 
   describe('Validations', () => {
