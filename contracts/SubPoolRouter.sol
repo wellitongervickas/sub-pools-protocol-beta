@@ -12,7 +12,7 @@ contract SubPoolRouter {
     using SubPoolLib for SubPoolLib.SubPool;
     using Counters for Counters.Counter;
 
-    Counters.Counter public nextMainPoolID;
+    Counters.Counter public nextMainPoolID; // starts from 0
     mapping(address => SubPoolLib.SubPool) public subPools;
 
     // events
@@ -73,7 +73,7 @@ contract SubPoolRouter {
     }
 
     /**
-     * @dev Additional deposit of subpool node
+     * @dev deposit of subpool node
      * @param _subPoolAddress The address of the sub pool
      * @param _amount The amount of the additional deposit
      */

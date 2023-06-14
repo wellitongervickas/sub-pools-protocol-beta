@@ -29,6 +29,7 @@ contract SubPoolNode is Ownable, AccessControl {
     // events
     event NodeManagerInvited(address indexed _invitedAddress);
     event NodeManagerJoined(address indexed _nodeManagerAddress, uint256 indexed _subPoolID);
+    event SubPoolNodeDeposited(address indexed _subPoolAddress, uint256 _amount);
 
     // errors
     error ParentNotFound();
@@ -38,6 +39,7 @@ contract SubPoolNode is Ownable, AccessControl {
     error NotAllowed();
     error NotInvited();
     error AlreadyInvited();
+    error NodeNotAllowed();
 
     constructor(address _managerAddress, uint256 _amount, address[] memory _invitedAddresses) {
         manager = ManagerLib.Manager({managerAddress: _managerAddress, initialBalance: _amount, balance: 0});
@@ -112,10 +114,12 @@ contract SubPoolNode is Ownable, AccessControl {
      */
     function deposit(address _subPoolAddress, uint256 _amount) external {
         bool _isNode = subPools[_subPoolAddress]._checkIsNode(msg.sender, _subPoolAddress);
-        if (!_isNode) revert NotAllowed();
+        if (!_isNode) revert NodeNotAllowed();
 
         subPools[_subPoolAddress]._deposit(_amount);
         _updateParentBalance(_amount);
+
+        emit SubPoolNodeDeposited(_subPoolAddress, _amount);
     }
 
     /**
