@@ -32,8 +32,12 @@ contract SubPoolNode is Ownable, AccessControl {
 
     // errors
     error ParentNotFound();
+    error ParentAlreadySet();
+    error ManagerNotAllowed();
+    error AlreadyNodeManager();
     error NotAllowed();
     error NotInvited();
+    error AlreadyInvited();
 
     constructor(address _managerAddress, uint256 _amount, address[] memory _invitedAddresses) {
         manager = ManagerLib.Manager({managerAddress: _managerAddress, initialBalance: _amount, balance: 0});
@@ -57,9 +61,9 @@ contract SubPoolNode is Ownable, AccessControl {
      * @param _invitedAddress The address of the invited node manager
      */
     function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
-        if (_checkIsManagerAddress(_invitedAddress)) revert NotAllowed();
-        if (_checkIsInvitedAddress(_invitedAddress)) revert NotAllowed();
-        if (_checkIsNodeManagerAddress(_invitedAddress)) revert NotAllowed();
+        if (_checkIsManagerAddress(_invitedAddress)) revert ManagerNotAllowed();
+        if (_checkIsInvitedAddress(_invitedAddress)) revert AlreadyInvited();
+        if (_checkIsNodeManagerAddress(_invitedAddress)) revert AlreadyNodeManager();
 
         _grantRole(INVITED_ROLE, _invitedAddress);
 
@@ -71,7 +75,7 @@ contract SubPoolNode is Ownable, AccessControl {
      * @param _parentSubPool The address of the parent subpool
      */
     function setParentSubPool(address _parentSubPool) external onlyOwner {
-        if (_checkHasParent()) revert NotAllowed();
+        if (_checkHasParent()) revert ParentAlreadySet();
         parentSubPool = _parentSubPool;
     }
 
@@ -86,33 +90,23 @@ contract SubPoolNode is Ownable, AccessControl {
         if (!_checkIsInvitedAddress(tx.origin)) revert NotInvited();
 
         nextSubPoolID.increment();
-        subPools[_subPoolAddress] = SubPoolLib.SubPool({id: nextSubPoolID.current(), initialBalance: 0, balance: 0});
+
+        subPools[_subPoolAddress] = SubPoolLib.SubPool({
+            id: nextSubPoolID.current(),
+            initialBalance: _amount,
+            balance: 0
+        });
 
         _updateNodeManagerRole(tx.origin);
-        _initialDeposit(_subPoolAddress, _amount);
+        _updateParentBalance(_amount);
 
         emit NodeManagerJoined(tx.origin, subPools[_subPoolAddress].id);
 
         return subPools[_subPoolAddress].id;
     }
 
-    function _updateNodeManagerRole(address _nodeManagerAddress) internal {
-        _revokeRole(INVITED_ROLE, _nodeManagerAddress);
-        _grantRole(NODE_ROLE, _nodeManagerAddress);
-    }
-
     /**
-     * @dev Anitial deposit of subpool node
-     * @param _subPoolAddress The address of the subpool
-     * @param _amount The amount of the initial deposit
-     */
-    function _initialDeposit(address _subPoolAddress, uint256 _amount) internal {
-        subPools[_subPoolAddress]._initialDeposit(_amount);
-        _updateParentBalance(_amount);
-    }
-
-    /**
-     * @dev Additional deposit of subpool node
+     * @dev deposit of subpool node
      * @param _subPoolAddress The address of the sub pool
      * @param _amount The amount of the additional deposit
      */
@@ -122,6 +116,15 @@ contract SubPoolNode is Ownable, AccessControl {
 
         subPools[_subPoolAddress]._deposit(_amount);
         _updateParentBalance(_amount);
+    }
+
+    /**
+     * @dev update role of node manager from invited to node
+     * @param _nodeManagerAddress The address of the node manager
+     */
+    function _updateNodeManagerRole(address _nodeManagerAddress) internal {
+        _revokeRole(INVITED_ROLE, _nodeManagerAddress);
+        _grantRole(NODE_ROLE, _nodeManagerAddress);
     }
 
     /**

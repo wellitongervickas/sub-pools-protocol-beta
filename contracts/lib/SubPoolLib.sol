@@ -8,10 +8,6 @@ library SubPoolLib {
         uint256 balance;
     }
 
-    function _initialDeposit(SubPool storage _self, uint256 _amount) internal {
-        _self.initialBalance = _amount;
-    }
-
     function _deposit(SubPool storage _self, uint256 _amount) internal {
         _self.balance += _amount;
     }

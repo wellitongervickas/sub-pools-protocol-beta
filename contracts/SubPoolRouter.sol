@@ -16,11 +16,12 @@ contract SubPoolRouter {
     mapping(address => SubPoolLib.SubPool) public subPools;
 
     // events
+    event SubPoolNodeDeposited(address indexed _subPoolAddress, uint256 _amount);
     event SubPoolMainCreated(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
     event SubPoolNodeCreated(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
 
     // errors
-    error NotAllowed();
+    error NodeNotAllowed();
 
     /**
      * @dev Create a new main subpool
@@ -33,10 +34,14 @@ contract SubPoolRouter {
         address _subPoolAddress = address(_subPool);
 
         nextMainPoolID.increment();
-        subPools[_subPoolAddress] = SubPoolLib.SubPool({id: nextMainPoolID.current(), initialBalance: 0, balance: 0});
+
+        subPools[_subPoolAddress] = SubPoolLib.SubPool({
+            id: nextMainPoolID.current(),
+            initialBalance: _amount,
+            balance: 0
+        });
 
         _subPool.setParentSubPool(address(this));
-        _initialDeposit(_subPoolAddress, _amount);
 
         emit SubPoolMainCreated(_subPoolAddress, subPools[_subPoolAddress].id, _amount);
 
@@ -47,48 +52,24 @@ contract SubPoolRouter {
      * @dev Create a new subpool node
      * @param _parentSubPoolAddress The address of the parent subpool
      * @param _amount The amount of the initial deposit
-     * @return bytes The address and the ID of the new subpool node
+     * @return  address of the new node subpool
      */
     function createNode(
         address _parentSubPoolAddress,
         uint256 _amount,
         address[] memory _invitedAddresses
     ) external returns (address) {
+        SubPoolNode _parentSubPool = SubPoolNode(_parentSubPoolAddress);
         SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _invitedAddresses);
 
         address _subPoolAddress = address(_subPool);
-        uint256 _subPoolId = _join(_parentSubPoolAddress, _subPoolAddress, _amount);
-
-        emit SubPoolNodeCreated(_subPoolAddress, _subPoolId, _amount);
-
-        return _subPoolAddress;
-    }
-
-    /**
-     * @dev Join a subpool node
-     * @param _parentSubPoolAddress The address of the parent subpool
-     * @param _subPoolAddress The address of the subpool node
-     * @param _amount The amount of the initial deposit
-     * @return The ID of the new subpool node
-     */
-    function _join(address _parentSubPoolAddress, address _subPoolAddress, uint256 _amount) internal returns (uint256) {
-        SubPoolNode _parentSubPool = SubPoolNode(_parentSubPoolAddress);
-        SubPoolNode _subPool = SubPoolNode(_subPoolAddress);
-
         uint256 _subPoolId = _parentSubPool.join(_subPoolAddress, _amount);
 
         _subPool.setParentSubPool(_parentSubPoolAddress);
 
-        return _subPoolId;
-    }
+        emit SubPoolNodeCreated(_subPoolAddress, _subPoolId, _amount);
 
-    /**
-     * @dev Initial deposit of a main sub pool
-     * @param _subPoolAddress The address of the main sub pool
-     * @param _amount The amount of the initial deposit
-     */
-    function _initialDeposit(address _subPoolAddress, uint256 _amount) internal {
-        subPools[_subPoolAddress]._initialDeposit(_amount);
+        return _subPoolAddress;
     }
 
     /**
@@ -98,8 +79,10 @@ contract SubPoolRouter {
      */
     function deposit(address _subPoolAddress, uint256 _amount) external {
         bool isNode = subPools[_subPoolAddress]._checkIsNode(msg.sender, _subPoolAddress);
-        if (!isNode) revert NotAllowed();
+        if (!isNode) revert NodeNotAllowed();
 
         subPools[_subPoolAddress]._deposit(_amount);
+
+        emit SubPoolNodeDeposited(_subPoolAddress, _amount);
     }
 }

@@ -43,14 +43,14 @@ describe('SubPoolNode', () => {
   describe('Deploy', () => {
     it('should set the right initial node subpool ID', async function () {
       const [manager] = await ethers.getSigners()
-      const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 100, []))
+      const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 0, []))
 
       expect(await subPoolNode.nextSubPoolID()).to.equal(0)
     })
 
     it('should set the right manager', async function () {
       const [, other] = await ethers.getSigners()
-      const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, other.address, 100, []))
+      const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, other.address, 0, []))
 
       const [managerAddress] = await subPoolNode.manager()
       expect(managerAddress).to.equal(other.address)
@@ -61,11 +61,11 @@ describe('SubPoolNode', () => {
       const [, other] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, other.address, amount, []))
 
-      const [, managerInitialBalance] = await subPoolNode.manager()
-      expect(managerInitialBalance).to.equal(ethers.toBigInt(amount))
+      const [, initialBalance] = await subPoolNode.manager()
+      expect(initialBalance).to.equal(ethers.toBigInt(amount))
     })
 
-    it('should set the right manager  balance', async function () {
+    it('should set the right manager balance', async function () {
       const [, other] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, other.address, 0, []))
 
@@ -88,24 +88,8 @@ describe('SubPoolNode', () => {
     })
   })
 
-  describe('Invite', () => {
-    it('should update from invited role to node role', async function () {
-      const [, other] = await ethers.getSigners()
-      const { subPoolNode, fakeParent } = await loadFixture(deployRountedNodeFixture)
-      const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture.bind(null, other.address, 0, []))
-
-      const subNodeAddress = await subPoolNode.getAddress()
-      const subNodeAddress2 = await subPoolNode2.getAddress()
-
-      const subPoolRouterNewInstance = fakeParent.connect(other) as FakeParent
-      await subPoolRouterNewInstance.join(subNodeAddress, subNodeAddress2)
-
-      expect(await subPoolNode.hasRole(NODE_ROLE, other.address)).to.be.true
-    })
-  })
-
   describe('Join', () => {
-    it('should update the nextSubPoolID', async function () {
+    it('should update the ID when join as node', async function () {
       const [, other] = await ethers.getSigners()
       const { subPoolNode, fakeParent } = await loadFixture(deployRountedNodeFixture)
       const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture.bind(null, other.address, 0, []))
@@ -114,25 +98,72 @@ describe('SubPoolNode', () => {
       const subNodeAddress2 = await subPoolNode2.getAddress()
 
       const subPoolRouterNewInstance = fakeParent.connect(other) as FakeParent
-      await subPoolRouterNewInstance.join(subNodeAddress, subNodeAddress2)
+      await subPoolRouterNewInstance.join(subNodeAddress, subNodeAddress2, 0)
 
       expect(await subPoolNode.nextSubPoolID()).to.equal(1)
     })
 
-    // working
+    it('should set initial balance when join as node', async function () {
+      const amount = 100
+      const [, other] = await ethers.getSigners()
+      const { subPoolNode, fakeParent } = await loadFixture(deployRountedNodeFixture)
+      const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture.bind(null, other.address, amount, []))
+
+      const subNodeAddress = await subPoolNode.getAddress()
+      const subNodeAddress2 = await subPoolNode2.getAddress()
+
+      const subPoolRouterNewInstance = fakeParent.connect(other) as FakeParent
+      await subPoolRouterNewInstance.join(subNodeAddress, subNodeAddress2, amount)
+      const [, initialBalance] = await subPoolNode.subPools(subNodeAddress2)
+
+      expect(initialBalance).to.be.equal(ethers.toBigInt(amount))
+    })
+
+    it('should update from invite to node role when join as node', async function () {
+      const [, other] = await ethers.getSigners()
+      const { subPoolNode, fakeParent } = await loadFixture(deployRountedNodeFixture)
+      const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture.bind(null, other.address, 0, []))
+
+      const subNodeAddress = await subPoolNode.getAddress()
+      const subNodeAddress2 = await subPoolNode2.getAddress()
+
+      const subPoolRouterNewInstance = fakeParent.connect(other) as FakeParent
+      await subPoolRouterNewInstance.join(subNodeAddress, subNodeAddress2, 0)
+
+      expect(await subPoolNode.hasRole(NODE_ROLE, other.address)).to.be.true
+    })
+
+    it('should update parent balance when join as node', async function () {
+      const amount = 100
+      const [, other] = await ethers.getSigners()
+      const { subPoolNode, fakeParent } = await loadFixture(deployRountedNodeFixture)
+      const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture.bind(null, other.address, amount, []))
+
+      const subNodeAddress = await subPoolNode.getAddress()
+      const subNodeAddress2 = await subPoolNode2.getAddress()
+
+      const subPoolRouterNewInstance = fakeParent.connect(other) as FakeParent
+      await subPoolRouterNewInstance.join(subNodeAddress, subNodeAddress2, amount)
+      const [, , parentBalance] = await fakeParent.subPools(subNodeAddress)
+
+      expect(parentBalance).to.be.equal(ethers.toBigInt(amount))
+    })
   })
 
   describe('Validations', () => {
-    describe('Invite', () => {
-      it('should rever if manager try to update parent twice', async function () {
+    describe('Parent', () => {
+      it('should revert if on update parent twice', async function () {
         const [manager, anyEntity] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 0, []))
 
         await subPoolNode.setParentSubPool(anyEntity.address)
-        await expect(subPoolNode.setParentSubPool(anyEntity.address)).to.be.rejectedWith('NotAllowed()')
+        await expect(subPoolNode.setParentSubPool(anyEntity.address)).to.be.revertedWithCustomError(
+          subPoolNode,
+          'ParentAlreadySet()'
+        )
       })
 
-      it('should revert if try to set parentSubPool if not the manager role', async function () {
+      it('should revert on set parentSubPool if not manager role', async function () {
         const [manager, other] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 0, []))
 
@@ -142,24 +173,29 @@ describe('SubPoolNode', () => {
           'Ownable: caller is not the owner'
         )
       })
+    })
 
-      it('should revert if manager try to invite himself', async function () {
+    describe('Invite', () => {
+      it('should revert when manager try to invite himself', async function () {
         const [manager] = await ethers.getSigners()
-        const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 0, []))
+        const { subPoolNode } = await loadFixture(deployNodeFixture.bind(null, manager.address, 0, []))
 
-        await expect(subPoolNode.invite(manager.address)).to.be.rejectedWith('NotAllowed()')
+        await expect(subPoolNode.invite(manager.address)).to.be.revertedWithCustomError(
+          subPoolNode,
+          'ManagerNotAllowed()'
+        )
       })
 
-      it('should revert if try to invite an already invited node manager', async function () {
+      it('should revert on invite an already invited node manager', async function () {
         const [manager, other] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 0, []))
 
         await subPoolNode.invite(other.address)
 
-        await expect(subPoolNode.invite(other.address)).to.be.rejectedWith('NotAllowed()')
+        await expect(subPoolNode.invite(other.address)).to.be.revertedWithCustomError(subPoolNode, 'AlreadyInvited()')
       })
 
-      it('should revert if try to invite an already node manager', async function () {
+      it('should revert on invite an already node manager', async function () {
         const [, other] = await ethers.getSigners()
         const { subPoolNode, fakeParent } = await loadFixture(deployRountedNodeFixture)
         const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture.bind(null, other.address, 0, []))
@@ -168,12 +204,15 @@ describe('SubPoolNode', () => {
         const subNodeAddress2 = await subPoolNode2.getAddress()
 
         const subPoolRouterNewInstance = fakeParent.connect(other) as FakeParent
-        await subPoolRouterNewInstance.join(subNodeAddress, subNodeAddress2)
+        await subPoolRouterNewInstance.join(subNodeAddress, subNodeAddress2, 0)
 
-        await expect(subPoolNode.invite(other.address)).to.be.rejectedWith('NotAllowed()')
+        await expect(subPoolNode.invite(other.address)).to.be.revertedWithCustomError(
+          subPoolNode,
+          'AlreadyNodeManager()'
+        )
       })
 
-      it('should revert when try to invite a node manager if not the manager role', async function () {
+      it('should revert on invite a node manager if not the manager role', async function () {
         const [manager, other] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 0, []))
 
@@ -186,7 +225,7 @@ describe('SubPoolNode', () => {
     })
 
     describe('Join', () => {
-      it('should revert when try to join as node without a parent subpool', async function () {
+      it('should revert on join as node without a parent subpool', async function () {
         const [, other] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, other.address, 0, []))
         const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture.bind(this, other.address, 0, []))
@@ -196,7 +235,7 @@ describe('SubPoolNode', () => {
         await expect(subPoolNode.join(subPoolAddress, 0)).to.be.rejectedWith('ParentNotFound()')
       })
 
-      it('should revert when try to join as node without being invited', async function () {
+      it('should revert on join as node without being invited', async function () {
         const [, other, hacker] = await ethers.getSigners()
         const { subPoolNode, fakeParent } = await loadFixture(deployRountedNodeFixture)
         const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture.bind(null, other.address, 0, []))
@@ -206,7 +245,9 @@ describe('SubPoolNode', () => {
 
         const subPoolRouterNewInstance = fakeParent.connect(hacker) as FakeParent
 
-        await expect(subPoolRouterNewInstance.join(subNodeAddress, subNodeAddress2)).to.be.rejectedWith('NotInvited()')
+        await expect(subPoolRouterNewInstance.join(subNodeAddress, subNodeAddress2, 0)).to.be.rejectedWith(
+          'NotInvited()'
+        )
       })
     })
   })
