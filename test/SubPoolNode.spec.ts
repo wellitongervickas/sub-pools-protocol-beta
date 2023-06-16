@@ -19,9 +19,9 @@ describe('SubPoolNode', () => {
     return { subPoolRouter }
   }
 
-  async function deployNodeFixture(owner: string, amount: number, invites: string[]) {
+  async function deployNodeFixture(manager: string, amount: number, invites: string[]) {
     const SubPoolNode = await ethers.getContractFactory('SubPoolNode')
-    const subPoolNode = await SubPoolNode.deploy(owner, amount, invites)
+    const subPoolNode = await SubPoolNode.deploy(manager, amount, invites)
 
     return { subPoolNode }
   }
@@ -308,6 +308,27 @@ describe('SubPoolNode', () => {
           .to.emit(subPoolNode, 'SubPoolDeposited')
           .withArgs(otherSubNodeAddress, anyValue)
       })
+    })
+  })
+
+  describe('Hacking', () => {
+    it('should revert if try to join setting manually the parent as a main subpool', async function () {
+      const [, hacker] = await ethers.getSigners()
+      const { subPoolNode: subPoolNodeDefault } = await loadFixture(deployRoutedNodeFixture)
+
+      const defaultSubPoolNodeAddress = await subPoolNodeDefault.getAddress()
+
+      const SubPoolNode = await ethers.getContractFactory('SubPoolNode', hacker)
+      const subPoolNode = await SubPoolNode.deploy(hacker.address, 100, [hacker.address])
+      const subPoolNode2 = await SubPoolNode.deploy(hacker.address, 100, [hacker.address])
+
+      const subPoolNode2Address = await subPoolNode2.getAddress()
+      await subPoolNode.setParentSubPool(defaultSubPoolNodeAddress)
+
+      await expect(subPoolNode.join(subPoolNode2Address, 100)).to.be.revertedWithCustomError(
+        subPoolNode,
+        'NodeNotAllowed()'
+      )
     })
   })
 })
