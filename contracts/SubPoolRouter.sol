@@ -30,6 +30,10 @@ contract SubPoolRouter is SubPool {
         return _subPoolAddress;
     }
 
+    function _setSubPoolParent(SubPoolNode _subPool, address _parentSubPoolAddress) internal {
+        _subPool.setParentSubPool(_parentSubPoolAddress);
+    }
+
     function createNode(
         address _parentSubPoolAddress,
         uint256 _amount,
@@ -55,10 +59,6 @@ contract SubPoolRouter is SubPool {
     ) internal returns (uint256) {
         uint256 _subPoolId = _parentSubPool.join(_subPoolAddress, _amount);
         return _subPoolId;
-    }
-
-    function _setSubPoolParent(SubPoolNode _subPool, address _parentSubPoolAddress) internal {
-        _subPool.setParentSubPool(_parentSubPoolAddress);
     }
 
     function deposit(address _subPoolAddress, uint256 _amount) external {
