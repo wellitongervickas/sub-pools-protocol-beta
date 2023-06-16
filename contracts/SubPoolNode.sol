@@ -33,12 +33,12 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
         manager = ManagerLib.Manager({managerAddress: _managerAddress, initialBalance: _amount, balance: 0});
 
         _setupInitialInvites(_invitedAddresses);
-        _grantRole(MANAGER_ROLE, _managerAddress);
+        super._grantRole(MANAGER_ROLE, _managerAddress);
     }
 
     function _setupInitialInvites(address[] memory _invitedAddresses) internal {
         for (uint256 i = 0; i < _invitedAddresses.length; i++) {
-            _grantRole(INVITED_ROLE, _invitedAddresses[i]);
+            super._grantRole(INVITED_ROLE, _invitedAddresses[i]);
         }
     }
 
@@ -56,21 +56,21 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
         if (_checkIsInvitedAddress(_invitedAddress)) revert AlreadyInvited();
         if (_checkIsNodeManagerAddress(_invitedAddress)) revert AlreadyNodeManager();
 
-        _grantRole(INVITED_ROLE, _invitedAddress);
+        super._grantRole(INVITED_ROLE, _invitedAddress);
 
         emit NodeManagerInvited(_invitedAddress);
     }
 
     function _checkIsManagerAddress(address _address) internal view returns (bool) {
-        return hasRole(MANAGER_ROLE, _address);
+        return super.hasRole(MANAGER_ROLE, _address);
     }
 
     function _checkIsInvitedAddress(address _nodeManagerAddress) internal view returns (bool) {
-        return hasRole(INVITED_ROLE, _nodeManagerAddress);
+        return super.hasRole(INVITED_ROLE, _nodeManagerAddress);
     }
 
     function _checkIsNodeManagerAddress(address _nodeManagerAddress) internal view returns (bool) {
-        return hasRole(NODE_ROLE, _nodeManagerAddress);
+        return super.hasRole(NODE_ROLE, _nodeManagerAddress);
     }
 
     function join(address _subPoolAddress, uint256 _amount) external onlyOwner returns (uint256) {
@@ -90,8 +90,8 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
     }
 
     function _updateNodeManagerRole(address _nodeManagerAddress) internal {
-        _revokeRole(INVITED_ROLE, _nodeManagerAddress);
-        _grantRole(NODE_ROLE, _nodeManagerAddress);
+        super._revokeRole(INVITED_ROLE, _nodeManagerAddress);
+        super._grantRole(NODE_ROLE, _nodeManagerAddress);
     }
 
     function _updateParentBalance(uint256 _amount) internal {
