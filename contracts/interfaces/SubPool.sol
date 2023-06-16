@@ -25,10 +25,10 @@ abstract contract SubPool {
         return nextSubPoolID.current();
     }
 
-    function deposit(address _sender, address _subPoolAddress, uint256 _amount) internal {
+    function deposit(address _subPoolAddress, uint256 _amount) public virtual {
         SubPoolLib.SubPool storage _subPool = subPools[_subPoolAddress];
 
-        bool _isNode = _subPool._checkIsNode(_sender, _subPoolAddress);
+        bool _isNode = _subPool._checkIsNode(msg.sender, _subPoolAddress);
         if (!_isNode) revert NodeNotAllowed();
 
         _setSubPoolBalance(_subPool, _amount);

@@ -61,8 +61,8 @@ contract SubPoolRouter is SubPool {
         return _subPoolId;
     }
 
-    function deposit(address _subPoolAddress, uint256 _amount) external {
-        super.deposit(msg.sender, _subPoolAddress, _amount);
+    function deposit(address _subPoolAddress, uint256 _amount) public override {
+        super.deposit(_subPoolAddress, _amount);
 
         emit SubPoolDeposited(_subPoolAddress, _amount);
     }
