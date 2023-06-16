@@ -20,7 +20,7 @@ contract SubPoolRouter is SubPool {
         SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _invitedAddresses);
 
         address _subPoolAddress = address(_subPool);
-        uint256 _id = super._updateCurrentSubPoolID();
+        uint256 _id = _updateCurrentSubPoolID();
 
         subPools[_subPoolAddress] = SubPoolLib.SubPool({id: _id, initialBalance: _amount, balance: 0});
         _setSubPoolParent(_subPool, address(this));
@@ -62,7 +62,7 @@ contract SubPoolRouter is SubPool {
     }
 
     function deposit(address _subPoolAddress, uint256 _amount) external {
-        super._deposit(msg.sender, _subPoolAddress, _amount);
+        super.deposit(msg.sender, _subPoolAddress, _amount);
 
         emit SubPoolDeposited(_subPoolAddress, _amount);
     }

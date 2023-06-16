@@ -33,12 +33,12 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
         manager = ManagerLib.Manager({managerAddress: _managerAddress, initialBalance: _amount, balance: 0});
 
         _setupInitialInvites(_invitedAddresses);
-        super._grantRole(MANAGER_ROLE, _managerAddress);
+        _grantRole(MANAGER_ROLE, _managerAddress);
     }
 
     function _setupInitialInvites(address[] memory _invitedAddresses) internal {
         for (uint256 i = 0; i < _invitedAddresses.length; i++) {
-            super._grantRole(INVITED_ROLE, _invitedAddresses[i]);
+            _grantRole(INVITED_ROLE, _invitedAddresses[i]);
         }
     }
 
@@ -56,28 +56,28 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
         if (_checkIsInvitedAddress(_invitedAddress)) revert AlreadyInvited();
         if (_checkIsNodeManagerAddress(_invitedAddress)) revert AlreadyNodeManager();
 
-        super._grantRole(INVITED_ROLE, _invitedAddress);
+        _grantRole(INVITED_ROLE, _invitedAddress);
 
         emit NodeManagerInvited(_invitedAddress);
     }
 
     function _checkIsManagerAddress(address _address) internal view returns (bool) {
-        return super.hasRole(MANAGER_ROLE, _address);
+        return hasRole(MANAGER_ROLE, _address);
     }
 
     function _checkIsInvitedAddress(address _nodeManagerAddress) internal view returns (bool) {
-        return super.hasRole(INVITED_ROLE, _nodeManagerAddress);
+        return hasRole(INVITED_ROLE, _nodeManagerAddress);
     }
 
     function _checkIsNodeManagerAddress(address _nodeManagerAddress) internal view returns (bool) {
-        return super.hasRole(NODE_ROLE, _nodeManagerAddress);
+        return hasRole(NODE_ROLE, _nodeManagerAddress);
     }
 
     function join(address _subPoolAddress, uint256 _amount) external onlyOwner returns (uint256) {
         if (!_checkHasParent()) revert ParentNotFound();
         if (!_checkIsInvitedAddress(tx.origin)) revert NotInvited();
 
-        uint256 _id = super._updateCurrentSubPoolID();
+        uint256 _id = _updateCurrentSubPoolID();
 
         subPools[_subPoolAddress] = SubPoolLib.SubPool({id: _id, initialBalance: _amount, balance: 0});
 
@@ -90,8 +90,8 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
     }
 
     function _updateNodeManagerRole(address _nodeManagerAddress) internal {
-        super._revokeRole(INVITED_ROLE, _nodeManagerAddress);
-        super._grantRole(NODE_ROLE, _nodeManagerAddress);
+        _revokeRole(INVITED_ROLE, _nodeManagerAddress);
+        _grantRole(NODE_ROLE, _nodeManagerAddress);
     }
 
     function _updateParentBalance(uint256 _amount) internal {
@@ -100,7 +100,7 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
     }
 
     function deposit(address _subPoolAddress, uint256 _amount) external {
-        super._deposit(_msgSender(), _subPoolAddress, _amount);
+        super.deposit(_msgSender(), _subPoolAddress, _amount);
 
         _updateParentBalance(_amount);
 

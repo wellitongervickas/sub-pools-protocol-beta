@@ -25,7 +25,7 @@ abstract contract SubPool {
         return nextSubPoolID.current();
     }
 
-    function _deposit(address _sender, address _subPoolAddress, uint256 _amount) internal {
+    function deposit(address _sender, address _subPoolAddress, uint256 _amount) internal {
         SubPoolLib.SubPool storage _subPool = subPools[_subPoolAddress];
 
         bool _isNode = _subPool._checkIsNode(_sender, _subPoolAddress);
