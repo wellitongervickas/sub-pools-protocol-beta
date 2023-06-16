@@ -17,7 +17,7 @@ describe('SubPoolRouter', () => {
     it('should set initial ID', async function () {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
 
-      expect(await subPoolRouter.nextMainPoolID()).to.equal(0)
+      expect(await subPoolRouter.nextSubPoolID()).to.equal(0)
     })
   })
 
@@ -26,7 +26,7 @@ describe('SubPoolRouter', () => {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
       await subPoolRouter.createMain(100, [])
 
-      expect(await subPoolRouter.nextMainPoolID()).to.equal(1)
+      expect(await subPoolRouter.nextSubPoolID()).to.equal(1)
     })
 
     it('should set the main subpool initial balance', async function () {
@@ -177,7 +177,7 @@ describe('SubPoolRouter', () => {
           .withArgs(anyValue, 1, amount)
       })
 
-      it('should emit SubPoolNodeDeposited when node deposit', async function () {
+      it('should emit SubPoolDeposited when node deposit', async function () {
         const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
         const amount = 1000
         const [, other] = accounts
@@ -189,7 +189,7 @@ describe('SubPoolRouter', () => {
         const newInstance = subPoolRouter.connect(other) as SubPoolRouter
 
         await expect(newInstance.createNode(subPoolAddress, amount, []))
-          .to.emit(subPoolRouter, 'SubPoolNodeDeposited')
+          .to.emit(subPoolRouter, 'SubPoolDeposited')
           .withArgs(anyValue, amount)
       })
     })

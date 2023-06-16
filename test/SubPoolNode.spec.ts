@@ -292,7 +292,7 @@ describe('SubPoolNode', () => {
           .withArgs(other.address, anyValue)
       })
 
-      it('should emit SubPoolNodeDeposited event when node join', async function () {
+      it('should emit SubPoolDeposited event when node join', async function () {
         const amount = 100
         const [, other, otherNode] = await ethers.getSigners()
         const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
@@ -305,7 +305,7 @@ describe('SubPoolNode', () => {
         const otherNodeRouterInstance = subPoolRouter.connect(otherNode) as any
 
         await expect(otherNodeRouterInstance.createNode(otherSubNodeAddress, amount, []))
-          .to.emit(subPoolNode, 'SubPoolNodeDeposited')
+          .to.emit(subPoolNode, 'SubPoolDeposited')
           .withArgs(otherSubNodeAddress, anyValue)
       })
     })
