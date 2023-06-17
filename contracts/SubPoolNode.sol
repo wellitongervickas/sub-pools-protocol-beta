@@ -6,14 +6,12 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 
 import './SubPool.sol';
-import './lib/Fraction.sol';
 import './lib/SubPoolLib.sol';
 import './lib/ManagerLib.sol';
 
 contract SubPoolNode is SubPool, Ownable, AccessControl {
     using ManagerLib for ManagerLib.Manager;
     using ManagerLib for ManagerLib.Manager;
-    using FractionLib for FractionLib.Fraction;
 
     bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
     bytes32 public constant INVITED_ROLE = keccak256('INVITED_ROLE');

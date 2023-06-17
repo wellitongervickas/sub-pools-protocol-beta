@@ -13,7 +13,6 @@ import './lib/Fraction.sol';
 contract SubPoolRouter is SubPool {
     using SubPoolLib for SubPoolLib.SubPool;
     using Counters for Counters.Counter;
-    using FractionLib for FractionLib.Fraction;
 
     event SubPoolCreated(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
     event SubPoolJoined(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
