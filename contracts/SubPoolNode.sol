@@ -95,8 +95,7 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
     }
 
     function _updateParentBalance(uint256 _amount) internal {
-        SubPoolNode _parentSubPool = SubPoolNode(parentSubPool);
-        _parentSubPool.deposit(address(this), _amount);
+        SubPoolNode(parentSubPool).deposit(address(this), _amount);
     }
 
     function deposit(address _subPoolAddress, uint256 _amount) public override {

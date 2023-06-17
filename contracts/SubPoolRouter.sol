@@ -57,8 +57,7 @@ contract SubPoolRouter is SubPool {
         address _subPoolAddress,
         uint256 _amount
     ) internal returns (uint256) {
-        uint256 _subPoolId = _parentSubPool.join(_subPoolAddress, _amount);
-        return _subPoolId;
+        return _parentSubPool.join(_subPoolAddress, _amount);
     }
 
     function deposit(address _subPoolAddress, uint256 _amount) public override {
