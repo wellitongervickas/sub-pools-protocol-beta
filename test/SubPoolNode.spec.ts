@@ -29,7 +29,7 @@ describe('SubPoolNode', () => {
     const [, invited] = await ethers.getSigners()
     const { subPoolRouter } = await loadFixture(deployRouterFixture)
 
-    const tx = await subPoolRouter.createMain(0, [invited.address])
+    const tx = await subPoolRouter.create(0, [invited.address])
     let receipt = await tx.wait()
     const [subPoolAddress] = receipt.logs[3].args
     const subPoolNode = await ethers.getContractAt('SubPoolNode', subPoolAddress)
@@ -42,7 +42,7 @@ describe('SubPoolNode', () => {
       const [manager] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 0, []))
 
-      expect(await subPoolNode.nextSubPoolID()).to.equal(0)
+      expect(await subPoolNode.currentID()).to.equal(0)
     })
 
     it('should set manager by address', async function () {
@@ -92,9 +92,9 @@ describe('SubPoolNode', () => {
 
       const subNodeAddress = await subPoolNode.getAddress()
       const subPoolRouterInstance = subPoolRouter.connect(invited) as SubPoolRouter
-      await subPoolRouterInstance.createNode(subNodeAddress, 0, [])
+      await subPoolRouterInstance.join(subNodeAddress, 0, [])
 
-      expect(await subPoolNode.nextSubPoolID()).to.equal(1)
+      expect(await subPoolNode.currentID()).to.equal(1)
     })
 
     it('should set initial balance when join as node', async function () {
@@ -104,12 +104,12 @@ describe('SubPoolNode', () => {
       const subNodeAddress = await subPoolNode.getAddress()
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
-      const tx0 = await invitedRouterInstance.createNode(subNodeAddress, amount, [node.address])
+      const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, [node.address])
       const rcpt0 = await tx0.wait()
       const invitedSubNodeAddress = rcpt0.logs[7].args[0]
 
       const nodeRouterInstance = subPoolRouter.connect(node) as any
-      const tx1 = await nodeRouterInstance.createNode(invitedSubNodeAddress, amount, [])
+      const tx1 = await nodeRouterInstance.join(invitedSubNodeAddress, amount, [])
       const rcpt1 = await tx1.wait()
       const nodeAddress = rcpt1.logs[7].args[0]
 
@@ -125,12 +125,12 @@ describe('SubPoolNode', () => {
       const subNodeAddress = await subPoolNode.getAddress()
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
-      const tx0 = await invitedRouterInstance.createNode(subNodeAddress, amount, [node.address])
+      const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, [node.address])
       const rcpt0 = await tx0.wait()
       const invitedSubNodeAddress = rcpt0.logs[7].args[0]
 
       const nodeRouterInstance = subPoolRouter.connect(node) as any
-      const tx1 = await nodeRouterInstance.createNode(invitedSubNodeAddress, amount, [])
+      const tx1 = await nodeRouterInstance.join(invitedSubNodeAddress, amount, [])
       const rcpt1 = await tx1.wait()
       const nodeAddress = rcpt1.logs[7].args[0]
 
@@ -145,7 +145,7 @@ describe('SubPoolNode', () => {
 
       const subNodeAddress = await subPoolNode.getAddress()
       const subPoolRouterInstance = subPoolRouter.connect(other) as SubPoolRouter
-      await subPoolRouterInstance.createNode(subNodeAddress, 0, [])
+      await subPoolRouterInstance.join(subNodeAddress, 0, [])
 
       expect(await subPoolNode.hasRole(NODE_ROLE, other.address)).to.be.true
     })
@@ -157,7 +157,7 @@ describe('SubPoolNode', () => {
       const subNodeAddress = await subPoolNode.getAddress()
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
-      await invitedRouterInstance.createNode(subNodeAddress, amount, [node.address])
+      await invitedRouterInstance.join(subNodeAddress, amount, [node.address])
 
       const [, , balance] = await subPoolRouter.subPools(subNodeAddress)
       expect(balance).to.be.equal(ethers.toBigInt(amount))
@@ -170,20 +170,20 @@ describe('SubPoolNode', () => {
         const [manager, anyEntity] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 0, []))
 
-        await subPoolNode.setParentSubPool(anyEntity.address)
-        await expect(subPoolNode.setParentSubPool(anyEntity.address)).to.be.revertedWithCustomError(
+        await subPoolNode.setParent(anyEntity.address)
+        await expect(subPoolNode.setParent(anyEntity.address)).to.be.revertedWithCustomError(
           subPoolNode,
           'ParentAlreadySet()'
         )
       })
 
-      it('should revert on set parentSubPool if not manager role', async function () {
+      it('should revert on set parent if not manager role', async function () {
         const [manager, anyEntity] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(deployNodeFixture.bind(this, manager.address, 0, []))
 
         const subPoolInstance = subPoolNode.connect(anyEntity) as SubPoolNode
 
-        await expect(subPoolInstance.setParentSubPool(anyEntity.address)).to.be.rejectedWith(
+        await expect(subPoolInstance.setParent(anyEntity.address)).to.be.rejectedWith(
           'Ownable: caller is not the owner'
         )
       })
@@ -216,7 +216,7 @@ describe('SubPoolNode', () => {
         const subNodeAddress = await subPoolNode.getAddress()
 
         const invitedRouterInstance = subPoolRouter.connect(invited) as any
-        await invitedRouterInstance.createNode(subNodeAddress, amount, [node.address])
+        await invitedRouterInstance.join(subNodeAddress, amount, [node.address])
 
         await expect(subPoolNode.invite(invited.address)).to.be.revertedWithCustomError(
           subPoolNode,
@@ -255,7 +255,7 @@ describe('SubPoolNode', () => {
       const subNodeAddress = await subPoolNode.getAddress()
       const subPoolRouterInstance = subPoolRouter.connect(hacker) as SubPoolRouter
 
-      await expect(subPoolRouterInstance.createNode(subNodeAddress, 0, [])).to.be.revertedWithCustomError(
+      await expect(subPoolRouterInstance.join(subNodeAddress, 0, [])).to.be.revertedWithCustomError(
         subPoolNode,
         'NotInvited()'
       )
@@ -303,7 +303,7 @@ describe('SubPoolNode', () => {
         const subNodeAddress = await subPoolNode.getAddress()
         const subPoolRouterInstance = subPoolRouter.connect(invited) as SubPoolRouter
 
-        await expect(await subPoolRouterInstance.createNode(subNodeAddress, 0, []))
+        await expect(await subPoolRouterInstance.join(subNodeAddress, 0, []))
           .to.emit(subPoolNode, 'NodeManagerJoined')
           .withArgs(invited.address, anyValue)
       })
@@ -315,13 +315,13 @@ describe('SubPoolNode', () => {
         const subNodeAddress = await subPoolNode.getAddress()
 
         const invitedRouterInstance = subPoolRouter.connect(invited) as any
-        const tx0 = await invitedRouterInstance.createNode(subNodeAddress, amount, [node.address])
+        const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, [node.address])
         const rcpt0 = await tx0.wait()
         const invitedSubNodeAddress = rcpt0.logs[7].args[0]
 
         const nodeRouterInstance = subPoolRouter.connect(node) as any
 
-        await expect(nodeRouterInstance.createNode(invitedSubNodeAddress, amount, []))
+        await expect(nodeRouterInstance.join(invitedSubNodeAddress, amount, []))
           .to.emit(subPoolNode, 'SubPoolDeposited')
           .withArgs(invitedSubNodeAddress, anyValue)
       })
@@ -340,7 +340,7 @@ describe('SubPoolNode', () => {
       const subPoolNode2 = await SubPoolNode.deploy(hacker.address, 100, [hacker.address])
 
       const subPoolNode2Address = await subPoolNode2.getAddress()
-      await subPoolNode.setParentSubPool(defaultSubPoolNodeAddress)
+      await subPoolNode.setParent(defaultSubPoolNodeAddress)
 
       await expect(subPoolNode.join(subPoolNode2Address, 100)).to.be.revertedWithCustomError(
         subPoolNode,

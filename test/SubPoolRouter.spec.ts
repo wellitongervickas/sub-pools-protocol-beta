@@ -17,23 +17,23 @@ describe('SubPoolRouter', () => {
     it('should set initial ID', async function () {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
 
-      expect(await subPoolRouter.nextSubPoolID()).to.equal(0)
+      expect(await subPoolRouter.currentID()).to.equal(0)
     })
   })
 
   describe('Main', () => {
     it('should update next ID', async function () {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
-      await subPoolRouter.createMain(100, [])
+      await subPoolRouter.create(100, [])
 
-      expect(await subPoolRouter.nextSubPoolID()).to.equal(1)
+      expect(await subPoolRouter.currentID()).to.equal(1)
     })
 
     it('should set the main subpool initial balance', async function () {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
 
       const amount = 1000
-      const tx = await subPoolRouter.createMain(amount, [])
+      const tx = await subPoolRouter.create(amount, [])
       let receipt = await tx.wait()
 
       const [subPoolAddress] = receipt.logs[2].args
@@ -46,12 +46,12 @@ describe('SubPoolRouter', () => {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
       const amount = 1000
 
-      const tx = await subPoolRouter.createMain(amount, [])
+      const tx = await subPoolRouter.create(amount, [])
       const receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[2].args
 
       const subPoolNode = await ethers.getContractAt('SubPoolNode', subPoolAddress)
-      const parent = await subPoolNode.parentSubPool()
+      const parent = await subPoolNode.parent()
 
       expect(await subPoolRouter.getAddress()).to.equal(parent)
     })
@@ -63,14 +63,14 @@ describe('SubPoolRouter', () => {
       const amount = 1000
       const [, invited] = accounts
 
-      const tx = await subPoolRouter.createMain(amount, [invited.address])
+      const tx = await subPoolRouter.create(amount, [invited.address])
       let receipt = await tx.wait()
 
       const [subPoolAddress] = receipt.logs[3].args
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as SubPoolRouter
 
-      await expect(invitedRouterInstance.createNode(subPoolAddress, amount, [])).to.not.be.reverted
+      await expect(invitedRouterInstance.join(subPoolAddress, amount, [])).to.not.be.reverted
     })
 
     it('should set parent subpool when joined', async function () {
@@ -78,16 +78,16 @@ describe('SubPoolRouter', () => {
       const amount = 1000
       const [, invited] = accounts
 
-      const tx = await subPoolRouter.createMain(amount, [invited.address])
+      const tx = await subPoolRouter.create(amount, [invited.address])
       let receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[3].args
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
-      const tx2 = await invitedRouterInstance.createNode(subPoolAddress, amount, [])
+      const tx2 = await invitedRouterInstance.join(subPoolAddress, amount, [])
       let receipt2 = await tx2.wait()
       const [subPoolAddress2] = receipt2.logs[6].args
       const subPoolNode = await ethers.getContractAt('SubPoolNode', subPoolAddress2)
-      const parentAddress = await subPoolNode.parentSubPool()
+      const parentAddress = await subPoolNode.parent()
 
       expect(parentAddress).to.equal(subPoolAddress)
     })
@@ -97,12 +97,12 @@ describe('SubPoolRouter', () => {
       const amount = 1000
       const [, invited] = accounts
 
-      const tx = await subPoolRouter.createMain(amount, [invited.address])
+      const tx = await subPoolRouter.create(amount, [invited.address])
       let receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[3].args
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as SubPoolRouter
-      await invitedRouterInstance.createNode(subPoolAddress, amount, [])
+      await invitedRouterInstance.join(subPoolAddress, amount, [])
 
       const [, , balance] = await subPoolRouter.subPools(subPoolAddress)
 
@@ -117,19 +117,19 @@ describe('SubPoolRouter', () => {
         const amount = 1000
         const [, , hacker] = accounts
 
-        const tx = await subPoolRouter.createMain(amount, [])
+        const tx = await subPoolRouter.create(amount, [])
         let receipt = await tx.wait()
         const [subPoolAddress] = receipt.logs[2].args
 
         const hackerRouterInstance = subPoolRouter.connect(hacker) as SubPoolRouter
-        await expect(hackerRouterInstance.createNode(subPoolAddress, amount, [])).to.be.rejectedWith('NotInvited()')
+        await expect(hackerRouterInstance.join(subPoolAddress, amount, [])).to.be.rejectedWith('NotInvited()')
       })
 
       it('should revert when try to call deposit if sender is not node', async function () {
         const { subPoolRouter } = await loadFixture(deployRouterFixture)
         const amount = 1000
 
-        const tx = await subPoolRouter.createMain(amount, [])
+        const tx = await subPoolRouter.create(amount, [])
         let receipt = await tx.wait()
         const [subPoolAddress] = receipt.logs[2].args
 
@@ -140,7 +140,7 @@ describe('SubPoolRouter', () => {
 
   describe('Events', () => {
     describe('Main', () => {
-      it('should emit SubPoolMainCreated on create a main node', async function () {
+      it('should emit SubPoolCreated on create a main node', async function () {
         const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
 
         const [, invited] = accounts
@@ -148,27 +148,27 @@ describe('SubPoolRouter', () => {
 
         const amount = 1000
 
-        await expect(subPoolRouter.createMain(amount, []))
-          .to.emit(subPoolRouter, 'SubPoolMainCreated')
+        await expect(subPoolRouter.create(amount, []))
+          .to.emit(subPoolRouter, 'SubPoolCreated')
           .withArgs(anyValue, 1, amount)
       })
     })
 
     describe('Node', () => {
-      it('should emit SubPoolNodeCreated on create a node', async function () {
+      it('should emit SubPoolJoined on create a node', async function () {
         const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
         const amount = 1000
         const [, invited] = accounts
 
-        const tx = await subPoolRouter.createMain(amount, [invited.address])
+        const tx = await subPoolRouter.create(amount, [invited.address])
         let receipt = await tx.wait()
 
         const [subPoolAddress] = receipt.logs[3].args
 
         const newInstance = subPoolRouter.connect(invited) as SubPoolRouter
 
-        await expect(newInstance.createNode(subPoolAddress, amount, []))
-          .to.emit(subPoolRouter, 'SubPoolNodeCreated')
+        await expect(newInstance.join(subPoolAddress, amount, []))
+          .to.emit(subPoolRouter, 'SubPoolJoined')
           .withArgs(anyValue, 1, amount)
       })
 
@@ -177,13 +177,13 @@ describe('SubPoolRouter', () => {
         const amount = 1000
         const [, invited] = accounts
 
-        const tx = await subPoolRouter.createMain(amount, [invited.address])
+        const tx = await subPoolRouter.create(amount, [invited.address])
         let receipt = await tx.wait()
         const [subPoolAddress] = receipt.logs[3].args
 
         const newInstance = subPoolRouter.connect(invited) as SubPoolRouter
 
-        await expect(newInstance.createNode(subPoolAddress, amount, []))
+        await expect(newInstance.join(subPoolAddress, amount, []))
           .to.emit(subPoolRouter, 'SubPoolDeposited')
           .withArgs(anyValue, amount)
       })
