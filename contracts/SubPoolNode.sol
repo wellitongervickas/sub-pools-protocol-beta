@@ -7,7 +7,7 @@ import '@openzeppelin/contracts/utils/Counters.sol';
 
 import './lib/SubPoolLib.sol';
 import './lib/ManagerLib.sol';
-import './interfaces/SubPool.sol';
+import './SubPool.sol';
 
 contract SubPoolNode is SubPool, Ownable, AccessControl {
     using ManagerLib for ManagerLib.Manager;

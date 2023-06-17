@@ -7,7 +7,7 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 
 import './SubPoolNode.sol';
 import './lib/SubPoolLib.sol';
-import './interfaces/SubPool.sol';
+import './SubPool.sol';
 
 contract SubPoolRouter is SubPool {
     using SubPoolLib for SubPoolLib.SubPool;
@@ -30,29 +30,29 @@ contract SubPoolRouter is SubPool {
         return _subPoolAddress;
     }
 
-    function _setSubPoolParent(SubPoolNode _subPool, address _parentSubPoolAddress) internal {
-        _subPool.setParentSubPool(_parentSubPoolAddress);
+    function _setSubPoolParent(SubPoolNode _subPool, address _subPoolParentAddress) internal {
+        _subPool.setParentSubPool(_subPoolParentAddress);
     }
 
     function createNode(
-        address _parentSubPoolAddress,
+        address _subPoolParentAddress,
         uint256 _amount,
         address[] memory _invitedAddresses
     ) external returns (address) {
-        SubPoolNode _parentSubPool = SubPoolNode(_parentSubPoolAddress);
+        SubPoolNode _parentSubPool = SubPoolNode(_subPoolParentAddress);
         SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _invitedAddresses);
 
         address _subPoolAddress = address(_subPool);
-        uint256 _subPoolId = _joinParentSubPoolAsNode(_parentSubPool, _subPoolAddress, _amount);
+        uint256 _subPoolId = _joinParentAsNode(_parentSubPool, _subPoolAddress, _amount);
 
-        _setSubPoolParent(_subPool, _parentSubPoolAddress);
+        _setSubPoolParent(_subPool, _subPoolParentAddress);
 
         emit SubPoolNodeCreated(_subPoolAddress, _subPoolId, _amount);
 
         return _subPoolAddress;
     }
 
-    function _joinParentSubPoolAsNode(
+    function _joinParentAsNode(
         SubPoolNode _parentSubPool,
         address _subPoolAddress,
         uint256 _amount

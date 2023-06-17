@@ -5,8 +5,8 @@ import '@openzeppelin/contracts/access/AccessControlEnumerable.sol'; // change t
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 
-import '../lib/SubPoolLib.sol';
-import '../lib/ManagerLib.sol';
+import './lib/SubPoolLib.sol';
+import './lib/ManagerLib.sol';
 
 abstract contract SubPool {
     using SubPoolLib for SubPoolLib.SubPool;

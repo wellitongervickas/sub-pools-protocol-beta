@@ -317,8 +317,8 @@ describe('SubPoolNode', () => {
       const { subPoolNode: subPoolNodeDefault } = await loadFixture(deployRoutedNodeFixture)
 
       const defaultSubPoolNodeAddress = await subPoolNodeDefault.getAddress()
-
       const SubPoolNode = await ethers.getContractFactory('SubPoolNode', hacker)
+
       const subPoolNode = await SubPoolNode.deploy(hacker.address, 100, [hacker.address])
       const subPoolNode2 = await SubPoolNode.deploy(hacker.address, 100, [hacker.address])
 
