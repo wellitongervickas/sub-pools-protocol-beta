@@ -6,7 +6,4 @@ library FractionLib {
         uint256 value; // numerator
         uint256 divider; // denominator
     }
-
-    error DividerIsZero();
-    error ValueIsZero();
 }

@@ -131,9 +131,9 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
         if (!_checkIsInvitedAddress(tx.origin)) revert NotInvited();
 
         uint256 _id = _updateCurrentID();
-        uint256 _initialBalance = _computeManagerFraction(_amount);
+        uint256 _amountSubTotal = _computeJoinFees(_amount);
 
-        subPools[_subPoolAddress] = SubPoolLib.SubPool({id: _id, initialBalance: _initialBalance, balance: 0});
+        subPools[_subPoolAddress] = SubPoolLib.SubPool({id: _id, initialBalance: _amountSubTotal, balance: 0});
 
         _updateNodeManagerRole(tx.origin);
         _updateParentBalance(_amount);
@@ -148,8 +148,8 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
      * @param _amount amount to compute
      * @return remaining amount
      */
-    function _computeManagerFraction(uint256 _amount) internal returns (uint256) {
-        uint256 _managerAmount = manager._computeFraction(_amount);
+    function _computeJoinFees(uint256 _amount) internal returns (uint256) {
+        uint256 _managerAmount = manager._computeFees(_amount);
         _updateManagerBalance(_managerAmount);
 
         return _amount.sub(_managerAmount);

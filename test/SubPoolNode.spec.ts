@@ -198,13 +198,11 @@ describe('SubPoolNode', () => {
 
     it('should set manager balance when manager ratio is set', async function () {
       const customFeesFraction = {
-        value: ethers.toBigInt(10),
-        divider: ethers.toBigInt(100),
-      } // 10%
+        value: ethers.toBigInt(1),
+        divider: ethers.toBigInt(200),
+      }
 
-      const numerator = 100
-      const denominator = ethers.toNumber(customFeesFraction.divider)
-      const amount = String(numerator * denominator)
+      const amount = ethers.parseUnits('100', 18)
 
       const [, invited, node] = await ethers.getSigners()
       const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
@@ -220,18 +218,16 @@ describe('SubPoolNode', () => {
       const invitedSubPoolNode = await ethers.getContractAt('SubPoolNode', invitedSubNodeAddress)
 
       const [, , balance] = await invitedSubPoolNode.manager()
-      expect(balance).to.be.equal(ethers.toBigInt(1000))
+      expect(balance).to.be.equal('500000000000000000')
     })
 
     it('should set node balance when manager ratio is set', async function () {
       const customFeesFraction = {
-        value: ethers.toBigInt(10),
+        value: ethers.toBigInt(1),
         divider: ethers.toBigInt(100),
       } // 10%
 
-      const numerator = 100
-      const denominator = ethers.toNumber(customFeesFraction.divider)
-      const amount = String(numerator * denominator)
+      const amount = ethers.parseUnits('100', 18)
 
       const [, invited, node] = await ethers.getSigners()
       const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
@@ -250,7 +246,7 @@ describe('SubPoolNode', () => {
       const invitedSubPoolNode = await ethers.getContractAt('SubPoolNode', invitedSubNodeAddress)
 
       const [, initialBalance] = await invitedSubPoolNode.subPools(nodeAddress)
-      expect(initialBalance).to.be.equal(ethers.toBigInt(9000))
+      expect(initialBalance).to.be.equal('99000000000000000000')
     })
   })
 
