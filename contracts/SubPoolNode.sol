@@ -32,6 +32,7 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
     error AlreadyNodeManager();
     error NotInvited();
     error AlreadyInvited();
+    error NotNodeManager();
 
     /**
      * @dev Initialize the contract
@@ -177,20 +178,19 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
      * @param _amount amount to update on parent context
      */
     function _updateParentBalance(uint256 _amount) internal {
-        SubPoolNode(parent).deposit(address(this), _amount);
+        SubPoolNode(parent).deposit(_amount);
     }
 
     /**
      * @dev Deposit to a subpool root and update parent balance
-     * @param _subPoolAddress address of the subpool root
      * @param _amount amount to deposit
      */
 
-    function deposit(address _subPoolAddress, uint256 _amount) public override {
-        super.deposit(_subPoolAddress, _amount);
+    function deposit(uint256 _amount) public override {
+        super.deposit(_amount);
 
         _updateParentBalance(_amount);
 
-        emit SubPoolDeposited(_subPoolAddress, _amount);
+        emit SubPoolDeposited(msg.sender, _amount);
     }
 }

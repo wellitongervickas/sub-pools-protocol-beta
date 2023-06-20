@@ -16,7 +16,7 @@ abstract contract SubPool {
 
     mapping(address => SubPoolLib.SubPool) public subPools;
 
-    error NodeNotAllowed();
+    error NotAllowed();
 
     /**
      * @dev Update the current ID.
@@ -29,14 +29,13 @@ abstract contract SubPool {
 
     /**
      * @dev Deposit to a subpool node
-     * @param _subPoolAddress address of the subpool node
      * @param _amount amount to deposit
      */
-    function deposit(address _subPoolAddress, uint256 _amount) public virtual {
-        SubPoolLib.SubPool storage _subPool = subPools[_subPoolAddress];
+    function deposit(uint256 _amount) public virtual {
+        SubPoolLib.SubPool storage _subPool = subPools[msg.sender];
 
-        bool _isNode = _subPool._checkIsNode(msg.sender, _subPoolAddress);
-        if (!_isNode) revert NodeNotAllowed();
+        bool _isNode = _subPool._checkIsNode();
+        if (!_isNode) revert NotAllowed();
 
         _setSubPoolBalance(_subPool, _amount);
     }

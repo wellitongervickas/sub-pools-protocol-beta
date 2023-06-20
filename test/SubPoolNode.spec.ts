@@ -200,7 +200,7 @@ describe('SubPoolNode', () => {
       const customFeesFraction = {
         value: ethers.toBigInt(1),
         divider: ethers.toBigInt(200),
-      }
+      } // 100e18 * (1/200 = 0.005) = 0.5e18
 
       const amount = ethers.parseUnits('100', 18)
 
@@ -375,15 +375,12 @@ describe('SubPoolNode', () => {
       })
 
       it('should revert when try to call deposit if sender is not node', async function () {
-        const [manager, anyEntity] = await ethers.getSigners()
+        const [manager] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(
           deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
         )
 
-        await expect(subPoolNode.deposit(anyEntity.address, 100)).to.be.revertedWithCustomError(
-          subPoolNode,
-          'NodeNotAllowed()'
-        )
+        await expect(subPoolNode.deposit(100)).to.be.revertedWithCustomError(subPoolNode, 'NotAllowed()')
       })
     })
   })
@@ -451,7 +448,7 @@ describe('SubPoolNode', () => {
 
       await expect(subPoolNode.join(subPoolNode2Address, 100)).to.be.revertedWithCustomError(
         subPoolNode,
-        'NodeNotAllowed()'
+        'NotAllowed()'
       )
     })
   })

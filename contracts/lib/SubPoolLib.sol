@@ -22,14 +22,9 @@ library SubPoolLib {
     /**
      * @dev Check if sender is node
      * @param _self subpool itself
-     * @param _sender caller
-     * @param _subPoolAddress address of the subpool node
+     * @return is the sender a node
      */
-    function _checkIsNode(
-        SubPool storage _self,
-        address _sender,
-        address _subPoolAddress
-    ) internal view returns (bool) {
-        return _sender == _subPoolAddress && _self.id > 0;
+    function _checkIsNode(SubPool storage _self) internal view returns (bool) {
+        return _self.id > 0;
     }
 }

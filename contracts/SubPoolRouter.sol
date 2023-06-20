@@ -39,7 +39,6 @@ contract SubPoolRouter is SubPool {
         _setParent(_subPool, address(this));
 
         emit SubPoolCreated(_subPoolAddress, subPools[_subPoolAddress].id, _amount);
-
         return _subPoolAddress;
     }
 
@@ -74,7 +73,6 @@ contract SubPoolRouter is SubPool {
         _setParent(_subPool, _parentAddress);
 
         emit SubPoolJoined(_subPoolAddress, _subPoolId, _amount);
-
         return _subPoolAddress;
     }
 
@@ -94,12 +92,10 @@ contract SubPoolRouter is SubPool {
 
     /**
      * @dev Deposit to a subpool root
-     * @param _subPoolAddress address of the subpool root
      * @param _amount amount to deposit
      */
-    function deposit(address _subPoolAddress, uint256 _amount) public override {
-        super.deposit(_subPoolAddress, _amount);
-
-        emit SubPoolDeposited(_subPoolAddress, _amount);
+    function deposit(uint256 _amount) public override {
+        super.deposit(_amount);
+        emit SubPoolDeposited(msg.sender, _amount);
     }
 }
