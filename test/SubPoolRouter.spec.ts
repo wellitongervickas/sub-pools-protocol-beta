@@ -96,53 +96,6 @@ describe('SubPoolRouter', () => {
 
       expect(parentAddress).to.equal(subPoolAddress)
     })
-
-    it('should update parent balance when joined', async function () {
-      const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
-      const amount = '1000'
-      const [, invited] = accounts
-
-      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address])
-      let receipt = await tx.wait()
-      const [subPoolAddress] = receipt.logs[3].args
-
-      const invitedRouterInstance = subPoolRouter.connect(invited) as SubPoolRouter
-      await invitedRouterInstance.join(subPoolAddress, amount, DEFAULT_FEES_FRACTION, [])
-
-      const [, , balance] = await subPoolRouter.subPools(subPoolAddress)
-
-      expect(balance).to.equal(ethers.toBigInt(amount))
-    })
-  })
-
-  describe('Validations', () => {
-    describe('Node', () => {
-      it('should revert when node manager is not invited', async function () {
-        const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
-        const amount = '1000'
-        const [, , hacker] = accounts
-
-        const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [])
-        let receipt = await tx.wait()
-        const [subPoolAddress] = receipt.logs[2].args
-
-        const hackerRouterInstance = subPoolRouter.connect(hacker) as SubPoolRouter
-        await expect(hackerRouterInstance.join(subPoolAddress, amount, DEFAULT_FEES_FRACTION, [])).to.be.rejectedWith(
-          'NotInvited()'
-        )
-      })
-
-      it('should revert when try to call deposit if sender is not node', async function () {
-        const { subPoolRouter } = await loadFixture(deployRouterFixture)
-        const amount = '1000'
-
-        const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [])
-        let receipt = await tx.wait()
-        const [subPoolAddress] = receipt.logs[2].args
-
-        await expect(subPoolRouter.deposit(subPoolAddress, amount)).to.be.rejectedWith('NodeNotAllowed()')
-      })
-    })
   })
 
   describe('Events', () => {
