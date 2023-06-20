@@ -24,18 +24,17 @@ contract SubPoolRouter is SubPool {
      * @param _invitedAddresses list of addresses invited by manager
      * @return address of the new root subpool
      */
-    function create(uint256 _amount, address[] memory _invitedAddresses) external returns (address) {
-        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _invitedAddresses);
+    function create(
+        uint256 _amount,
+        FractionLib.Fraction memory _fees,
+        address[] memory _invitedAddresses
+    ) external returns (address) {
+        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _fees, _invitedAddresses);
 
         address _subPoolAddress = address(_subPool);
         uint256 _id = _updateCurrentID();
 
-        subPools[_subPoolAddress] = SubPoolLib.SubPool({
-            id: _id,
-            initialBalance: _amount,
-            balance: 0,
-            feesRatio: FractionLib.Fraction({value: 0, divider: 100})
-        });
+        subPools[_subPoolAddress] = SubPoolLib.SubPool({id: _id, initialBalance: _amount, balance: 0});
 
         _setParent(_subPool, address(this));
 
@@ -63,10 +62,11 @@ contract SubPoolRouter is SubPool {
     function join(
         address _parentAddress,
         uint256 _amount,
+        FractionLib.Fraction memory _fees,
         address[] memory _invitedAddresses
     ) external returns (address) {
         SubPoolNode _parentSubPool = SubPoolNode(_parentAddress);
-        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _invitedAddresses);
+        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _fees, _invitedAddresses);
 
         address _subPoolAddress = address(_subPool);
         uint256 _subPoolId = _joinParent(_parentSubPool, _subPoolAddress, _amount);

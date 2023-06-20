@@ -8,7 +8,6 @@ library SubPoolLib {
         uint256 id;
         uint256 initialBalance;
         uint256 balance;
-        FractionLib.Fraction feesRatio;
     }
 
     /**

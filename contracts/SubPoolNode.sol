@@ -9,9 +9,11 @@ import './SubPool.sol';
 import './lib/SubPoolLib.sol';
 import './lib/ManagerLib.sol';
 
+import 'hardhat/console.sol';
+
 contract SubPoolNode is SubPool, Ownable, AccessControl {
     using ManagerLib for ManagerLib.Manager;
-    using ManagerLib for ManagerLib.Manager;
+    using SafeMath for uint256;
 
     bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
     bytes32 public constant INVITED_ROLE = keccak256('INVITED_ROLE');
@@ -37,12 +39,17 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
      * @param _amount amount of initial deposit of the manager
      * @param _invitedAddresses array of addresses to invite
      */
-    constructor(address _managerAddress, uint256 _amount, address[] memory _invitedAddresses) {
+    constructor(
+        address _managerAddress,
+        uint256 _amount,
+        FractionLib.Fraction memory _fees,
+        address[] memory _invitedAddresses
+    ) {
         manager = ManagerLib.Manager({
             managerAddress: _managerAddress,
             initialBalance: _amount,
             balance: 0,
-            feesRatio: FractionLib.Fraction({value: 0, divider: 100})
+            fees: _fees
         });
 
         _setupInitialInvites(_invitedAddresses);
@@ -124,13 +131,9 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
         if (!_checkIsInvitedAddress(tx.origin)) revert NotInvited();
 
         uint256 _id = _updateCurrentID();
+        uint256 _initialBalance = _computeManagerFraction(_amount);
 
-        subPools[_subPoolAddress] = SubPoolLib.SubPool({
-            id: _id,
-            initialBalance: _amount,
-            balance: 0,
-            feesRatio: FractionLib.Fraction({value: 0, divider: 100})
-        });
+        subPools[_subPoolAddress] = SubPoolLib.SubPool({id: _id, initialBalance: _initialBalance, balance: 0});
 
         _updateNodeManagerRole(tx.origin);
         _updateParentBalance(_amount);
@@ -138,6 +141,26 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
         emit NodeManagerJoined(tx.origin, subPools[_subPoolAddress].id);
 
         return subPools[_subPoolAddress].id;
+    }
+
+    /**
+     * @dev compute manager fraction
+     * @param _amount amount to compute
+     * @return remaining amount
+     */
+    function _computeManagerFraction(uint256 _amount) internal returns (uint256) {
+        uint256 _managerAmount = manager._computeFraction(_amount);
+        _updateManagerBalance(_managerAmount);
+
+        return _amount.sub(_managerAmount);
+    }
+
+    /**
+     * @dev update manager balance
+     * @param _amount amount to update on manager context
+     */
+    function _updateManagerBalance(uint256 _amount) internal {
+        manager._updateBalance(_amount);
     }
 
     /**
