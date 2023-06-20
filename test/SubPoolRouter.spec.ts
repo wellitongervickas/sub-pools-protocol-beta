@@ -5,9 +5,9 @@ import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers'
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 
 const DEFAULT_FEES_FRACTION = {
-  value: ethers.toBigInt(1),
+  value: ethers.toBigInt(0),
   divider: ethers.toBigInt(100),
-} // 0.01
+}
 
 describe('SubPoolRouter', () => {
   async function deployRouterFixture() {
