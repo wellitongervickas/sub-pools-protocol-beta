@@ -202,9 +202,9 @@ describe('SubPoolNode', () => {
         divider: ethers.toBigInt(100),
       } // 10%
 
-      const nominator = 100
+      const numerator = 100
       const denominator = ethers.toNumber(customFeesFraction.divider)
-      const amount = String(nominator * denominator)
+      const amount = String(numerator * denominator)
 
       const [, invited, node] = await ethers.getSigners()
       const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
@@ -229,9 +229,9 @@ describe('SubPoolNode', () => {
         divider: ethers.toBigInt(100),
       } // 10%
 
-      const nominator = 100
+      const numerator = 100
       const denominator = ethers.toNumber(customFeesFraction.divider)
-      const amount = String(nominator * denominator)
+      const amount = String(numerator * denominator)
 
       const [, invited, node] = await ethers.getSigners()
       const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
