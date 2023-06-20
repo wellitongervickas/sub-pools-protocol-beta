@@ -5,6 +5,7 @@ import './Fraction.sol';
 
 library SubPoolLib {
     struct SubPool {
+        address managerAddress;
         uint256 id;
         uint256 initialBalance;
         uint256 balance;

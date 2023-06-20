@@ -134,7 +134,12 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
         uint256 _id = _updateCurrentID();
         uint256 _amountSubTotal = _computeJoinFees(_amount);
 
-        subPools[_subPoolAddress] = SubPoolLib.SubPool({id: _id, initialBalance: _amountSubTotal, balance: 0});
+        subPools[_subPoolAddress] = SubPoolLib.SubPool({
+            managerAddress: tx.origin,
+            id: _id,
+            initialBalance: _amountSubTotal,
+            balance: 0
+        });
 
         _updateNodeManagerRole(tx.origin);
         _updateParentBalance(_amount);

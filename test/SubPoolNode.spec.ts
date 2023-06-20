@@ -147,7 +147,8 @@ describe('SubPoolNode', () => {
       const nodeAddress = rcpt1.logs[7].args[0]
 
       const invitedSubPoolNode = await ethers.getContractAt('SubPoolNode', invitedSubNodeAddress)
-      const [, initialBalance] = await invitedSubPoolNode.subPools(nodeAddress)
+      // console.log(await invitedSubPoolNode.subPools(nodeAddress))
+      const [, , initialBalance] = await invitedSubPoolNode.subPools(nodeAddress)
       expect(initialBalance).to.be.equal(ethers.toBigInt(amount))
     })
 
@@ -168,7 +169,7 @@ describe('SubPoolNode', () => {
       const nodeAddress = rcpt1.logs[7].args[0]
 
       const invitedSubPoolNode = await ethers.getContractAt('SubPoolNode', invitedSubNodeAddress)
-      const [, , balance] = await invitedSubPoolNode.subPools(nodeAddress)
+      const [, , , balance] = await invitedSubPoolNode.subPools(nodeAddress)
       expect(balance).to.be.equal(ethers.toBigInt(0))
     })
 
@@ -192,7 +193,7 @@ describe('SubPoolNode', () => {
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
       await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node.address])
 
-      const [, , balance] = await subPoolRouter.subPools(subNodeAddress)
+      const [, , , balance] = await subPoolRouter.subPools(subNodeAddress)
       expect(balance).to.be.equal(ethers.toBigInt(amount))
     })
 
@@ -245,7 +246,7 @@ describe('SubPoolNode', () => {
 
       const invitedSubPoolNode = await ethers.getContractAt('SubPoolNode', invitedSubNodeAddress)
 
-      const [, initialBalance] = await invitedSubPoolNode.subPools(nodeAddress)
+      const [, , initialBalance] = await invitedSubPoolNode.subPools(nodeAddress)
       expect(initialBalance).to.be.equal('99000000000000000000')
     })
   })

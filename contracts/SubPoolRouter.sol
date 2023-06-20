@@ -34,7 +34,12 @@ contract SubPoolRouter is SubPool {
         address _subPoolAddress = address(_subPool);
         uint256 _id = _updateCurrentID();
 
-        subPools[_subPoolAddress] = SubPoolLib.SubPool({id: _id, initialBalance: _amount, balance: 0});
+        subPools[_subPoolAddress] = SubPoolLib.SubPool({
+            managerAddress: msg.sender,
+            id: _id,
+            initialBalance: _amount,
+            balance: 0
+        });
 
         _setParent(_subPool, address(this));
 

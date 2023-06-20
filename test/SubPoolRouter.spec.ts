@@ -42,7 +42,7 @@ describe('SubPoolRouter', () => {
       let receipt = await tx.wait()
 
       const [subPoolAddress] = receipt.logs[2].args
-      const [, initialBalance] = await subPoolRouter.subPools(subPoolAddress)
+      const [, , initialBalance] = await subPoolRouter.subPools(subPoolAddress)
 
       expect(initialBalance).to.deep.equal(ethers.toBigInt(amount))
     })
@@ -97,10 +97,6 @@ describe('SubPoolRouter', () => {
       expect(parentAddress).to.equal(subPoolAddress)
     })
   })
-
-  // describe('Additional Deposit', () => {
-  //   it('')
-  // })
 
   describe('Events', () => {
     describe('Main', () => {
