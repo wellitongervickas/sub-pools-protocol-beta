@@ -32,20 +32,31 @@ abstract contract SubPool {
      * @param _amount amount to deposit
      */
     function deposit(uint256 _amount) public virtual {
-        SubPoolLib.SubPool storage _subPool = subPools[msg.sender];
+        _checkIsNode(msg.sender);
+        _setSubPoolBalance(msg.sender, _amount);
+    }
 
-        bool _isNode = _subPool._checkIsNode();
+    function _checkIsNode(address _address) internal view {
+        bool _isNode = subPools[_address]._checkIsNode();
         if (!_isNode) revert NotAllowed();
-
-        _setSubPoolBalance(_subPool, _amount);
     }
 
     /**
      * @dev Updated subpool node balance
-     * @param _subPool subpool instance
+     * @param _address subpool address
      * @param _amount amount of balance to set
      */
-    function _setSubPoolBalance(SubPoolLib.SubPool storage _subPool, uint256 _amount) internal {
-        _subPool._setBalance(_amount);
+    function _setSubPoolBalance(address _address, uint256 _amount) internal {
+        subPools[_address]._setBalance(_amount);
+    }
+
+    /**
+     * @dev update subpool node balance
+     * @param _subPoolAddress address of the subpool node
+     * @param _amount additional amount deposited by manager of node
+     */
+    function additionalDeposit(address _subPoolAddress, uint256 _amount) public virtual {
+        _checkIsNode(_subPoolAddress);
+        _setSubPoolBalance(_subPoolAddress, _amount);
     }
 }

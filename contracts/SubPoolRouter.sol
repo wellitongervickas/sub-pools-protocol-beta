@@ -103,4 +103,21 @@ contract SubPoolRouter is SubPool {
         super.deposit(_amount);
         emit SubPoolDeposited(msg.sender, _amount);
     }
+
+    /**
+     * @dev update subpool node balance
+     * @param _subPoolAddress address of the subpool node
+     * @param _amount additional amount deposited by manager of node
+     */
+    function additionalDeposit(address _subPoolAddress, uint256 _amount) public override {
+        address _parentAddress = SubPoolNode(_subPoolAddress).parent();
+
+        if (_parentAddress == address(this)) {
+            super.additionalDeposit(_subPoolAddress, _amount);
+        } else {
+            SubPoolNode(_parentAddress).additionalDeposit(_subPoolAddress, _amount);
+        }
+
+        emit SubPoolDeposited(_subPoolAddress, _amount);
+    }
 }

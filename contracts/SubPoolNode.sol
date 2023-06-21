@@ -150,7 +150,7 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
     }
 
     /**
-     * @dev compute manager fraction
+     * @dev compute manager join fees
      * @param _amount amount to compute
      * @return remaining amount
      */
@@ -187,15 +187,26 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
     }
 
     /**
-     * @dev Deposit to a subpool root and update parent balance
+     * @dev Deposit to a subpool
      * @param _amount amount to deposit
      */
 
     function deposit(uint256 _amount) public override {
         super.deposit(_amount);
-
         _updateParentBalance(_amount);
 
         emit SubPoolDeposited(msg.sender, _amount);
+    }
+
+    /**
+     * @dev update subpool node balance
+     * @param _subPoolAddress address of the subpool node
+     * @param _amount additional amount deposited by manager of node
+     */
+    function additionalDeposit(address _subPoolAddress, uint256 _amount) public override onlyOwner {
+        super.additionalDeposit(_subPoolAddress, _amount);
+        _updateParentBalance(_amount);
+
+        emit SubPoolDeposited(_subPoolAddress, _amount);
     }
 }

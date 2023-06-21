@@ -14,10 +14,10 @@ library SubPoolLib {
     /**
      * @dev set subpool balance
      * @param _self subpool itself
-     * @param _amount amount to set
+     * @param _value amount to set
      */
-    function _setBalance(SubPool storage _self, uint256 _amount) internal {
-        _self.balance += _amount;
+    function _setBalance(SubPool storage _self, uint256 _value) internal {
+        _self.balance += _value;
     }
 
     /**
