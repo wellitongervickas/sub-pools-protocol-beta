@@ -8,6 +8,7 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
+    "test:coverage": "hardhat coverage",
     "local:watchTest": "chokidar '(contracts|test)/**/*' -c 'npx hardhat test'"
   },
   "devDependencies": {

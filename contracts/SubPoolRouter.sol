@@ -18,12 +18,6 @@ contract SubPoolRouter is SubPool {
     event SubPoolJoined(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
     event SubPoolDeposited(address indexed _subPoolAddress, uint256 _amount);
 
-    /**
-     * @dev Create a new root subpool
-     * @param _amount initial amount deposited by manager
-     * @param _invitedAddresses list of addresses invited by manager
-     * @return address of the new root subpool
-     */
     function create(
         uint256 _amount,
         FractionLib.Fraction memory _fees,
@@ -47,22 +41,10 @@ contract SubPoolRouter is SubPool {
         return _subPoolAddress;
     }
 
-    /**
-     * @dev Set subpool parent by address
-     * @param _subPool subpool instance
-     * @param _parentAddress address of the parent subpool
-     */
     function _setParent(SubPoolNode _subPool, address _parentAddress) internal {
         _subPool.setParent(_parentAddress);
     }
 
-    /**
-     * @dev Join an existing subpool as node
-     * @param _parentAddress address of the parent subpool
-     * @param _amount initial amount deposited by manager of node
-     * @param _invitedAddresses list of addresses invited by manager of node
-     * @return address of the new node subpool
-     */
     function join(
         address _parentAddress,
         uint256 _amount,
@@ -81,12 +63,6 @@ contract SubPoolRouter is SubPool {
         return _subPoolAddress;
     }
 
-    /**
-     * @dev join parent as subpool
-     * @param _parentSubPool instance of parent subpool
-     * @param _subPoolAddress address of the node subpool
-     * @param _amount initial amount deposited by manager of node
-     */
     function _joinParent(
         SubPoolNode _parentSubPool,
         address _subPoolAddress,
@@ -95,27 +71,18 @@ contract SubPoolRouter is SubPool {
         return _parentSubPool.join(_subPoolAddress, _amount);
     }
 
-    /**
-     * @dev Deposit to a subpool root
-     * @param _amount amount to deposit
-     */
     function deposit(uint256 _amount) public override {
         super.deposit(_amount);
         emit SubPoolDeposited(msg.sender, _amount);
     }
 
-    /**
-     * @dev update subpool node balance
-     * @param _subPoolAddress address of the subpool node
-     * @param _amount additional amount deposited by manager of node
-     */
-    function additionalDeposit(address _subPoolAddress, uint256 _amount) public override {
+    function additionalDeposit(address _subPoolAddress, uint256 _amount) external {
         address _parentAddress = SubPoolNode(_subPoolAddress).parent();
 
         if (_parentAddress == address(this)) {
-            super.additionalDeposit(_subPoolAddress, _amount);
+            _setSubPoolBalance(_subPoolAddress, _amount);
         } else {
-            SubPoolNode(_parentAddress).additionalDeposit(_subPoolAddress, _amount);
+            SubPoolNode(_subPoolAddress).additionalDeposit(_amount);
         }
 
         emit SubPoolDeposited(_subPoolAddress, _amount);

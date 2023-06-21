@@ -39,7 +39,7 @@ describe('SubPoolNode', () => {
     const [, invited] = await ethers.getSigners()
     const { subPoolRouter } = await loadFixture(deployRouterFixture)
 
-    const tx = await subPoolRouter.create(0, DEFAULT_FEES_FRACTION, [invited.address])
+    const tx = await subPoolRouter.create(ethers.toBigInt(100), DEFAULT_FEES_FRACTION, [invited.address])
     let receipt = await tx.wait()
     const [subPoolAddress] = receipt.logs[3].args
     const subPoolNode = await ethers.getContractAt('SubPoolNode', subPoolAddress)
@@ -147,7 +147,6 @@ describe('SubPoolNode', () => {
       const nodeAddress = rcpt1.logs[7].args[0]
 
       const invitedSubPoolNode = await ethers.getContractAt('SubPoolNode', invitedSubNodeAddress)
-      // console.log(await invitedSubPoolNode.subPools(nodeAddress))
       const [, , initialBalance] = await invitedSubPoolNode.subPools(nodeAddress)
       expect(initialBalance).to.be.equal(ethers.toBigInt(amount))
     })
@@ -251,6 +250,56 @@ describe('SubPoolNode', () => {
     })
   })
 
+  describe('Additional deposit', () => {
+    it('should update manager balance on additional deposit', async function () {
+      const amount = ethers.toBigInt(100)
+      const [, invited, node1] = await ethers.getSigners()
+      const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
+
+      const subNodeAddress = await subPoolNode.getAddress()
+      const invitedRouterInstance = subPoolRouter.connect(invited) as any
+      const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node1.address])
+      const rcpt0 = await tx0.wait()
+      const invitedSubPoolNodeAddress = rcpt0.logs[7].args[0]
+
+      const node1RouterInstance = subPoolRouter.connect(node1) as any
+      const tx1 = await node1RouterInstance.join(invitedSubPoolNodeAddress, amount, DEFAULT_FEES_FRACTION, [])
+      const rcpt1 = await tx1.wait()
+      const node1SubPoolNodeAddress = rcpt1.logs[7].args[0]
+
+      const newAmount = ethers.toBigInt(1000)
+      await node1RouterInstance.additionalDeposit(node1SubPoolNodeAddress, newAmount)
+
+      const subPoolNode1 = await ethers.getContractAt('SubPoolNode', node1SubPoolNodeAddress)
+      const [, , balance] = await subPoolNode1.manager()
+      expect(balance).to.be.deep.equal(newAmount)
+    })
+
+    it('should update parent balance when manager additional deposit', async function () {
+      const amount = ethers.toBigInt(100)
+      const [, invited, node1] = await ethers.getSigners()
+      const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
+
+      const subNodeAddress = await subPoolNode.getAddress()
+      const invitedRouterInstance = subPoolRouter.connect(invited) as any
+      const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node1.address])
+      const rcpt0 = await tx0.wait()
+      const invitedSubPoolNodeAddress = rcpt0.logs[7].args[0]
+
+      const node1RouterInstance = subPoolRouter.connect(node1) as any
+      const tx1 = await node1RouterInstance.join(invitedSubPoolNodeAddress, amount, DEFAULT_FEES_FRACTION, [])
+      const rcpt1 = await tx1.wait()
+      const node1SubPoolNodeAddress = rcpt1.logs[7].args[0]
+
+      const newAmount = ethers.toBigInt(1000)
+      await node1RouterInstance.additionalDeposit(node1SubPoolNodeAddress, newAmount)
+
+      const subPoolInvited = await ethers.getContractAt('SubPoolNode', invitedSubPoolNodeAddress)
+      const [, , , balance] = await subPoolInvited.subPools(node1SubPoolNodeAddress)
+      expect(balance).to.be.deep.equal(newAmount)
+    })
+  })
+
   describe('Validations', () => {
     describe('Parent', () => {
       it('should revert if try to update parent twice', async function () {
@@ -348,6 +397,25 @@ describe('SubPoolNode', () => {
         await expect(subPoolNode.join(subPoolAddress, 0)).to.be.revertedWithCustomError(subPoolNode, 'ParentNotFound()')
       })
 
+      it('should revert if try to join setting manually the parent as a main subpool', async function () {
+        const [, , hacker] = await ethers.getSigners()
+        const { subPoolNode: subPoolNodeDefault } = await loadFixture(deployRoutedNodeFixture)
+
+        const defaultSubPoolNodeAddress = await subPoolNodeDefault.getAddress()
+        const SubPoolNode = await ethers.getContractFactory('SubPoolNode', hacker)
+
+        const subPoolNode = await SubPoolNode.deploy(hacker.address, 100, DEFAULT_FEES_FRACTION, [hacker.address])
+        const subPoolNode2 = await SubPoolNode.deploy(hacker.address, 100, DEFAULT_FEES_FRACTION, [hacker.address])
+
+        const subPoolNode2Address = await subPoolNode2.getAddress()
+        await subPoolNode.setParent(defaultSubPoolNodeAddress)
+
+        await expect(subPoolNode.join(subPoolNode2Address, 100)).to.be.revertedWithCustomError(
+          subPoolNode,
+          'NotAllowed()'
+        )
+      })
+
       it('should revert on join as node without being invited', async function () {
         const [, , hacker] = await ethers.getSigners()
         const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
@@ -382,6 +450,18 @@ describe('SubPoolNode', () => {
         )
 
         await expect(subPoolNode.deposit(100)).to.be.revertedWithCustomError(subPoolNode, 'NotAllowed()')
+      })
+    })
+
+    describe('Additional deposit', () => {
+      it('should revert if try to call manager additional deposit without being the manager', async function () {
+        const { subPoolNode } = await loadFixture(deployRoutedNodeFixture)
+        const [manager] = await ethers.getSigners()
+        deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+
+        await expect(subPoolNode.additionalDeposit(ethers.toBigInt(100))).to.be.revertedWith(
+          'Ownable: caller is not the owner'
+        )
       })
     })
   })
@@ -430,27 +510,6 @@ describe('SubPoolNode', () => {
           .to.emit(subPoolNode, 'SubPoolDeposited')
           .withArgs(invitedSubNodeAddress, anyValue)
       })
-    })
-  })
-
-  describe('Hacking', () => {
-    it('should revert if try to join setting manually the parent as a main subpool', async function () {
-      const [, , hacker] = await ethers.getSigners()
-      const { subPoolNode: subPoolNodeDefault } = await loadFixture(deployRoutedNodeFixture)
-
-      const defaultSubPoolNodeAddress = await subPoolNodeDefault.getAddress()
-      const SubPoolNode = await ethers.getContractFactory('SubPoolNode', hacker)
-
-      const subPoolNode = await SubPoolNode.deploy(hacker.address, 100, DEFAULT_FEES_FRACTION, [hacker.address])
-      const subPoolNode2 = await SubPoolNode.deploy(hacker.address, 100, DEFAULT_FEES_FRACTION, [hacker.address])
-
-      const subPoolNode2Address = await subPoolNode2.getAddress()
-      await subPoolNode.setParent(defaultSubPoolNodeAddress)
-
-      await expect(subPoolNode.join(subPoolNode2Address, 100)).to.be.revertedWithCustomError(
-        subPoolNode,
-        'NotAllowed()'
-      )
     })
   })
 })
