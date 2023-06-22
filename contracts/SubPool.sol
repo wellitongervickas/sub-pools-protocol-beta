@@ -10,7 +10,7 @@ import './lib/ManagerLib.sol';
 
 import 'hardhat/console.sol';
 
-abstract contract SubPool {
+contract SubPool {
     using SubPoolLib for SubPoolLib.SubPool;
     using Counters for Counters.Counter;
 

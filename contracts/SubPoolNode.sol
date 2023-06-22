@@ -4,14 +4,16 @@ pragma solidity =0.8.18;
 import '@openzeppelin/contracts/access/AccessControlEnumerable.sol'; // change to enumerable
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
+import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 
 import './SubPool.sol';
+import './SubPoolManager.sol';
 import './lib/SubPoolLib.sol';
 import './lib/ManagerLib.sol';
 
 import 'hardhat/console.sol';
 
-contract SubPoolNode is SubPool, Ownable, AccessControl {
+contract SubPoolNode is SubPool, SubPoolManager, Ownable, AccessControl {
     using ManagerLib for ManagerLib.Manager;
     using SafeMath for uint256;
 
@@ -20,7 +22,6 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
     bytes32 public constant NODE_ROLE = keccak256('NODE_ROLE');
 
     address public parent;
-    ManagerLib.Manager public manager;
 
     event NodeManagerInvited(address indexed _invitedAddress);
     event NodeManagerJoined(address indexed _nodeManagerAddress, uint256 indexed _subPoolID);
@@ -40,7 +41,7 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
         uint256 _amount,
         FractionLib.Fraction memory _fees,
         address[] memory _invitedAddresses
-    ) {
+    ) SubPoolManager(_managerAddress, _amount, _fees) {
         manager = ManagerLib.Manager({
             managerAddress: _managerAddress,
             initialBalance: _amount,
@@ -94,7 +95,7 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
         if (!checkIsInvitedAddress(tx.origin)) revert NotInvited();
 
         uint256 _id = _updateCurrentID();
-        uint256 _amountSubTotal = _computeJoinFees(_amount);
+        uint256 _amountSubTotal = _computeManagerFees(_amount);
 
         subPools[_subPoolAddress] = SubPoolLib.SubPool({
             managerAddress: tx.origin,
@@ -109,17 +110,6 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
         emit NodeManagerJoined(tx.origin, subPools[_subPoolAddress].id);
 
         return subPools[_subPoolAddress].id;
-    }
-
-    function _computeJoinFees(uint256 _amount) internal returns (uint256) {
-        uint256 _managerAmount = manager._computeFees(_amount);
-        _updateManagerBalance(_managerAmount);
-
-        return _amount.sub(_managerAmount);
-    }
-
-    function _updateManagerBalance(uint256 _amount) internal {
-        manager._updateBalance(_amount);
     }
 
     function _updateNodeManagerRole(address _nodeManagerAddress) internal {
@@ -142,6 +132,6 @@ contract SubPoolNode is SubPool, Ownable, AccessControl {
         _updateManagerBalance(_amount);
         _updateParentBalance(_amount);
 
-        emit SubPoolDeposited(tx.origin, _amount);
+        emit ManagerDeposited(tx.origin, _amount);
     }
 }

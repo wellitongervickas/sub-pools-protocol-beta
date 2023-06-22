@@ -55,5 +55,31 @@ describe('SubPoolNode', () => {
           .withArgs(invitedSubNodeAddress, anyValue)
       })
     })
+
+    describe('Additional deposit', () => {
+      it('should emit SubPoolDeposited event when node manager additional deposit', async function () {
+        const amount = ethers.toBigInt(100)
+        const [, invited, node1] = await ethers.getSigners()
+        const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
+
+        const subNodeAddress = await subPoolNode.getAddress()
+        const invitedRouterInstance = subPoolRouter.connect(invited) as any
+        const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node1.address])
+        const rcpt0 = await tx0.wait()
+        const invitedSubPoolNodeAddress = rcpt0.logs[7].args[0]
+
+        const node1RouterInstance = subPoolRouter.connect(node1) as any
+        const tx1 = await node1RouterInstance.join(invitedSubPoolNodeAddress, amount, DEFAULT_FEES_FRACTION, [])
+        const rcpt1 = await tx1.wait()
+        const node1SubPoolNodeAddress = rcpt1.logs[7].args[0]
+
+        const newAmount = ethers.toBigInt(1000)
+        const subPoolNodeContract = await ethers.getContractAt('SubPoolNode', node1SubPoolNodeAddress)
+
+        await expect(node1RouterInstance.additionalDeposit(node1SubPoolNodeAddress, newAmount))
+          .to.emit(subPoolNodeContract, 'ManagerDeposited')
+          .withArgs(node1.address, anyValue)
+      })
+    })
   })
 })
