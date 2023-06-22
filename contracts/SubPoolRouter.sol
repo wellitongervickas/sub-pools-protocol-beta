@@ -55,20 +55,12 @@ contract SubPoolRouter is SubPool {
         SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _fees, _invitedAddresses);
 
         address _subPoolAddress = address(_subPool);
-        uint256 _subPoolId = _joinParent(_parentSubPool, _subPoolAddress, _amount);
+        uint256 _subPoolId = _parentSubPool.join(_subPoolAddress, _amount);
 
         _setParent(_subPool, _parentAddress);
 
         emit SubPoolJoined(_subPoolAddress, _subPoolId, _amount);
         return _subPoolAddress;
-    }
-
-    function _joinParent(
-        SubPoolNode _parentSubPool,
-        address _subPoolAddress,
-        uint256 _amount
-    ) internal returns (uint256) {
-        return _parentSubPool.join(_subPoolAddress, _amount);
     }
 
     function deposit(uint256 _amount) public override {
@@ -77,9 +69,7 @@ contract SubPoolRouter is SubPool {
     }
 
     function additionalDeposit(address _subPoolAddress, uint256 _amount) external {
-        address _parentAddress = SubPoolNode(_subPoolAddress).parent();
-
-        if (_parentAddress == address(this)) {
+        if (SubPoolNode(_subPoolAddress).parent() == address(this)) {
             _setSubPoolBalance(_subPoolAddress, _amount);
         } else {
             SubPoolNode(_subPoolAddress).additionalDeposit(_amount);
