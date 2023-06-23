@@ -1,14 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.18;
 
-import '@openzeppelin/contracts/access/AccessControlEnumerable.sol'; // change to enumerable
-import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 
 import './lib/SubPoolLib.sol';
-import './lib/ManagerLib.sol';
-
-import 'hardhat/console.sol';
 
 contract SubPool {
     using SubPoolLib for SubPoolLib.SubPool;

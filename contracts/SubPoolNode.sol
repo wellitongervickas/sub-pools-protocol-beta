@@ -2,7 +2,6 @@
 pragma solidity =0.8.18;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
-import '@openzeppelin/contracts/utils/Counters.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 
 import './SubPool.sol';
@@ -10,10 +9,7 @@ import './SubPoolManager.sol';
 import './lib/SubPoolLib.sol';
 import './lib/ManagerLib.sol';
 
-import 'hardhat/console.sol';
-
 contract SubPoolNode is SubPool, SubPoolManager, Ownable {
-    using ManagerLib for ManagerLib.Manager;
     using SafeMath for uint256;
 
     address public parent;
@@ -27,15 +23,7 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         FractionLib.Fraction memory _fees,
         address[] memory _invitedAddresses
     ) SubPoolManager(_managerAddress, _amount, _fees) {
-        manager = ManagerLib.Manager({
-            managerAddress: _managerAddress,
-            initialBalance: _amount,
-            balance: 0,
-            fees: _fees
-        });
-
-        _setupInitialInvites(_invitedAddresses);
-        _grantRole(MANAGER_ROLE, _managerAddress);
+        _grantInitialInvites(_invitedAddresses);
     }
 
     function setParent(address _parent) external onlyOwner {
@@ -49,7 +37,7 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
 
     function join(address _subPoolAddress, uint256 _amount) external onlyOwner returns (uint256) {
         if (!_checkHasParent()) revert ParentNotFound();
-        if (!checkIsInvitedAddress(tx.origin)) revert NotInvited();
+        if (!checkIsInvitedRole(tx.origin)) revert SubPoolManager.NotInvited();
 
         uint256 _id = _updateCurrentID();
         uint256 _amountSubTotal = _computeManagerFees(_amount);
@@ -61,7 +49,7 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
             balance: 0
         });
 
-        _updateNodeManagerRole(tx.origin);
+        _updateManagerRole(tx.origin);
         _increaseParentBalance(_amount);
 
         return subPools[_subPoolAddress].id;

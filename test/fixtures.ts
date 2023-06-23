@@ -39,7 +39,9 @@ export async function deployNodeFixture(
 }
 
 export async function deployRoutedNodeFixture() {
-  const [, invited] = await ethers.getSigners()
+  const accounts = await ethers.getSigners()
+
+  const [, invited] = accounts
   const { subPoolRouter } = await loadFixture(deployRouterFixture)
 
   const tx = await subPoolRouter.create(ethers.toBigInt(100), DEFAULT_FEES_FRACTION, [invited.address])
@@ -47,7 +49,7 @@ export async function deployRoutedNodeFixture() {
   const [subPoolAddress] = receipt.logs[3].args
   const subPoolNode = await ethers.getContractAt('SubPoolNode', subPoolAddress)
 
-  return { subPoolRouter, subPoolNode }
+  return { subPoolRouter, subPoolNode, accounts }
 }
 
 export const getArgs = (abi: InterfaceAbi, event: string, logs: LogParams[]) => {

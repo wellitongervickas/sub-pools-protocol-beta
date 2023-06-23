@@ -21,6 +21,8 @@ contract SubPoolRouter is SubPool {
     event ManagerDeposited(address indexed _managerAddress, uint256 _amount);
     event ManagerWithdrew(address indexed _managerAddress, uint256 _amount);
 
+    error NotNodeManager();
+
     function create(
         uint256 _amount,
         FractionLib.Fraction memory _fees,
@@ -76,8 +78,9 @@ contract SubPoolRouter is SubPool {
         emit ManagerDeposited(msg.sender, _amount);
     }
 
-    /**ToDo:check is subpool manager msg.sender */
     function additionalDeposit(address _subPoolAddress, uint256 _amount) external {
+        _checkIsNodeManager(_subPoolAddress);
+
         if (SubPoolNode(_subPoolAddress).parent() == address(this)) {
             _increaseSubPoolBalance(_subPoolAddress, _amount);
         } else {
@@ -87,8 +90,9 @@ contract SubPoolRouter is SubPool {
         emit ManagerDeposited(_subPoolAddress, _amount);
     }
 
-    /**ToDo:check is subpool manager msg.sender */
     function withdrawFunds(address _subPoolAddress, uint256 _amount) external {
+        _checkIsNodeManager(_subPoolAddress);
+
         if (SubPoolNode(_subPoolAddress).parent() == address(this)) {
             _decreaseSubPoolBalance(_subPoolAddress, _amount);
         } else {
@@ -96,5 +100,10 @@ contract SubPoolRouter is SubPool {
         }
 
         emit ManagerWithdrew(_subPoolAddress, _amount);
+    }
+
+    function _checkIsNodeManager(address _subPoolAddress) internal view virtual {
+        (address _managerAddress, , , ) = SubPoolNode(_subPoolAddress).manager();
+        if (_managerAddress != msg.sender) revert NotNodeManager();
     }
 }

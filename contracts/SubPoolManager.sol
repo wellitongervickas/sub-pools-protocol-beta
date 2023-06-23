@@ -24,7 +24,6 @@ contract SubPoolManager is AccessControl {
     error AlreadyNodeManager();
     error NotInvited();
     error AlreadyInvited();
-    error NotNodeManager();
 
     constructor(address _managerAddress, uint256 _amount, FractionLib.Fraction memory _fees) {
         manager = ManagerLib.Manager({
@@ -33,6 +32,12 @@ contract SubPoolManager is AccessControl {
             balance: 0,
             fees: _fees
         });
+
+        _setManagerRole(manager);
+    }
+
+    function _setManagerRole(ManagerLib.Manager storage _manager) internal {
+        _grantRole(MANAGER_ROLE, _manager.managerAddress);
     }
 
     function _computeManagerFees(uint256 _amount) internal returns (uint256) {
@@ -51,35 +56,35 @@ contract SubPoolManager is AccessControl {
     }
 
     function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
-        if (_checkIsManagerAddress(_invitedAddress)) revert ManagerNotAllowed();
-        if (checkIsInvitedAddress(_invitedAddress)) revert AlreadyInvited();
-        if (_checkIsNodeManagerAddress(_invitedAddress)) revert AlreadyNodeManager();
+        if (_checkIsManagerRole(_invitedAddress)) revert ManagerNotAllowed();
+        if (checkIsInvitedRole(_invitedAddress)) revert AlreadyInvited();
+        if (_checkIsNodeRole(_invitedAddress)) revert AlreadyNodeManager();
 
         _grantRole(INVITED_ROLE, _invitedAddress);
 
         emit NodeManagerInvited(_invitedAddress);
     }
 
-    function _setupInitialInvites(address[] memory _invitedAddresses) internal {
+    function _grantInitialInvites(address[] memory _invitedAddresses) internal {
         for (uint256 i = 0; i < _invitedAddresses.length; i++) {
             _grantRole(INVITED_ROLE, _invitedAddresses[i]);
         }
     }
 
-    function _updateNodeManagerRole(address _nodeManagerAddress) internal {
+    function _updateManagerRole(address _nodeManagerAddress) internal {
         _revokeRole(INVITED_ROLE, _nodeManagerAddress);
         _grantRole(NODE_ROLE, _nodeManagerAddress);
     }
 
-    function _checkIsManagerAddress(address _address) internal view returns (bool) {
+    function _checkIsManagerRole(address _address) internal view returns (bool) {
         return hasRole(MANAGER_ROLE, _address);
     }
 
-    function checkIsInvitedAddress(address _nodeManagerAddress) public view returns (bool) {
+    function checkIsInvitedRole(address _nodeManagerAddress) public view returns (bool) {
         return hasRole(INVITED_ROLE, _nodeManagerAddress);
     }
 
-    function _checkIsNodeManagerAddress(address _nodeManagerAddress) internal view returns (bool) {
+    function _checkIsNodeRole(address _nodeManagerAddress) internal view returns (bool) {
         return hasRole(NODE_ROLE, _nodeManagerAddress);
     }
 }
