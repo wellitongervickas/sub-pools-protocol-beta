@@ -39,20 +39,13 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         if (!_checkHasParent()) revert ParentNotFound();
         if (!checkIsInvitedRole(tx.origin)) revert SubPoolManager.NotInvited();
 
-        uint256 _id = _updateCurrentID();
         uint256 _amountSubTotal = _computeManagerFees(_amount);
-
-        subPools[_subPoolAddress] = SubPoolLib.SubPool({
-            managerAddress: tx.origin,
-            id: _id,
-            initialBalance: _amountSubTotal,
-            balance: 0
-        });
+        uint256 _id = _setupNode(_subPoolAddress, msg.sender, _amountSubTotal);
 
         _updateManagerRole(tx.origin);
         _increaseParentBalance(_amount);
 
-        return subPools[_subPoolAddress].id;
+        return _id;
     }
 
     function _increaseParentBalance(uint256 _amount) internal {

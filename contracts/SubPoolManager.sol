@@ -12,9 +12,9 @@ contract SubPoolManager is AccessControl {
     using ManagerLib for ManagerLib.Manager;
     using SafeMath for uint256;
 
-    bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
-    bytes32 public constant INVITED_ROLE = keccak256('INVITED_ROLE');
-    bytes32 public constant NODE_ROLE = keccak256('NODE_ROLE');
+    bytes32 private constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
+    bytes32 private constant INVITED_ROLE = keccak256('INVITED_ROLE');
+    bytes32 private constant NODE_ROLE = keccak256('NODE_ROLE');
 
     ManagerLib.Manager public manager;
 

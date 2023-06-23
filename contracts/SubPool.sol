@@ -20,6 +20,19 @@ contract SubPool {
         return currentID.current();
     }
 
+    function _setupNode(address _subPoolAddress, address _managerAddress, uint256 _amount) internal returns (uint256) {
+        uint256 _id = _updateCurrentID();
+
+        subPools[_subPoolAddress] = SubPoolLib.SubPool({
+            managerAddress: _managerAddress,
+            id: _id,
+            initialBalance: _amount,
+            balance: 0
+        });
+
+        return _id;
+    }
+
     function deposit(uint256 _amount) public virtual {
         _increaseSubPoolBalance(msg.sender, _amount);
     }

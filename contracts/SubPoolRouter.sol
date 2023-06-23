@@ -31,23 +31,12 @@ contract SubPoolRouter is SubPool {
         SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _fees, _invitedAddresses);
 
         address _subPoolAddress = address(_subPool);
-        uint256 _id = _updateCurrentID();
+        uint256 _id = _setupNode(_subPoolAddress, msg.sender, _amount);
 
-        subPools[_subPoolAddress] = SubPoolLib.SubPool({
-            managerAddress: msg.sender,
-            id: _id,
-            initialBalance: _amount,
-            balance: 0
-        });
+        _setupNodeParent(_subPool, address(this));
 
-        _setParent(_subPool, address(this));
-
-        emit SubPoolCreated(_subPoolAddress, subPools[_subPoolAddress].id, _amount);
+        emit SubPoolCreated(_subPoolAddress, _id, _amount);
         return _subPoolAddress;
-    }
-
-    function _setParent(SubPoolNode _subPool, address _parentAddress) internal {
-        _subPool.setParent(_parentAddress);
     }
 
     function join(
@@ -62,10 +51,14 @@ contract SubPoolRouter is SubPool {
         address _subPoolAddress = address(_subPool);
         uint256 _subPoolId = _parentSubPool.join(_subPoolAddress, _amount);
 
-        _setParent(_subPool, _parentAddress);
+        _setupNodeParent(_subPool, _parentAddress);
 
         emit SubPoolJoined(_subPoolAddress, _subPoolId, _amount);
         return _subPoolAddress;
+    }
+
+    function _setupNodeParent(SubPoolNode _subPool, address _parentAddress) internal {
+        _subPool.setParent(_parentAddress);
     }
 
     function withdraw(uint256 _amount) public override {
