@@ -1,14 +1,5 @@
 import { expect } from 'chai'
-import {
-  deployNodeFixture,
-  deployRoutedNodeFixture,
-  loadFixture,
-  DEFAULT_FEES_FRACTION,
-  MANAGER_ROLE,
-  ethers,
-  SubPoolRouter,
-  SubPoolNode,
-} from '../fixtures'
+import { deployRoutedNodeFixture, loadFixture, ethers } from '../fixtures'
 
 describe('SubPoolRouter', () => {
   describe('Validations', () => {
