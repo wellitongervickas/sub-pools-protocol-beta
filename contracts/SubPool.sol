@@ -33,11 +33,6 @@ contract SubPool {
         _decreaseSubPoolBalance(msg.sender, _amount);
     }
 
-    function _checkIsNode(address _address) internal view {
-        bool _isNode = subPools[_address]._checkIsNode();
-        if (!_isNode) revert NotAllowed();
-    }
-
     function _increaseSubPoolBalance(address _address, uint256 _amount) internal {
         _checkIsNode(_address);
         subPools[_address]._increaseBalance(_amount);
@@ -46,5 +41,10 @@ contract SubPool {
     function _decreaseSubPoolBalance(address _address, uint256 _amount) internal {
         _checkIsNode(_address);
         subPools[_address]._decreaseBalance(_amount);
+    }
+
+    function _checkIsNode(address _address) internal view {
+        bool _isNode = subPools[_address]._checkIsNode();
+        if (!_isNode) revert NotAllowed();
     }
 }
