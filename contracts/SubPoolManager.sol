@@ -25,12 +25,12 @@ contract SubPoolManager {
 
     function _computeManagerFees(uint256 _amount) internal returns (uint256) {
         uint256 _managerAmount = manager._computeFees(_amount);
-        _updateManagerBalance(_managerAmount);
+        _increaseManagerBalance(_managerAmount);
 
         return _amount.sub(_managerAmount);
     }
 
-    function _updateManagerBalance(uint256 _amount) internal {
-        manager._updateBalance(_amount);
+    function _increaseManagerBalance(uint256 _amount) internal {
+        manager._increaseBalance(_amount);
     }
 }

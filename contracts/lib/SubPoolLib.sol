@@ -11,7 +11,7 @@ library SubPoolLib {
         uint256 balance;
     }
 
-    function _updateBalance(SubPool storage _self, uint256 _value) internal {
+    function _increaseBalance(SubPool storage _self, uint256 _value) internal {
         _self.balance += _value;
     }
 

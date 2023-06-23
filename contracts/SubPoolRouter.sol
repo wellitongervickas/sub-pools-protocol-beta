@@ -17,6 +17,7 @@ contract SubPoolRouter is SubPool {
     event SubPoolCreated(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
     event SubPoolJoined(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
     event SubPoolDeposited(address indexed _subPoolAddress, uint256 _amount);
+    event SubPoolWithdrawn(address indexed _subPoolAddress, uint256 _amount);
 
     function create(
         uint256 _amount,
@@ -70,7 +71,7 @@ contract SubPoolRouter is SubPool {
 
     function additionalDeposit(address _subPoolAddress, uint256 _amount) external {
         if (SubPoolNode(_subPoolAddress).parent() == address(this)) {
-            _setSubPoolBalance(_subPoolAddress, _amount);
+            _increaseSubPoolBalance(_subPoolAddress, _amount);
         } else {
             SubPoolNode(_subPoolAddress).additionalDeposit(_amount);
         }

@@ -15,7 +15,7 @@ library ManagerLib {
         FractionLib.Fraction fees;
     }
 
-    function _updateBalance(Manager storage _self, uint256 _value) internal {
+    function _increaseBalance(Manager storage _self, uint256 _value) internal {
         _self.balance += _value;
     }
 

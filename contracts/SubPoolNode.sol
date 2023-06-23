@@ -105,7 +105,7 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable, AccessControl {
         });
 
         _updateNodeManagerRole(tx.origin);
-        _updateParentBalance(_amount);
+        _increaseParentBalance(_amount);
 
         emit NodeManagerJoined(tx.origin, subPools[_subPoolAddress].id);
 
@@ -117,20 +117,20 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable, AccessControl {
         _grantRole(NODE_ROLE, _nodeManagerAddress);
     }
 
-    function _updateParentBalance(uint256 _amount) internal {
+    function _increaseParentBalance(uint256 _amount) internal {
         SubPoolNode(parent).deposit(_amount);
     }
 
     function deposit(uint256 _amount) public override {
         super.deposit(_amount);
-        _updateParentBalance(_amount);
+        _increaseParentBalance(_amount);
 
         emit SubPoolDeposited(msg.sender, _amount);
     }
 
     function additionalDeposit(uint256 _amount) external onlyOwner {
-        _updateManagerBalance(_amount);
-        _updateParentBalance(_amount);
+        _increaseManagerBalance(_amount);
+        _increaseParentBalance(_amount);
 
         emit ManagerDeposited(tx.origin, _amount);
     }

@@ -26,7 +26,7 @@ contract SubPool {
     }
 
     function deposit(uint256 _amount) public virtual {
-        _setSubPoolBalance(msg.sender, _amount);
+        _increaseSubPoolBalance(msg.sender, _amount);
     }
 
     function _checkIsNode(address _address) internal view {
@@ -34,8 +34,8 @@ contract SubPool {
         if (!_isNode) revert NotAllowed();
     }
 
-    function _setSubPoolBalance(address _address, uint256 _amount) internal {
+    function _increaseSubPoolBalance(address _address, uint256 _amount) internal {
         _checkIsNode(_address);
-        subPools[_address]._updateBalance(_amount);
+        subPools[_address]._increaseBalance(_amount);
     }
 }
