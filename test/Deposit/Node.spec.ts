@@ -12,12 +12,12 @@ describe('SubPoolNode', () => {
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
       const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node1.address])
       const rcpt0 = await tx0.wait()
-      const invitedSubPoolNodeAddress = rcpt0.logs[7].args[0]
+      const invitedSubPoolNodeAddress = rcpt0.logs[6].args[0]
 
       const node1RouterInstance = subPoolRouter.connect(node1) as any
       const tx1 = await node1RouterInstance.join(invitedSubPoolNodeAddress, amount, DEFAULT_FEES_FRACTION, [])
       const rcpt1 = await tx1.wait()
-      const node1SubPoolNodeAddress = rcpt1.logs[7].args[0]
+      const node1SubPoolNodeAddress = rcpt1.logs[5].args[0]
 
       const newAmount = ethers.toBigInt(1000)
       await node1RouterInstance.additionalDeposit(node1SubPoolNodeAddress, newAmount)
@@ -36,12 +36,12 @@ describe('SubPoolNode', () => {
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
       const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node1.address])
       const rcpt0 = await tx0.wait()
-      const invitedSubPoolNodeAddress = rcpt0.logs[7].args[0]
+      const invitedSubPoolNodeAddress = rcpt0.logs[6].args[0]
 
       const node1RouterInstance = subPoolRouter.connect(node1) as any
       const tx1 = await node1RouterInstance.join(invitedSubPoolNodeAddress, amount, DEFAULT_FEES_FRACTION, [])
       const rcpt1 = await tx1.wait()
-      const node1SubPoolNodeAddress = rcpt1.logs[7].args[0]
+      const node1SubPoolNodeAddress = rcpt1.logs[5].args[0]
 
       const newAmount = ethers.toBigInt(1000)
       await node1RouterInstance.additionalDeposit(node1SubPoolNodeAddress, newAmount)

@@ -33,4 +33,8 @@ contract SubPoolManager {
     function _increaseManagerBalance(uint256 _amount) internal {
         manager._increaseBalance(_amount);
     }
+
+    function _decreaseManagerBalance(uint256 _amount) internal {
+        manager._decreaseBalance(_amount);
+    }
 }

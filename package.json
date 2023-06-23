@@ -9,7 +9,7 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "test:coverage": "hardhat coverage",
-    "local:watchTest": "chokidar '(contracts|test)/**/*' -c 'npx hardhat test'"
+    "test:watch": "chokidar '(contracts|test)/**/*' -c 'npx hardhat test'"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",

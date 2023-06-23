@@ -29,6 +29,10 @@ contract SubPool {
         _increaseSubPoolBalance(msg.sender, _amount);
     }
 
+    function withdraw(uint256 _amount) public virtual {
+        _decreaseSubPoolBalance(msg.sender, _amount);
+    }
+
     function _checkIsNode(address _address) internal view {
         bool _isNode = subPools[_address]._checkIsNode();
         if (!_isNode) revert NotAllowed();
@@ -37,5 +41,10 @@ contract SubPool {
     function _increaseSubPoolBalance(address _address, uint256 _amount) internal {
         _checkIsNode(_address);
         subPools[_address]._increaseBalance(_amount);
+    }
+
+    function _decreaseSubPoolBalance(address _address, uint256 _amount) internal {
+        _checkIsNode(_address);
+        subPools[_address]._decreaseBalance(_amount);
     }
 }

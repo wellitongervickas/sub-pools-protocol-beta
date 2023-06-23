@@ -30,7 +30,7 @@ describe('SubPoolRouter', () => {
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
       const tx2 = await invitedRouterInstance.join(subPoolAddress, amount, DEFAULT_FEES_FRACTION, [])
       let receipt2 = await tx2.wait()
-      const [subPoolAddress2] = receipt2.logs[6].args
+      const [subPoolAddress2] = receipt2.logs[5].args
       const subPoolNode = await ethers.getContractAt('SubPoolNode', subPoolAddress2)
       const parentAddress = await subPoolNode.parent()
 

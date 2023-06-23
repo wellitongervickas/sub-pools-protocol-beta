@@ -24,9 +24,6 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable, AccessControl {
     address public parent;
 
     event NodeManagerInvited(address indexed _invitedAddress);
-    event NodeManagerJoined(address indexed _nodeManagerAddress, uint256 indexed _subPoolID);
-    event SubPoolDeposited(address indexed _subPoolAddress, uint256 _amount);
-    event ManagerDeposited(address indexed _managerAddress, uint256 _amount);
 
     error ParentNotFound();
     error ParentAlreadySet();
@@ -107,7 +104,7 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable, AccessControl {
         _updateNodeManagerRole(tx.origin);
         _increaseParentBalance(_amount);
 
-        emit NodeManagerJoined(tx.origin, subPools[_subPoolAddress].id);
+        // emit NodeManagerJoined(tx.origin, subPools[_subPoolAddress].id);
 
         return subPools[_subPoolAddress].id;
     }
@@ -121,17 +118,27 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable, AccessControl {
         SubPoolNode(parent).deposit(_amount);
     }
 
+    function _decreaseParentBalance(uint256 _amount) internal {
+        SubPoolNode(parent).withdraw(_amount);
+    }
+
     function deposit(uint256 _amount) public override {
         super.deposit(_amount);
         _increaseParentBalance(_amount);
+    }
 
-        emit SubPoolDeposited(msg.sender, _amount);
+    function withdraw(uint256 _amount) public override {
+        super.withdraw(_amount);
+        _decreaseParentBalance(_amount);
     }
 
     function additionalDeposit(uint256 _amount) external onlyOwner {
         _increaseManagerBalance(_amount);
         _increaseParentBalance(_amount);
+    }
 
-        emit ManagerDeposited(tx.origin, _amount);
+    function withdrawFunds(uint256 _amount) external onlyOwner {
+        _decreaseManagerBalance(_amount);
+        _decreaseParentBalance(_amount);
     }
 }

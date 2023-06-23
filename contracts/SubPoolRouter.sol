@@ -10,14 +10,16 @@ import './SubPoolNode.sol';
 import './lib/SubPoolLib.sol';
 import './lib/Fraction.sol';
 
+import 'hardhat/console.sol';
+
 contract SubPoolRouter is SubPool {
     using SubPoolLib for SubPoolLib.SubPool;
     using Counters for Counters.Counter;
 
     event SubPoolCreated(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
     event SubPoolJoined(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
-    event SubPoolDeposited(address indexed _subPoolAddress, uint256 _amount);
-    event SubPoolWithdrawn(address indexed _subPoolAddress, uint256 _amount);
+    event ManagerDeposited(address indexed _managerAddress, uint256 _amount);
+    event ManagerWithdrew(address indexed _managerAddress, uint256 _amount);
 
     function create(
         uint256 _amount,
@@ -64,11 +66,17 @@ contract SubPoolRouter is SubPool {
         return _subPoolAddress;
     }
 
-    function deposit(uint256 _amount) public override {
-        super.deposit(_amount);
-        emit SubPoolDeposited(msg.sender, _amount);
+    function withdraw(uint256 _amount) public override {
+        super.withdraw(_amount);
+        emit ManagerWithdrew(msg.sender, _amount);
     }
 
+    function deposit(uint256 _amount) public override {
+        super.deposit(_amount);
+        emit ManagerDeposited(msg.sender, _amount);
+    }
+
+    /**ToDo:check is subpool manager msg.sender */
     function additionalDeposit(address _subPoolAddress, uint256 _amount) external {
         if (SubPoolNode(_subPoolAddress).parent() == address(this)) {
             _increaseSubPoolBalance(_subPoolAddress, _amount);
@@ -76,6 +84,17 @@ contract SubPoolRouter is SubPool {
             SubPoolNode(_subPoolAddress).additionalDeposit(_amount);
         }
 
-        emit SubPoolDeposited(_subPoolAddress, _amount);
+        emit ManagerDeposited(_subPoolAddress, _amount);
+    }
+
+    /**ToDo:check is subpool manager msg.sender */
+    function withdrawFunds(address _subPoolAddress, uint256 _amount) external {
+        if (SubPoolNode(_subPoolAddress).parent() == address(this)) {
+            _decreaseSubPoolBalance(_subPoolAddress, _amount);
+        } else {
+            SubPoolNode(_subPoolAddress).withdrawFunds(_amount);
+        }
+
+        emit ManagerWithdrew(_subPoolAddress, _amount);
     }
 }

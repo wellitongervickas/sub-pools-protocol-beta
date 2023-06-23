@@ -1,5 +1,6 @@
 import { ethers } from 'hardhat'
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers'
+import { InterfaceAbi, LogDescription, LogParams, Result } from 'ethers'
 
 export { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 
@@ -47,4 +48,15 @@ export async function deployRoutedNodeFixture() {
   const subPoolNode = await ethers.getContractAt('SubPoolNode', subPoolAddress)
 
   return { subPoolRouter, subPoolNode }
+}
+
+export const getArgs = (abi: InterfaceAbi, event: string, logs: LogParams[]) => {
+  const contractInterface = new ethers.Interface(abi)
+  return logs.map((log) => {
+    try {
+      return contractInterface.decodeEventLog(event, log.data, log.topics)
+    } catch {
+      return
+    }
+  })
 }

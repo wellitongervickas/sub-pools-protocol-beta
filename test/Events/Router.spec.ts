@@ -36,7 +36,7 @@ describe('SubPoolRouter', () => {
           .withArgs(anyValue, 1, amount)
       })
 
-      it('should emit SubPoolDeposited when node deposit', async function () {
+      it('should emit ManagerDeposited when node deposit', async function () {
         const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
         const amount = '1000'
         const [, invited] = accounts
@@ -48,13 +48,13 @@ describe('SubPoolRouter', () => {
         const newInstance = subPoolRouter.connect(invited) as SubPoolRouter
 
         await expect(newInstance.join(subPoolAddress, amount, DEFAULT_FEES_FRACTION, []))
-          .to.emit(subPoolRouter, 'SubPoolDeposited')
+          .to.emit(subPoolRouter, 'ManagerDeposited')
           .withArgs(anyValue, amount)
       })
     })
 
     describe('Additional deposit', () => {
-      it('should emit SubPoolDeposited when do additional deposit', async function () {
+      it('should emit ManagerDeposited when do additional deposit', async function () {
         const { subPoolRouter } = await loadFixture(deployRouterFixture)
         const amount = ethers.toBigInt(1000)
 
@@ -64,7 +64,7 @@ describe('SubPoolRouter', () => {
         const [subPoolAddress] = receipt.logs[2].args
 
         await expect(subPoolRouter.additionalDeposit(subPoolAddress, amount))
-          .to.emit(subPoolRouter, 'SubPoolDeposited')
+          .to.emit(subPoolRouter, 'ManagerDeposited')
           .withArgs(anyValue, amount)
       })
     })

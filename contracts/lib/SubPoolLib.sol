@@ -15,6 +15,10 @@ library SubPoolLib {
         _self.balance += _value;
     }
 
+    function _decreaseBalance(SubPool storage _self, uint256 _value) internal {
+        _self.balance -= _value;
+    }
+
     function _checkIsNode(SubPool storage _self) internal view returns (bool) {
         return _self.id > 0;
     }
