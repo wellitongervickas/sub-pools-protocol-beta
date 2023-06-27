@@ -2,16 +2,12 @@
 pragma solidity =0.8.18;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
-import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 
 import './SubPool.sol';
 import './SubPoolManager.sol';
 import './lib/SubPoolLib.sol';
-import './lib/ManagerLib.sol';
 
 contract SubPoolNode is SubPool, SubPoolManager, Ownable {
-    using SafeMath for uint256;
-
     address public parent;
     uint public lockPeriod;
 

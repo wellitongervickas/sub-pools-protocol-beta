@@ -2,7 +2,6 @@
 pragma solidity =0.8.18;
 
 import '@openzeppelin/contracts/utils/Counters.sol';
-
 import './lib/SubPoolLib.sol';
 
 contract SubPool {

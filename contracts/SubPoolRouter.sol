@@ -7,21 +7,22 @@ import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 
 import './SubPool.sol';
 import './SubPoolNode.sol';
-import './lib/SubPoolLib.sol';
 import './lib/Fraction.sol';
 
-import 'hardhat/console.sol';
-
 contract SubPoolRouter is SubPool {
-    using SubPoolLib for SubPoolLib.SubPool;
-    using Counters for Counters.Counter;
-
     event SubPoolCreated(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
     event SubPoolJoined(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
     event ManagerDeposited(address indexed _managerAddress, uint256 _amount);
     event ManagerWithdrew(address indexed _managerAddress, uint256 _amount);
 
     error NotNodeManager();
+
+    error LockPeriod();
+
+    modifier onlyUnlockedPeriod(uint _lockperiod) {
+        if (_lockperiod > block.timestamp) revert LockPeriod();
+        _;
+    }
 
     modifier onlyNodeManager(address _subPoolAddress) {
         (address _managerAddress, , , ) = SubPoolNode(_subPoolAddress).manager();
@@ -107,7 +108,7 @@ contract SubPoolRouter is SubPool {
     function withdrawInitialBalance(
         address _subPoolAddress,
         uint256 _amount
-    ) external onlyNodeManager(_subPoolAddress) {
+    ) external onlyNodeManager(_subPoolAddress) onlyUnlockedPeriod(SubPoolNode(_subPoolAddress).lockPeriod()) {
         if (!_checkIsParentRouter(_subPoolAddress)) {
             return SubPoolNode(_subPoolAddress).withdrawInitialBalance(_amount);
         }

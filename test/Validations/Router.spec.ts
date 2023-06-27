@@ -1,5 +1,12 @@
 import { expect } from 'chai'
-import { deployRoutedNodeFixture, loadFixture, ethers } from '../fixtures'
+import {
+  deployRoutedNodeFixture,
+  loadFixture,
+  ethers,
+  DEFAULT_FEES_FRACTION,
+  deployRouterFixture,
+  time,
+} from '../fixtures'
 
 describe('SubPoolRouter', () => {
   describe('Validations', () => {
@@ -72,6 +79,29 @@ describe('SubPoolRouter', () => {
           subPoolRouter,
           'NotAllowed()'
         )
+      })
+
+      it('should revert if try to withdraw initial balance in locked period', async function () {
+        const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
+
+        const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60
+        const unlockTime = (await time.latest()) + ONE_YEAR_IN_SECS
+
+        const amount = ethers.toBigInt(1000)
+        const [, invited] = accounts
+
+        const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address], unlockTime)
+        let receipt = await tx.wait()
+        const [subPoolAddress] = receipt.logs[3].args
+
+        const invitedRouterInstance = subPoolRouter.connect(invited) as any
+        const tx2 = await invitedRouterInstance.join(subPoolAddress, amount, DEFAULT_FEES_FRACTION, [], unlockTime)
+        let receipt2 = await tx2.wait()
+        const [subPoolAddress2] = receipt2.logs[5].args
+
+        await expect(
+          invitedRouterInstance.withdrawInitialBalance(subPoolAddress2, ethers.toBigInt(100))
+        ).to.be.revertedWithCustomError(invitedRouterInstance, 'LockPeriod()')
       })
     })
   })

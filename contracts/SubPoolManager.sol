@@ -1,16 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.18;
 
-import '@openzeppelin/contracts/access/AccessControlEnumerable.sol'; // change to enumerable
-import '@openzeppelin/contracts/access/Ownable.sol';
-import '@openzeppelin/contracts/utils/Counters.sol';
-import '@openzeppelin/contracts/utils/math/SafeMath.sol';
+import '@openzeppelin/contracts/access/AccessControlEnumerable.sol';
 
 import './lib/ManagerLib.sol';
 
 contract SubPoolManager is AccessControl {
     using ManagerLib for ManagerLib.Manager;
-    using SafeMath for uint256;
 
     bytes32 private constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
     bytes32 private constant INVITED_ROLE = keccak256('INVITED_ROLE');
@@ -44,7 +40,7 @@ contract SubPoolManager is AccessControl {
         uint256 _managerAmount = manager._computeFees(_amount);
         _increaseManagerBalance(_managerAmount);
 
-        return _amount.sub(_managerAmount);
+        return _amount - _managerAmount;
     }
 
     function _increaseManagerBalance(uint256 _amount) internal {
