@@ -15,6 +15,12 @@ contract SubPool {
 
     error NotAllowed();
 
+    modifier onlySubNode(address _address) {
+        bool _isNode = subPools[_address]._validateIsNode();
+        if (!_isNode) revert NotAllowed();
+        _;
+    }
+
     function _updateCurrentID() internal returns (uint256) {
         currentID.increment();
         return currentID.current();
@@ -46,22 +52,14 @@ contract SubPool {
     }
 
     function _increaseSubPoolBalance(address _address, uint256 _amount) internal {
-        _validateIsNode(_address);
         subPools[_address]._increaseBalance(_amount);
     }
 
     function _decreaseSubPoolBalance(address _address, uint256 _amount) internal {
-        _validateIsNode(_address);
         subPools[_address]._decreaseBalance(_amount);
     }
 
     function _decreaseSubPoolInitialBalance(address _address, uint256 _amount) internal {
-        _validateIsNode(_address);
         subPools[_address]._decreaseInitialBalance(_amount);
-    }
-
-    function _validateIsNode(address _address) internal view {
-        bool _isNode = subPools[_address]._validateIsNode();
-        if (!_isNode) revert NotAllowed();
     }
 }

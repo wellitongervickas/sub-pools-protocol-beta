@@ -67,17 +67,17 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         SubPoolNode(parent).cashback(_amount);
     }
 
-    function deposit(uint256 _amount) public override {
+    function deposit(uint256 _amount) public override onlySubNode(msg.sender) {
         super.deposit(_amount);
         _increaseParentBalance(_amount);
     }
 
-    function withdraw(uint256 _amount) public override {
+    function withdraw(uint256 _amount) public override onlySubNode(msg.sender) {
         super.withdraw(_amount);
         _decreaseParentBalance(_amount);
     }
 
-    function cashback(uint256 _amount) public override {
+    function cashback(uint256 _amount) public override onlySubNode(msg.sender) {
         super.cashback(_amount);
         _decreaseParentInitialBalance(_amount);
     }

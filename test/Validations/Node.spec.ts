@@ -153,7 +153,9 @@ describe('SubPoolNode', () => {
 
         await expect(newSubPoolInstance.join(subNodeAddress2, 0)).to.be.rejectedWith('Ownable: caller is not the owner')
       })
+    })
 
+    describe('Deposit', () => {
       it('should revert when try to call deposit if sender is not node', async function () {
         const [manager] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(
@@ -195,6 +197,24 @@ describe('SubPoolNode', () => {
         await expect(subPoolNode.withdrawInitialBalance(ethers.toBigInt(100))).to.be.revertedWith(
           'Ownable: caller is not the owner'
         )
+      })
+
+      it('should revert when try to call withdraw if sender is not node', async function () {
+        const [manager] = await ethers.getSigners()
+        const { subPoolNode } = await loadFixture(
+          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
+        )
+
+        await expect(subPoolNode.withdraw(100)).to.be.revertedWithCustomError(subPoolNode, 'NotAllowed()')
+      })
+
+      it('should revert when try to call cashback if sender is not node', async function () {
+        const [manager] = await ethers.getSigners()
+        const { subPoolNode } = await loadFixture(
+          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
+        )
+
+        await expect(subPoolNode.cashback(100)).to.be.revertedWithCustomError(subPoolNode, 'NotAllowed()')
       })
     })
   })
