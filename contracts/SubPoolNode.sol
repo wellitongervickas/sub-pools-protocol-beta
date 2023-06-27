@@ -5,7 +5,6 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 
 import './SubPool.sol';
 import './SubPoolManager.sol';
-import './lib/SubPoolLib.sol';
 
 contract SubPoolNode is SubPool, SubPoolManager, Ownable {
     address public parent;
@@ -13,12 +12,6 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
 
     error ParentNotFound();
     error ParentAlreadySet();
-    error LockPeriod();
-
-    modifier onlyUnlockedPeriod() {
-        if (lockPeriod > block.timestamp) revert LockPeriod();
-        _;
-    }
 
     constructor(
         address _managerAddress,
@@ -94,7 +87,7 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         _decreaseParentBalance(_amount);
     }
 
-    function withdrawInitialBalance(uint256 _amount) external onlyUnlockedPeriod onlyOwner {
+    function withdrawInitialBalance(uint256 _amount) external onlyUnlockedPeriod(lockPeriod) onlyOwner {
         _decreaseManagerInitialBalance(_amount);
         _decreaseParentInitialBalance(_amount);
     }

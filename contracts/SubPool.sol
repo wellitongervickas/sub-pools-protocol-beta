@@ -14,6 +14,13 @@ contract SubPool {
 
     error NotAllowed();
 
+    error LockPeriod();
+
+    modifier onlyUnlockedPeriod(uint _lockPeriod) {
+        if (_lockPeriod > block.timestamp) revert LockPeriod();
+        _;
+    }
+
     modifier onlySubNode(address _address) {
         bool _isNode = subPools[_address]._validateIsNode();
         if (!_isNode) revert NotAllowed();
@@ -58,7 +65,7 @@ contract SubPool {
         subPools[_address]._decreaseBalance(_amount);
     }
 
-    function _decreaseSubPoolInitialBalance(address _address, uint256 _amount) internal {
+    function _decreaseSubPoolInitialBalance(address _address, uint256 _amount) internal virtual {
         subPools[_address]._decreaseInitialBalance(_amount);
     }
 }

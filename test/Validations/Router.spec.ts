@@ -100,8 +100,8 @@ describe('SubPoolRouter', () => {
         const [subPoolAddress2] = receipt2.logs[5].args
 
         await expect(
-          invitedRouterInstance.withdrawInitialBalance(subPoolAddress2, ethers.toBigInt(100))
-        ).to.be.revertedWithCustomError(invitedRouterInstance, 'LockPeriod()')
+          subPoolRouter.withdrawInitialBalance(subPoolAddress, ethers.toBigInt(100))
+        ).to.be.revertedWithCustomError(subPoolRouter, 'LockPeriod()')
       })
     })
   })

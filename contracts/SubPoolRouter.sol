@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.18;
 
-import '@openzeppelin/contracts/access/Ownable.sol';
-import '@openzeppelin/contracts/utils/Counters.sol';
-import '@openzeppelin/contracts/utils/math/SafeMath.sol';
-
 import './SubPool.sol';
 import './SubPoolNode.sol';
 import './lib/Fraction.sol';
@@ -16,13 +12,6 @@ contract SubPoolRouter is SubPool {
     event ManagerWithdrew(address indexed _managerAddress, uint256 _amount);
 
     error NotNodeManager();
-
-    error LockPeriod();
-
-    modifier onlyUnlockedPeriod(uint _lockperiod) {
-        if (_lockperiod > block.timestamp) revert LockPeriod();
-        _;
-    }
 
     modifier onlyNodeManager(address _subPoolAddress) {
         (address _managerAddress, , , ) = SubPoolNode(_subPoolAddress).manager();
@@ -108,7 +97,7 @@ contract SubPoolRouter is SubPool {
     function withdrawInitialBalance(
         address _subPoolAddress,
         uint256 _amount
-    ) external onlyNodeManager(_subPoolAddress) onlyUnlockedPeriod(SubPoolNode(_subPoolAddress).lockPeriod()) {
+    ) external onlyNodeManager(_subPoolAddress) {
         if (!_checkIsParentRouter(_subPoolAddress)) {
             return SubPoolNode(_subPoolAddress).withdrawInitialBalance(_amount);
         }
@@ -116,6 +105,13 @@ contract SubPoolRouter is SubPool {
         _decreaseSubPoolInitialBalance(_subPoolAddress, _amount);
 
         emit ManagerWithdrew(_subPoolAddress, _amount);
+    }
+
+    function _decreaseSubPoolInitialBalance(
+        address _address,
+        uint256 _amount
+    ) internal override onlyUnlockedPeriod(SubPoolNode(_address).lockPeriod()) {
+        super._decreaseSubPoolInitialBalance(_address, _amount);
     }
 
     function _checkIsParentRouter(address _subPoolAddress) internal view returns (bool) {
