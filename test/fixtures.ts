@@ -1,12 +1,12 @@
 import { ethers } from 'hardhat'
-import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers'
+import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers'
 
 export { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 
 export type { SubPoolRouter } from '../typechain-types/contracts/SubPoolRouter'
 export type { SubPoolNode } from '../typechain-types/contracts/SubPoolNode'
 
-export { loadFixture, ethers }
+export { loadFixture, ethers, time }
 
 export const DEFAULT_FEES_FRACTION = {
   value: ethers.toBigInt(0),

@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+
 import {
   deployNodeFixture,
   deployRoutedNodeFixture,
@@ -8,6 +9,7 @@ import {
   ethers,
   SubPoolRouter,
   SubPoolNode,
+  time,
 } from '../fixtures'
 
 describe('SubPoolNode', () => {
@@ -179,7 +181,7 @@ describe('SubPoolNode', () => {
     })
 
     describe('Withdraw ', () => {
-      it('should revert if try to withdraw balance without being the manager', async function () {
+      it('should revert if try to withdraw balance without being the owner', async function () {
         const { subPoolNode } = await loadFixture(deployRoutedNodeFixture)
         const [manager] = await ethers.getSigners()
         deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
@@ -189,7 +191,7 @@ describe('SubPoolNode', () => {
         )
       })
 
-      it('should revert if try to withdraw initial balance without being the manager', async function () {
+      it('should revert if try to withdraw initial balance without being the owner', async function () {
         const { subPoolNode } = await loadFixture(deployRoutedNodeFixture)
         const [manager] = await ethers.getSigners()
         deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
@@ -215,6 +217,24 @@ describe('SubPoolNode', () => {
         )
 
         await expect(subPoolNode.cashback(100)).to.be.revertedWithCustomError(subPoolNode, 'NotAllowed()')
+      })
+
+      it('should revert if try to withdraw initial balance in locked period', async function () {
+        const [manager] = await ethers.getSigners()
+
+        const amount = ethers.toBigInt(1000)
+
+        const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60
+        const unlockTime = (await time.latest()) + ONE_YEAR_IN_SECS
+
+        const { subPoolNode } = await loadFixture(
+          deployNodeFixture.bind(this, manager.address, amount, DEFAULT_FEES_FRACTION, [], unlockTime)
+        )
+
+        await expect(subPoolNode.withdrawInitialBalance(amount)).to.be.revertedWithCustomError(
+          subPoolNode,
+          'LockPeriod()'
+        )
       })
     })
   })

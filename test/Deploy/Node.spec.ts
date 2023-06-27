@@ -1,5 +1,13 @@
 import { expect } from 'chai'
-import { deployNodeFixture, loadFixture, ethers, DEFAULT_FEES_FRACTION, MANAGER_ROLE, INVITED_ROLE } from '../fixtures'
+import {
+  deployNodeFixture,
+  loadFixture,
+  ethers,
+  DEFAULT_FEES_FRACTION,
+  MANAGER_ROLE,
+  INVITED_ROLE,
+  time,
+} from '../fixtures'
 
 describe('SubPoolNode', () => {
   describe('Deploy', () => {
@@ -69,6 +77,20 @@ describe('SubPoolNode', () => {
       )
 
       expect(await subPoolNode.hasRole(INVITED_ROLE, invited.address)).to.be.true
+    })
+
+    it('should set initial locked period', async function () {
+      const amount = ethers.toBigInt(1000)
+      const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60
+      const [manager] = await ethers.getSigners()
+
+      const unlockTime = (await time.latest()) + ONE_YEAR_IN_SECS
+
+      const { subPoolNode } = await loadFixture(
+        deployNodeFixture.bind(this, manager.address, amount, DEFAULT_FEES_FRACTION, [], unlockTime)
+      )
+
+      expect(await subPoolNode.lockPeriod()).to.equal(unlockTime)
     })
   })
 })

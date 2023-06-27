@@ -117,7 +117,7 @@ describe('SubPoolNode', () => {
       const customFeesFraction = {
         value: ethers.toBigInt(1),
         divider: ethers.toBigInt(100),
-      } // 10%
+      }
 
       const amount = ethers.parseUnits('100', 18)
 

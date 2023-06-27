@@ -20,7 +20,6 @@ describe('SubPoolRouter', () => {
       it('should revert when try to call deposit if sender is not node', async function () {
         const { subPoolRouter, subPoolNode, accounts } = await loadFixture(deployRoutedNodeFixture)
         const [, anyEntity] = accounts
-        const nodeAddress = await subPoolNode.getAddress()
         const anyEntityRouterInstance = subPoolRouter.connect(anyEntity) as any
 
         await expect(anyEntityRouterInstance.deposit(ethers.toBigInt(100))).to.be.revertedWithCustomError(
@@ -54,9 +53,8 @@ describe('SubPoolRouter', () => {
       })
 
       it('should revert when try to call withdraw if sender is not node', async function () {
-        const { subPoolRouter, subPoolNode, accounts } = await loadFixture(deployRoutedNodeFixture)
+        const { subPoolRouter, accounts } = await loadFixture(deployRoutedNodeFixture)
         const [, anyEntity] = accounts
-        const nodeAddress = await subPoolNode.getAddress()
         const anyEntityRouterInstance = subPoolRouter.connect(anyEntity) as any
 
         await expect(anyEntityRouterInstance.withdraw(ethers.toBigInt(100))).to.be.revertedWithCustomError(
@@ -66,9 +64,8 @@ describe('SubPoolRouter', () => {
       })
 
       it('should revert when try to call cashback if sender is not node', async function () {
-        const { subPoolRouter, subPoolNode, accounts } = await loadFixture(deployRoutedNodeFixture)
+        const { subPoolRouter, accounts } = await loadFixture(deployRoutedNodeFixture)
         const [, anyEntity] = accounts
-        const nodeAddress = await subPoolNode.getAddress()
         const anyEntityRouterInstance = subPoolRouter.connect(anyEntity) as any
 
         await expect(anyEntityRouterInstance.cashback(ethers.toBigInt(100))).to.be.revertedWithCustomError(

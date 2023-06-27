@@ -13,10 +13,16 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
     using SafeMath for uint256;
 
     address public parent;
-    uint public lockPeriod = 0;
+    uint public lockPeriod;
 
     error ParentNotFound();
     error ParentAlreadySet();
+    error LockPeriod();
+
+    modifier onlyUnlockedPeriod() {
+        if (lockPeriod > block.timestamp) revert LockPeriod();
+        _;
+    }
 
     constructor(
         address _managerAddress,
@@ -92,7 +98,7 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         _decreaseParentBalance(_amount);
     }
 
-    function withdrawInitialBalance(uint256 _amount) external onlyOwner {
+    function withdrawInitialBalance(uint256 _amount) external onlyUnlockedPeriod onlyOwner {
         _decreaseManagerInitialBalance(_amount);
         _decreaseParentInitialBalance(_amount);
     }
