@@ -9,7 +9,7 @@ describe('SubPoolRouter', () => {
       const amount = ethers.toBigInt(1000)
       const additionalAmount = ethers.toBigInt(100)
 
-      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address])
+      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address], 0)
       let receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[3].args
 
@@ -27,7 +27,7 @@ describe('SubPoolRouter', () => {
       const [, invited] = accounts
       const amount = ethers.toBigInt(1000)
 
-      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address])
+      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address], 0)
       let receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[3].args
 

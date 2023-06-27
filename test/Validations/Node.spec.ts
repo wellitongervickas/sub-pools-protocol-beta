@@ -16,7 +16,7 @@ describe('SubPoolNode', () => {
       it('should revert if try to update parent twice', async function () {
         const [manager, anyEntity] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(
-          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
         )
 
         await subPoolNode.setParent(anyEntity.address)
@@ -29,7 +29,7 @@ describe('SubPoolNode', () => {
       it('should revert on set parent if not manager role', async function () {
         const [manager, anyEntity] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(
-          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
         )
 
         const subPoolInstance = subPoolNode.connect(anyEntity) as SubPoolNode
@@ -44,7 +44,7 @@ describe('SubPoolNode', () => {
       it('should revert when manager try to invite himself', async function () {
         const [manager] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(
-          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
         )
 
         await expect(subPoolNode.invite(manager.address)).to.be.revertedWithCustomError(
@@ -56,7 +56,7 @@ describe('SubPoolNode', () => {
       it('should revert on invite an already invited node manager', async function () {
         const [manager, invited] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(
-          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
         )
 
         await subPoolNode.invite(invited.address)
@@ -71,7 +71,7 @@ describe('SubPoolNode', () => {
         const subNodeAddress = await subPoolNode.getAddress()
 
         const invitedRouterInstance = subPoolRouter.connect(invited) as any
-        await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node.address])
+        await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node.address], 0)
 
         await expect(subPoolNode.invite(invited.address)).to.be.revertedWithCustomError(
           subPoolNode,
@@ -82,7 +82,7 @@ describe('SubPoolNode', () => {
       it('should revert on invite a node manager if not the manager role', async function () {
         const [manager, invited] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(
-          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
         )
 
         const subPoolInstance = subPoolNode.connect(invited) as SubPoolNode
@@ -97,10 +97,10 @@ describe('SubPoolNode', () => {
       it('should revert on join as node without a parent subpool', async function () {
         const [manager] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(
-          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
         )
         const { subPoolNode: subPoolNode2 } = await loadFixture(
-          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
         )
 
         const subPoolAddress = await subPoolNode2.getAddress()
@@ -115,8 +115,8 @@ describe('SubPoolNode', () => {
         const defaultSubPoolNodeAddress = await subPoolNodeDefault.getAddress()
         const SubPoolNode = await ethers.getContractFactory('SubPoolNode', hacker)
 
-        const subPoolNode = await SubPoolNode.deploy(hacker.address, 100, DEFAULT_FEES_FRACTION, [hacker.address])
-        const subPoolNode2 = await SubPoolNode.deploy(hacker.address, 100, DEFAULT_FEES_FRACTION, [hacker.address])
+        const subPoolNode = await SubPoolNode.deploy(hacker.address, 100, DEFAULT_FEES_FRACTION, [hacker.address], 0)
+        const subPoolNode2 = await SubPoolNode.deploy(hacker.address, 100, DEFAULT_FEES_FRACTION, [hacker.address], 0)
 
         const subPoolNode2Address = await subPoolNode2.getAddress()
         await subPoolNode.setParent(defaultSubPoolNodeAddress)
@@ -135,17 +135,17 @@ describe('SubPoolNode', () => {
         const subPoolRouterInstance = subPoolRouter.connect(hacker) as SubPoolRouter
 
         await expect(
-          subPoolRouterInstance.join(subNodeAddress, 0, DEFAULT_FEES_FRACTION, [])
+          subPoolRouterInstance.join(subNodeAddress, 0, DEFAULT_FEES_FRACTION, [], 0)
         ).to.be.revertedWithCustomError(subPoolNode, 'NotInvited()')
       })
 
       it('should revert on call join without being the owner', async function () {
         const [manager, invited] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(
-          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
         )
         const { subPoolNode: subPoolNode2 } = await loadFixture(
-          deployNodeFixture.bind(this, invited.address, '0', DEFAULT_FEES_FRACTION, [])
+          deployNodeFixture.bind(this, invited.address, '0', DEFAULT_FEES_FRACTION, [], 0)
         )
 
         const subNodeAddress2 = await subPoolNode2.getAddress()
@@ -157,7 +157,7 @@ describe('SubPoolNode', () => {
       it('should revert when try to call deposit if sender is not node', async function () {
         const [manager] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(
-          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+          deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
         )
 
         await expect(subPoolNode.deposit(100)).to.be.revertedWithCustomError(subPoolNode, 'NotAllowed()')
@@ -168,7 +168,7 @@ describe('SubPoolNode', () => {
       it('should revert if try to call manager additional deposit without being the manager', async function () {
         const { subPoolNode } = await loadFixture(deployRoutedNodeFixture)
         const [manager] = await ethers.getSigners()
-        deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+        deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
 
         await expect(subPoolNode.additionalDeposit(ethers.toBigInt(100))).to.be.revertedWith(
           'Ownable: caller is not the owner'
@@ -180,7 +180,7 @@ describe('SubPoolNode', () => {
       it('should revert if try to withdraw balance without being the manager', async function () {
         const { subPoolNode } = await loadFixture(deployRoutedNodeFixture)
         const [manager] = await ethers.getSigners()
-        deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+        deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
 
         await expect(subPoolNode.withdrawBalance(ethers.toBigInt(100))).to.be.revertedWith(
           'Ownable: caller is not the owner'
@@ -190,7 +190,7 @@ describe('SubPoolNode', () => {
       it('should revert if try to withdraw initial balance without being the manager', async function () {
         const { subPoolNode } = await loadFixture(deployRoutedNodeFixture)
         const [manager] = await ethers.getSigners()
-        deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+        deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [], 0)
 
         await expect(subPoolNode.withdrawInitialBalance(ethers.toBigInt(100))).to.be.revertedWith(
           'Ownable: caller is not the owner'

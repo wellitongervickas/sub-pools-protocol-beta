@@ -8,14 +8,14 @@ describe('SubPoolRouter', () => {
       const amount = ethers.toBigInt(1000)
       const [, invited] = accounts
 
-      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address])
+      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address], 0)
       let receipt = await tx.wait()
 
       const [subPoolAddress] = receipt.logs[3].args
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as SubPoolRouter
 
-      await expect(invitedRouterInstance.join(subPoolAddress, amount, DEFAULT_FEES_FRACTION, [])).to.not.be.reverted
+      await expect(invitedRouterInstance.join(subPoolAddress, amount, DEFAULT_FEES_FRACTION, [], 0)).to.not.be.reverted
     })
 
     it('should set parent subpool when joined', async function () {
@@ -23,12 +23,12 @@ describe('SubPoolRouter', () => {
       const amount = ethers.toBigInt(1000)
       const [, invited] = accounts
 
-      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address])
+      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address], 0)
       let receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[3].args
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
-      const tx2 = await invitedRouterInstance.join(subPoolAddress, amount, DEFAULT_FEES_FRACTION, [])
+      const tx2 = await invitedRouterInstance.join(subPoolAddress, amount, DEFAULT_FEES_FRACTION, [], 0)
       let receipt2 = await tx2.wait()
       const [subPoolAddress2] = receipt2.logs[5].args
       const subPoolNode = await ethers.getContractAt('SubPoolNode', subPoolAddress2)

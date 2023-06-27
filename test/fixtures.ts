@@ -1,6 +1,5 @@
 import { ethers } from 'hardhat'
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers'
-import { InterfaceAbi, LogDescription, LogParams, Result } from 'ethers'
 
 export { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 
@@ -30,10 +29,11 @@ export async function deployNodeFixture(
   manager: string,
   amount: string | BigInt,
   fees: typeof DEFAULT_FEES_FRACTION,
-  invites: string[]
+  invites: string[],
+  lockperiod = 0
 ) {
   const SubPoolNode = await ethers.getContractFactory('SubPoolNode')
-  const subPoolNode = await SubPoolNode.deploy(manager, amount, fees, invites)
+  const subPoolNode = await SubPoolNode.deploy(manager, amount, fees, invites, lockperiod)
 
   return { subPoolNode }
 }
@@ -44,21 +44,10 @@ export async function deployRoutedNodeFixture() {
   const [, invited] = accounts
   const { subPoolRouter } = await loadFixture(deployRouterFixture)
 
-  const tx = await subPoolRouter.create(ethers.toBigInt(100), DEFAULT_FEES_FRACTION, [invited.address])
+  const tx = await subPoolRouter.create(ethers.toBigInt(100), DEFAULT_FEES_FRACTION, [invited.address], 0)
   let receipt = await tx.wait()
   const [subPoolAddress] = receipt.logs[3].args
   const subPoolNode = await ethers.getContractAt('SubPoolNode', subPoolAddress)
 
   return { subPoolRouter, subPoolNode, accounts }
-}
-
-export const getArgs = (abi: InterfaceAbi, event: string, logs: LogParams[]) => {
-  const contractInterface = new ethers.Interface(abi)
-  return logs.map((log) => {
-    try {
-      return contractInterface.decodeEventLog(event, log.data, log.topics)
-    } catch {
-      return
-    }
-  })
 }

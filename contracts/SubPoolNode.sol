@@ -13,6 +13,7 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
     using SafeMath for uint256;
 
     address public parent;
+    uint public lockPeriod = 0;
 
     error ParentNotFound();
     error ParentAlreadySet();
@@ -21,9 +22,15 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         address _managerAddress,
         uint256 _amount,
         FractionLib.Fraction memory _fees,
-        address[] memory _invitedAddresses
+        address[] memory _invitedAddresses,
+        uint _lockPeriod
     ) SubPoolManager(_managerAddress, _amount, _fees) {
         _grantInitialInvites(_invitedAddresses);
+        _setLockPeriod(_lockPeriod);
+    }
+
+    function _setLockPeriod(uint _lockPeriod) internal {
+        lockPeriod = _lockPeriod;
     }
 
     function setParent(address _parent) external onlyOwner {

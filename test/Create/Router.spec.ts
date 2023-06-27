@@ -5,7 +5,7 @@ describe('SubPoolRouter', () => {
   describe('Create', () => {
     it('should update next ID', async function () {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
-      await subPoolRouter.create(100, DEFAULT_FEES_FRACTION, [])
+      await subPoolRouter.create(100, DEFAULT_FEES_FRACTION, [], 0)
 
       expect(await subPoolRouter.currentID()).to.equal(1)
     })
@@ -14,7 +14,7 @@ describe('SubPoolRouter', () => {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
 
       const amount = ethers.toBigInt(1000)
-      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [])
+      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [], 0)
       let receipt = await tx.wait()
 
       const [subPoolAddress] = receipt.logs[2].args
@@ -27,7 +27,7 @@ describe('SubPoolRouter', () => {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
       const amount = ethers.toBigInt(1000)
 
-      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [])
+      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [], 0)
       const receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[2].args
 

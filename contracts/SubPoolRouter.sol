@@ -32,9 +32,10 @@ contract SubPoolRouter is SubPool {
     function create(
         uint256 _amount,
         FractionLib.Fraction memory _fees,
-        address[] memory _invitedAddresses
+        address[] memory _invitedAddresses,
+        uint _unlockTime
     ) external returns (address) {
-        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _fees, _invitedAddresses);
+        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _fees, _invitedAddresses, _unlockTime);
 
         address _subPoolAddress = address(_subPool);
         uint256 _id = _setupNode(_subPoolAddress, msg.sender, _amount);
@@ -49,10 +50,11 @@ contract SubPoolRouter is SubPool {
         address _parentAddress,
         uint256 _amount,
         FractionLib.Fraction memory _fees,
-        address[] memory _invitedAddresses
+        address[] memory _invitedAddresses,
+        uint _unlockTime
     ) external returns (address) {
         SubPoolNode _parentSubPool = SubPoolNode(_parentAddress);
-        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _fees, _invitedAddresses);
+        SubPoolNode _subPool = new SubPoolNode(msg.sender, _amount, _fees, _invitedAddresses, _unlockTime);
 
         address _subPoolAddress = address(_subPool);
         uint256 _subPoolId = _parentSubPool.join(_subPoolAddress, _amount);
