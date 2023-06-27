@@ -55,6 +55,10 @@ contract SubPoolManager is AccessControl {
         manager._decreaseBalance(_amount);
     }
 
+    function _decreaseManagerInitialBalance(uint256 _amount) internal {
+        manager._decreaseInitialBalance(_amount);
+    }
+
     function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
         if (_checkIsManagerRole(_invitedAddress)) revert ManagerNotAllowed();
         if (checkIsInvitedRole(_invitedAddress)) revert AlreadyInvited();

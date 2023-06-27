@@ -4,7 +4,7 @@ import { deployRoutedNodeFixture, loadFixture, DEFAULT_FEES_FRACTION, ethers } f
 describe('SubPoolNode', () => {
   describe('Additional deposit', () => {
     it('should update manager balance on additional deposit', async function () {
-      const amount = ethers.toBigInt(100)
+      const amount = ethers.toBigInt(1000)
       const [, invited, node1] = await ethers.getSigners()
       const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
 
@@ -28,7 +28,7 @@ describe('SubPoolNode', () => {
     })
 
     it('should update parent balance when manager additional deposit', async function () {
-      const amount = ethers.toBigInt(100)
+      const amount = ethers.toBigInt(1000)
       const [, invited, node1] = await ethers.getSigners()
       const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
 

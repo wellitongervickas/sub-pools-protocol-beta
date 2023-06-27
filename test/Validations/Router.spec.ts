@@ -16,15 +16,26 @@ describe('SubPoolRouter', () => {
       })
     })
 
-    describe('Withdraw funds', () => {
-      it('should revert if try to call withdraw funds without being the manager', async function () {
+    describe('Withdraw Balance', () => {
+      it('should revert if try to call withdraw balance without being the manager', async function () {
         const { subPoolRouter, subPoolNode, accounts } = await loadFixture(deployRoutedNodeFixture)
         const [, anyEntity] = accounts
         const nodeAddress = await subPoolNode.getAddress()
         const anyEntityRouterInstance = subPoolRouter.connect(anyEntity) as any
 
         await expect(
-          anyEntityRouterInstance.withdrawFunds(nodeAddress, ethers.toBigInt(100))
+          anyEntityRouterInstance.withdrawBalance(nodeAddress, ethers.toBigInt(100))
+        ).to.be.revertedWithCustomError(subPoolRouter, 'NotNodeManager()')
+      })
+
+      it('should revert if try to call withdraw initial balance without being the manager', async function () {
+        const { subPoolRouter, subPoolNode, accounts } = await loadFixture(deployRoutedNodeFixture)
+        const [, anyEntity] = accounts
+        const nodeAddress = await subPoolNode.getAddress()
+        const anyEntityRouterInstance = subPoolRouter.connect(anyEntity) as any
+
+        await expect(
+          anyEntityRouterInstance.withdrawInitialBalance(nodeAddress, ethers.toBigInt(100))
         ).to.be.revertedWithCustomError(subPoolRouter, 'NotNodeManager()')
       })
     })

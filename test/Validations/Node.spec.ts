@@ -176,13 +176,23 @@ describe('SubPoolNode', () => {
       })
     })
 
-    describe('Withdraw funds', () => {
-      it('should revert if try to withdraw funds without being the manager', async function () {
+    describe('Withdraw ', () => {
+      it('should revert if try to withdraw balance without being the manager', async function () {
         const { subPoolNode } = await loadFixture(deployRoutedNodeFixture)
         const [manager] = await ethers.getSigners()
         deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
 
-        await expect(subPoolNode.withdrawFunds(ethers.toBigInt(100))).to.be.revertedWith(
+        await expect(subPoolNode.withdrawBalance(ethers.toBigInt(100))).to.be.revertedWith(
+          'Ownable: caller is not the owner'
+        )
+      })
+
+      it('should revert if try to withdraw initial balance without being the manager', async function () {
+        const { subPoolNode } = await loadFixture(deployRoutedNodeFixture)
+        const [manager] = await ethers.getSigners()
+        deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [])
+
+        await expect(subPoolNode.withdrawInitialBalance(ethers.toBigInt(100))).to.be.revertedWith(
           'Ownable: caller is not the owner'
         )
       })

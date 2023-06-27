@@ -23,7 +23,7 @@ describe('SubPoolNode', () => {
     })
 
     it('should set manager initial balance', async function () {
-      const amount = '100'
+      const amount = ethers.toBigInt(1000)
       const [manager] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(
         deployNodeFixture.bind(this, manager.address, amount, DEFAULT_FEES_FRACTION, [])

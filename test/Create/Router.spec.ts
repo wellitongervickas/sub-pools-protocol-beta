@@ -13,7 +13,7 @@ describe('SubPoolRouter', () => {
     it('should set the main subpool initial balance', async function () {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
 
-      const amount = '1000'
+      const amount = ethers.toBigInt(1000)
       const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [])
       let receipt = await tx.wait()
 
@@ -25,7 +25,7 @@ describe('SubPoolRouter', () => {
 
     it('should set the parent of main node as router itself', async function () {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
-      const amount = '1000'
+      const amount = ethers.toBigInt(1000)
 
       const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [])
       const receipt = await tx.wait()

@@ -8,11 +8,10 @@ describe('SubPoolRouter', () => {
         const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
 
         const [, invited] = accounts
-        subPoolRouter.connect(invited)
+        const rounterInvitedInstance = subPoolRouter.connect(invited) as any
+        const amount = ethers.toBigInt(1000)
 
-        const amount = '1000'
-
-        await expect(subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, []))
+        await expect(rounterInvitedInstance.create(amount, DEFAULT_FEES_FRACTION, []))
           .to.emit(subPoolRouter, 'SubPoolCreated')
           .withArgs(anyValue, 1, amount)
       })
@@ -21,7 +20,7 @@ describe('SubPoolRouter', () => {
     describe('Node', () => {
       it('should emit SubPoolJoined on create a node', async function () {
         const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
-        const amount = '1000'
+        const amount = ethers.toBigInt(1000)
         const [, invited] = accounts
 
         const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address])
@@ -38,7 +37,7 @@ describe('SubPoolRouter', () => {
 
       it('should emit ManagerDeposited when node deposit', async function () {
         const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
-        const amount = '1000'
+        const amount = ethers.toBigInt(1000)
         const [, invited] = accounts
 
         const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address])
@@ -60,11 +59,43 @@ describe('SubPoolRouter', () => {
 
         const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [])
         let receipt = await tx.wait()
-
         const [subPoolAddress] = receipt.logs[2].args
 
         await expect(subPoolRouter.additionalDeposit(subPoolAddress, amount))
           .to.emit(subPoolRouter, 'ManagerDeposited')
+          .withArgs(anyValue, amount)
+      })
+    })
+
+    describe('Withdraw', () => {
+      it('should emit ManagerWithdrew when withdraw balance from a node', async function () {
+        const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
+        const [, invited] = accounts
+        const amount = ethers.toBigInt(1000)
+        const additionalAmount = ethers.toBigInt(100)
+
+        const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address])
+        let receipt = await tx.wait()
+        const [subPoolAddress] = receipt.logs[3].args
+
+        await subPoolRouter.additionalDeposit(subPoolAddress, additionalAmount)
+
+        await expect(subPoolRouter.withdrawBalance(subPoolAddress, additionalAmount))
+          .to.emit(subPoolRouter, 'ManagerWithdrew')
+          .withArgs(anyValue, additionalAmount)
+      })
+
+      it('should emit ManagerWithdrew when withdraw initial balance from a node', async function () {
+        const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
+        const [, invited] = accounts
+        const amount = ethers.toBigInt(1000)
+
+        const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address])
+        let receipt = await tx.wait()
+        const [subPoolAddress] = receipt.logs[3].args
+
+        await expect(subPoolRouter.withdrawInitialBalance(subPoolAddress, amount))
+          .to.emit(subPoolRouter, 'ManagerWithdrew')
           .withArgs(anyValue, amount)
       })
     })

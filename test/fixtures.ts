@@ -28,7 +28,7 @@ export async function deployRouterFixture() {
 
 export async function deployNodeFixture(
   manager: string,
-  amount: string,
+  amount: string | BigInt,
   fees: typeof DEFAULT_FEES_FRACTION,
   invites: string[]
 ) {

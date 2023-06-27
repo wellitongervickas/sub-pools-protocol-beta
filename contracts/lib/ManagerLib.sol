@@ -23,6 +23,10 @@ library ManagerLib {
         _self.balance -= _value;
     }
 
+    function _decreaseInitialBalance(Manager storage _self, uint256 _value) internal {
+        _self.initialBalance -= _value;
+    }
+
     function _computeFees(Manager storage _self, uint256 _value) internal view returns (uint256) {
         return _value.mul(_self.fees.value).div(_self.fees.divider);
     }

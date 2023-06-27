@@ -41,18 +41,27 @@ contract SubPool {
         _decreaseSubPoolBalance(msg.sender, _amount);
     }
 
+    function cashback(uint256 _amount) public virtual {
+        _decreaseSubPoolInitialBalance(msg.sender, _amount);
+    }
+
     function _increaseSubPoolBalance(address _address, uint256 _amount) internal {
-        _checkIsNode(_address);
+        _validateIsNode(_address);
         subPools[_address]._increaseBalance(_amount);
     }
 
     function _decreaseSubPoolBalance(address _address, uint256 _amount) internal {
-        _checkIsNode(_address);
+        _validateIsNode(_address);
         subPools[_address]._decreaseBalance(_amount);
     }
 
-    function _checkIsNode(address _address) internal view {
-        bool _isNode = subPools[_address]._checkIsNode();
+    function _decreaseSubPoolInitialBalance(address _address, uint256 _amount) internal {
+        _validateIsNode(_address);
+        subPools[_address]._decreaseInitialBalance(_amount);
+    }
+
+    function _validateIsNode(address _address) internal view {
+        bool _isNode = subPools[_address]._validateIsNode();
         if (!_isNode) revert NotAllowed();
     }
 }

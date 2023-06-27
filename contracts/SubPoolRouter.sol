@@ -23,6 +23,12 @@ contract SubPoolRouter is SubPool {
 
     error NotNodeManager();
 
+    modifier onlyNodeManager(address _subPoolAddress) {
+        (address _managerAddress, , , ) = SubPoolNode(_subPoolAddress).manager();
+        if (_managerAddress != msg.sender) revert NotNodeManager();
+        _;
+    }
+
     function create(
         uint256 _amount,
         FractionLib.Fraction memory _fees,
@@ -66,37 +72,50 @@ contract SubPoolRouter is SubPool {
         emit ManagerWithdrew(msg.sender, _amount);
     }
 
+    function cashback(uint256 _amount) public override {
+        super.cashback(_amount);
+        emit ManagerWithdrew(msg.sender, _amount);
+    }
+
     function deposit(uint256 _amount) public override {
         super.deposit(_amount);
         emit ManagerDeposited(msg.sender, _amount);
     }
 
-    function additionalDeposit(address _subPoolAddress, uint256 _amount) external {
-        _checkIsNodeManager(_subPoolAddress);
-
-        if (SubPoolNode(_subPoolAddress).parent() == address(this)) {
-            _increaseSubPoolBalance(_subPoolAddress, _amount);
-        } else {
-            SubPoolNode(_subPoolAddress).additionalDeposit(_amount);
+    function additionalDeposit(address _subPoolAddress, uint256 _amount) external onlyNodeManager(_subPoolAddress) {
+        if (!_checkIsParentRouter(_subPoolAddress)) {
+            return SubPoolNode(_subPoolAddress).additionalDeposit(_amount);
         }
+
+        _increaseSubPoolBalance(_subPoolAddress, _amount);
 
         emit ManagerDeposited(_subPoolAddress, _amount);
     }
 
-    function withdrawFunds(address _subPoolAddress, uint256 _amount) external {
-        _checkIsNodeManager(_subPoolAddress);
-
-        if (SubPoolNode(_subPoolAddress).parent() == address(this)) {
-            _decreaseSubPoolBalance(_subPoolAddress, _amount);
-        } else {
-            SubPoolNode(_subPoolAddress).withdrawFunds(_amount);
+    function withdrawBalance(address _subPoolAddress, uint256 _amount) external onlyNodeManager(_subPoolAddress) {
+        if (!_checkIsParentRouter(_subPoolAddress)) {
+            return SubPoolNode(_subPoolAddress).withdrawBalance(_amount);
         }
+
+        _decreaseSubPoolBalance(_subPoolAddress, _amount);
 
         emit ManagerWithdrew(_subPoolAddress, _amount);
     }
 
-    function _checkIsNodeManager(address _subPoolAddress) internal view virtual {
-        (address _managerAddress, , , ) = SubPoolNode(_subPoolAddress).manager();
-        if (_managerAddress != msg.sender) revert NotNodeManager();
+    function withdrawInitialBalance(
+        address _subPoolAddress,
+        uint256 _amount
+    ) external onlyNodeManager(_subPoolAddress) {
+        if (!_checkIsParentRouter(_subPoolAddress)) {
+            return SubPoolNode(_subPoolAddress).withdrawInitialBalance(_amount);
+        }
+
+        _decreaseSubPoolInitialBalance(_subPoolAddress, _amount);
+
+        emit ManagerWithdrew(_subPoolAddress, _amount);
+    }
+
+    function _checkIsParentRouter(address _subPoolAddress) internal view returns (bool) {
+        return SubPoolNode(_subPoolAddress).parent() == address(this);
     }
 }

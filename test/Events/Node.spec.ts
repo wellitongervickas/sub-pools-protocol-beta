@@ -1,13 +1,5 @@
 import { expect } from 'chai'
-import {
-  deployNodeFixture,
-  deployRoutedNodeFixture,
-  loadFixture,
-  DEFAULT_FEES_FRACTION,
-  ethers,
-  SubPoolRouter,
-  anyValue,
-} from '../fixtures'
+import { deployNodeFixture, loadFixture, DEFAULT_FEES_FRACTION, ethers } from '../fixtures'
 
 describe('SubPoolNode', () => {
   describe('Events', () => {

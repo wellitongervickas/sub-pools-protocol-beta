@@ -5,7 +5,7 @@ describe('SubPoolRouter', () => {
   describe('Join', () => {
     it('should join a parent subpool as node', async function () {
       const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
-      const amount = '1000'
+      const amount = ethers.toBigInt(1000)
       const [, invited] = accounts
 
       const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address])
@@ -20,7 +20,7 @@ describe('SubPoolRouter', () => {
 
     it('should set parent subpool when joined', async function () {
       const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
-      const amount = '1000'
+      const amount = ethers.toBigInt(1000)
       const [, invited] = accounts
 
       const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address])

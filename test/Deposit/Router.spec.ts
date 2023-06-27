@@ -9,13 +9,11 @@ describe('SubPoolRouter', () => {
 
       const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [])
       let receipt = await tx.wait()
-
       const [subPoolAddress] = receipt.logs[2].args
 
       await subPoolRouter.additionalDeposit(subPoolAddress, amount)
 
       const [, , , balance] = await subPoolRouter.subPools(subPoolAddress)
-
       expect(balance).to.deep.equal(amount)
     })
   })
