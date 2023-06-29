@@ -72,7 +72,8 @@ describe('SubPoolNode', () => {
           amount,
           DEFAULT_FEES_FRACTION,
           [node.address],
-          DEFAULT_PERIOD_LOCK
+          DEFAULT_PERIOD_LOCK,
+          DEFAULT_REQUIRED_INITIAL_BALANCE
         )
 
         await expect(subPoolNode.invite(invited.address)).to.be.revertedWithCustomError(
@@ -144,7 +145,14 @@ describe('SubPoolNode', () => {
         const subPoolRouterInstance = subPoolRouter.connect(hacker) as SubPoolRouter
 
         await expect(
-          subPoolRouterInstance.join(subNodeAddress, 0, DEFAULT_FEES_FRACTION, [], DEFAULT_PERIOD_LOCK)
+          subPoolRouterInstance.join(
+            subNodeAddress,
+            0,
+            DEFAULT_FEES_FRACTION,
+            [],
+            DEFAULT_PERIOD_LOCK,
+            DEFAULT_REQUIRED_INITIAL_BALANCE
+          )
         ).to.be.revertedWithCustomError(subPoolNode, 'NotInvited()')
       })
 
@@ -157,6 +165,37 @@ describe('SubPoolNode', () => {
         const newSubPoolInstance = subPoolNode.connect(invited) as SubPoolNode
 
         await expect(newSubPoolInstance.join(subNodeAddress2, 0)).to.be.rejectedWith('Ownable: caller is not the owner')
+      })
+
+      it('should revert if try to join without a required initial balance', async function () {
+        const [, , otherInvited] = await ethers.getSigners()
+        const { subPoolNode, subPoolRouter } = await loadFixture(
+          deployRoutedNodeFixture.bind(
+            this,
+            ethers.toBigInt(100),
+            DEFAULT_FEES_FRACTION,
+            [],
+            DEFAULT_PERIOD_LOCK,
+            ethers.toBigInt(100)
+          )
+        )
+
+        const subPoolNodeAddress = await subPoolNode.getAddress()
+
+        await subPoolNode.invite(otherInvited.address)
+
+        const invitedRouterInstance = subPoolRouter.connect(otherInvited) as SubPoolRouter
+
+        await expect(
+          invitedRouterInstance.join(
+            subPoolNodeAddress,
+            0,
+            DEFAULT_FEES_FRACTION,
+            [],
+            DEFAULT_PERIOD_LOCK,
+            DEFAULT_REQUIRED_INITIAL_BALANCE
+          )
+        ).to.be.revertedWithCustomError(subPoolNode, 'InvalidInitialAmount()')
       })
     })
 

@@ -6,6 +6,8 @@ import {
   SubPoolRouter,
   deployRoutedNodeFixture,
   NODE_ROLE,
+  DEFAULT_PERIOD_LOCK,
+  DEFAULT_REQUIRED_INITIAL_BALANCE,
 } from '../fixtures'
 
 describe('SubPoolNode', () => {
@@ -16,7 +18,14 @@ describe('SubPoolNode', () => {
 
       const subNodeAddress = await subPoolNode.getAddress()
       const subPoolRouterInstance = subPoolRouter.connect(invited) as SubPoolRouter
-      await subPoolRouterInstance.join(subNodeAddress, 0, DEFAULT_FEES_FRACTION, [], 0)
+      await subPoolRouterInstance.join(
+        subNodeAddress,
+        0,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
 
       expect(await subPoolNode.currentID()).to.equal(1)
     })
@@ -29,12 +38,26 @@ describe('SubPoolNode', () => {
       const subNodeAddress = await subPoolNode.getAddress()
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
-      const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node.address], 0)
+      const tx0 = await invitedRouterInstance.join(
+        subNodeAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [node.address],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const rcpt0 = await tx0.wait()
       const invitedSubNodeAddress = rcpt0.logs[6].args[0]
 
       const nodeRouterInstance = subPoolRouter.connect(node) as any
-      const tx1 = await nodeRouterInstance.join(invitedSubNodeAddress, amount, DEFAULT_FEES_FRACTION, [], 0)
+      const tx1 = await nodeRouterInstance.join(
+        invitedSubNodeAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const rcpt1 = await tx1.wait()
       const nodeAddress = rcpt1.logs[5].args[0]
 
@@ -50,12 +73,26 @@ describe('SubPoolNode', () => {
       const subNodeAddress = await subPoolNode.getAddress()
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
-      const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node.address], 0)
+      const tx0 = await invitedRouterInstance.join(
+        subNodeAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [node.address],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const rcpt0 = await tx0.wait()
       const invitedSubNodeAddress = rcpt0.logs[6].args[0]
 
       const nodeRouterInstance = subPoolRouter.connect(node) as any
-      const tx1 = await nodeRouterInstance.join(invitedSubNodeAddress, amount, DEFAULT_FEES_FRACTION, [], 0)
+      const tx1 = await nodeRouterInstance.join(
+        invitedSubNodeAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const rcpt1 = await tx1.wait()
       const nodeAddress = rcpt1.logs[5].args[0]
 
@@ -70,7 +107,14 @@ describe('SubPoolNode', () => {
 
       const subNodeAddress = await subPoolNode.getAddress()
       const subPoolRouterInstance = subPoolRouter.connect(other) as SubPoolRouter
-      await subPoolRouterInstance.join(subNodeAddress, 0, DEFAULT_FEES_FRACTION, [], 0)
+      await subPoolRouterInstance.join(
+        subNodeAddress,
+        0,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
 
       expect(await subPoolNode.hasRole(NODE_ROLE, other.address)).to.be.true
     })
@@ -82,7 +126,14 @@ describe('SubPoolNode', () => {
       const subNodeAddress = await subPoolNode.getAddress()
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
-      await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node.address], 0)
+      await invitedRouterInstance.join(
+        subNodeAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [node.address],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
 
       const [, , , balance] = await subPoolRouter.subPools(subNodeAddress)
       expect(balance).to.be.equal(ethers.toBigInt(amount))
@@ -101,12 +152,26 @@ describe('SubPoolNode', () => {
       const subNodeAddress = await subPoolNode.getAddress()
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
-      const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, customFeesFraction, [node.address], 0)
+      const tx0 = await invitedRouterInstance.join(
+        subNodeAddress,
+        amount,
+        customFeesFraction,
+        [node.address],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const rcpt0 = await tx0.wait()
       const invitedSubNodeAddress = rcpt0.logs[6].args[0]
 
       const nodeRouterInstance = subPoolRouter.connect(node) as any
-      await nodeRouterInstance.join(invitedSubNodeAddress, amount, DEFAULT_FEES_FRACTION, [], 0)
+      await nodeRouterInstance.join(
+        invitedSubNodeAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const invitedSubPoolNode = await ethers.getContractAt('SubPoolNode', invitedSubNodeAddress)
 
       const [, , balance] = await invitedSubPoolNode.manager()
@@ -126,12 +191,26 @@ describe('SubPoolNode', () => {
       const subNodeAddress = await subPoolNode.getAddress()
 
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
-      const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, customFeesFraction, [node.address], 0)
+      const tx0 = await invitedRouterInstance.join(
+        subNodeAddress,
+        amount,
+        customFeesFraction,
+        [node.address],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const rcpt0 = await tx0.wait()
       const invitedSubNodeAddress = rcpt0.logs[6].args[0]
 
       const nodeRouterInstance = subPoolRouter.connect(node) as any
-      const tx1 = await nodeRouterInstance.join(invitedSubNodeAddress, amount, DEFAULT_FEES_FRACTION, [], 0)
+      const tx1 = await nodeRouterInstance.join(
+        invitedSubNodeAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const rcpt1 = await tx1.wait()
       const nodeAddress = rcpt1.logs[5].args[0]
 

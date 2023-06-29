@@ -1,5 +1,12 @@
 import { expect } from 'chai'
-import { deployRoutedNodeFixture, loadFixture, DEFAULT_FEES_FRACTION, ethers } from '../fixtures'
+import {
+  deployRoutedNodeFixture,
+  loadFixture,
+  DEFAULT_FEES_FRACTION,
+  ethers,
+  DEFAULT_PERIOD_LOCK,
+  DEFAULT_REQUIRED_INITIAL_BALANCE,
+} from '../fixtures'
 
 describe('SubPoolNode', () => {
   describe('Additional deposit', () => {
@@ -10,12 +17,26 @@ describe('SubPoolNode', () => {
 
       const subNodeAddress = await subPoolNode.getAddress()
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
-      const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node1.address], 0)
+      const tx0 = await invitedRouterInstance.join(
+        subNodeAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [node1.address],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const rcpt0 = await tx0.wait()
       const invitedSubPoolNodeAddress = rcpt0.logs[6].args[0]
 
       const node1RouterInstance = subPoolRouter.connect(node1) as any
-      const tx1 = await node1RouterInstance.join(invitedSubPoolNodeAddress, amount, DEFAULT_FEES_FRACTION, [], 0)
+      const tx1 = await node1RouterInstance.join(
+        invitedSubPoolNodeAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const rcpt1 = await tx1.wait()
       const node1SubPoolNodeAddress = rcpt1.logs[5].args[0]
 
@@ -34,12 +55,26 @@ describe('SubPoolNode', () => {
 
       const subNodeAddress = await subPoolNode.getAddress()
       const invitedRouterInstance = subPoolRouter.connect(invited) as any
-      const tx0 = await invitedRouterInstance.join(subNodeAddress, amount, DEFAULT_FEES_FRACTION, [node1.address], 0)
+      const tx0 = await invitedRouterInstance.join(
+        subNodeAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [node1.address],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const rcpt0 = await tx0.wait()
       const invitedSubPoolNodeAddress = rcpt0.logs[6].args[0]
 
       const node1RouterInstance = subPoolRouter.connect(node1) as any
-      const tx1 = await node1RouterInstance.join(invitedSubPoolNodeAddress, amount, DEFAULT_FEES_FRACTION, [], 0)
+      const tx1 = await node1RouterInstance.join(
+        invitedSubPoolNodeAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const rcpt1 = await tx1.wait()
       const node1SubPoolNodeAddress = rcpt1.logs[5].args[0]
 

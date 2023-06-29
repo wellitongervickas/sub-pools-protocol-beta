@@ -1,11 +1,18 @@
 import { expect } from 'chai'
-import { deployRouterFixture, loadFixture, DEFAULT_FEES_FRACTION, ethers } from '../fixtures'
+import {
+  deployRouterFixture,
+  loadFixture,
+  DEFAULT_FEES_FRACTION,
+  ethers,
+  DEFAULT_PERIOD_LOCK,
+  DEFAULT_REQUIRED_INITIAL_BALANCE,
+} from '../fixtures'
 
 describe('SubPoolRouter', () => {
   describe('Create', () => {
     it('should update next ID', async function () {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
-      await subPoolRouter.create(100, DEFAULT_FEES_FRACTION, [], 0)
+      await subPoolRouter.create(100, DEFAULT_FEES_FRACTION, [], DEFAULT_PERIOD_LOCK, DEFAULT_REQUIRED_INITIAL_BALANCE)
 
       expect(await subPoolRouter.currentID()).to.equal(1)
     })
@@ -14,7 +21,13 @@ describe('SubPoolRouter', () => {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
 
       const amount = ethers.toBigInt(1000)
-      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [], 0)
+      const tx = await subPoolRouter.create(
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       let receipt = await tx.wait()
 
       const [subPoolAddress] = receipt.logs[2].args
@@ -27,7 +40,13 @@ describe('SubPoolRouter', () => {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
       const amount = ethers.toBigInt(1000)
 
-      const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [], 0)
+      const tx = await subPoolRouter.create(
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_BALANCE
+      )
       const receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[2].args
 

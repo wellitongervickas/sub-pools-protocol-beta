@@ -6,6 +6,7 @@ import {
   DEFAULT_FEES_FRACTION,
   deployRouterFixture,
   time,
+  DEFAULT_REQUIRED_INITIAL_BALANCE,
 } from '../fixtures'
 
 describe('SubPoolRouter', () => {
@@ -90,12 +91,25 @@ describe('SubPoolRouter', () => {
         const amount = ethers.toBigInt(1000)
         const [, invited] = accounts
 
-        const tx = await subPoolRouter.create(amount, DEFAULT_FEES_FRACTION, [invited.address], unlockTime)
+        const tx = await subPoolRouter.create(
+          amount,
+          DEFAULT_FEES_FRACTION,
+          [invited.address],
+          unlockTime,
+          DEFAULT_REQUIRED_INITIAL_BALANCE
+        )
         let receipt = await tx.wait()
         const [subPoolAddress] = receipt.logs[3].args
 
         const invitedRouterInstance = subPoolRouter.connect(invited) as any
-        await invitedRouterInstance.join(subPoolAddress, amount, DEFAULT_FEES_FRACTION, [], unlockTime)
+        await invitedRouterInstance.join(
+          subPoolAddress,
+          amount,
+          DEFAULT_FEES_FRACTION,
+          [],
+          unlockTime,
+          DEFAULT_REQUIRED_INITIAL_BALANCE
+        )
 
         await expect(
           subPoolRouter.withdrawInitialBalance(subPoolAddress, ethers.toBigInt(100))
