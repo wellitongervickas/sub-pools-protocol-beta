@@ -8,38 +8,49 @@ import './SubPoolManager.sol';
 
 contract SubPoolNode is SubPool, SubPoolManager, Ownable {
     address public parent;
-    uint public lockPeriod;
+    uint256 public lockPeriod;
+    uint256 public requiredInitialAmount;
 
     error ParentNotFound();
     error ParentAlreadySet();
+    error InvalidInitialAmount();
+
+    // @dev same as onlyOwner, the name is to make it clear that this is only used by the router
+    modifier onlyRouter() {
+        _checkOwner();
+        _;
+    }
 
     constructor(
         address _managerAddress,
         uint256 _amount,
         FractionLib.Fraction memory _fees,
         address[] memory _invitedAddresses,
-        uint _lockPeriod
+        uint256 _lockPeriod,
+        uint256 _requiredInitialAmount
     ) SubPoolManager(_managerAddress, _amount, _fees) {
         _grantInitialInvites(_invitedAddresses);
         _setLockPeriod(_lockPeriod);
+        _setRequiredInitialAmount(_requiredInitialAmount);
     }
 
-    function _setLockPeriod(uint _lockPeriod) internal {
+    function _setLockPeriod(uint256 _lockPeriod) internal {
         lockPeriod = _lockPeriod;
     }
 
-    function setParent(address _parent) external onlyOwner {
+    function _setRequiredInitialAmount(uint256 _requiredInitialAmount) internal {
+        requiredInitialAmount = _requiredInitialAmount;
+    }
+
+    function setParent(address _parent) external onlyRouter {
         if (_checkHasParent()) revert ParentAlreadySet();
         parent = _parent;
     }
 
-    function _checkHasParent() internal view returns (bool) {
-        return parent != address(0);
-    }
-
-    function join(address _subPoolAddress, uint256 _amount) external onlyOwner returns (uint256) {
+    function join(address _subPoolAddress, uint256 _amount) external onlyRouter returns (uint256) {
+        if (!_checkAmountInitialBalance(_amount)) revert InvalidInitialAmount();
         if (!_checkHasParent()) revert ParentNotFound();
-        if (!checkIsInvitedRole(tx.origin)) revert SubPoolManager.NotInvited();
+        if (!_checkIsInvitedRole(tx.origin)) revert SubPoolManager.NotInvited();
 
         uint256 _amountSubTotal = _computeManagerFees(_amount);
         uint256 _id = _setupNode(_subPoolAddress, msg.sender, _amountSubTotal);
@@ -50,16 +61,13 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         return _id;
     }
 
-    function _increaseParentBalance(uint256 _amount) internal {
-        SubPoolNode(parent).deposit(_amount);
+    function _checkHasParent() internal view returns (bool) {
+        return parent != address(0);
     }
 
-    function _decreaseParentBalance(uint256 _amount) internal {
-        SubPoolNode(parent).withdraw(_amount);
-    }
-
-    function _decreaseParentInitialBalance(uint256 _amount) internal {
-        SubPoolNode(parent).cashback(_amount);
+    function _checkAmountInitialBalance(uint256 _amount) internal view returns (bool) {
+        if (requiredInitialAmount == 0) return true;
+        return _amount == requiredInitialAmount;
     }
 
     function deposit(uint256 _amount) public override onlySubNode(msg.sender) {
@@ -77,18 +85,30 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         _decreaseParentInitialBalance(_amount);
     }
 
-    function additionalDeposit(uint256 _amount) external onlyOwner {
+    function additionalDeposit(uint256 _amount) external onlyRouter {
         _increaseManagerBalance(_amount);
         _increaseParentBalance(_amount);
     }
 
-    function withdrawBalance(uint256 _amount) external onlyOwner {
+    function withdrawBalance(uint256 _amount) external onlyRouter {
         _decreaseManagerBalance(_amount);
         _decreaseParentBalance(_amount);
     }
 
-    function withdrawInitialBalance(uint256 _amount) external onlyUnlockedPeriod(lockPeriod) onlyOwner {
+    function withdrawInitialBalance(uint256 _amount) external onlyUnlockedPeriod(lockPeriod) onlyRouter {
         _decreaseManagerInitialBalance(_amount);
         _decreaseParentInitialBalance(_amount);
+    }
+
+    function _increaseParentBalance(uint256 _amount) internal {
+        SubPoolNode(parent).deposit(_amount);
+    }
+
+    function _decreaseParentBalance(uint256 _amount) internal {
+        SubPoolNode(parent).withdraw(_amount);
+    }
+
+    function _decreaseParentInitialBalance(uint256 _amount) internal {
+        SubPoolNode(parent).cashback(_amount);
     }
 }

@@ -57,7 +57,7 @@ contract SubPoolManager is AccessControl {
 
     function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
         if (_checkIsManagerRole(_invitedAddress)) revert ManagerNotAllowed();
-        if (checkIsInvitedRole(_invitedAddress)) revert AlreadyInvited();
+        if (_checkIsInvitedRole(_invitedAddress)) revert AlreadyInvited();
         if (_checkIsNodeRole(_invitedAddress)) revert AlreadyNodeManager();
 
         _grantRole(INVITED_ROLE, _invitedAddress);
@@ -80,7 +80,7 @@ contract SubPoolManager is AccessControl {
         return hasRole(MANAGER_ROLE, _address);
     }
 
-    function checkIsInvitedRole(address _nodeManagerAddress) public view returns (bool) {
+    function _checkIsInvitedRole(address _nodeManagerAddress) internal view returns (bool) {
         return hasRole(INVITED_ROLE, _nodeManagerAddress);
     }
 

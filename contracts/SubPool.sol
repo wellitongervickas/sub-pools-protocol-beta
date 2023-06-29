@@ -13,10 +13,9 @@ contract SubPool {
     mapping(address => SubPoolLib.SubPool) public subPools;
 
     error NotAllowed();
-
     error LockPeriod();
 
-    modifier onlyUnlockedPeriod(uint _lockPeriod) {
+    modifier onlyUnlockedPeriod(uint256 _lockPeriod) {
         if (_lockPeriod > block.timestamp) revert LockPeriod();
         _;
     }

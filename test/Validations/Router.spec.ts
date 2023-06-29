@@ -95,9 +95,7 @@ describe('SubPoolRouter', () => {
         const [subPoolAddress] = receipt.logs[3].args
 
         const invitedRouterInstance = subPoolRouter.connect(invited) as any
-        const tx2 = await invitedRouterInstance.join(subPoolAddress, amount, DEFAULT_FEES_FRACTION, [], unlockTime)
-        let receipt2 = await tx2.wait()
-        const [subPoolAddress2] = receipt2.logs[5].args
+        await invitedRouterInstance.join(subPoolAddress, amount, DEFAULT_FEES_FRACTION, [], unlockTime)
 
         await expect(
           subPoolRouter.withdrawInitialBalance(subPoolAddress, ethers.toBigInt(100))
