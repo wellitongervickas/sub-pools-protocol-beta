@@ -6,7 +6,9 @@ import {
   DEFAULT_FEES_FRACTION,
   deployRouterFixture,
   time,
-  DEFAULT_REQUIRED_INITIAL_BALANCE,
+  DEFAULT_REQUIRED_INITIAL_AMOUNT,
+  DEFAULT_MAX_ADDITIONAL_AMOUNT,
+  DEFAULT_PERIOD_LOCK,
 } from '../fixtures'
 
 describe('SubPoolRouter', () => {
@@ -21,6 +23,28 @@ describe('SubPoolRouter', () => {
         await expect(
           anyEntityRouterInstance.additionalDeposit(nodeAddress, ethers.toBigInt(100))
         ).to.be.revertedWithCustomError(subPoolRouter, 'NotNodeManager()')
+      })
+
+      it.skip('should revert if try to call additional deposit with amount greater than node max deposit amount', async function () {
+        const { subPoolRouter } = await loadFixture(deployRouterFixture)
+        const amount = ethers.toBigInt(1000)
+
+        const tx = await subPoolRouter.create(
+          amount,
+          DEFAULT_FEES_FRACTION,
+          [],
+          DEFAULT_PERIOD_LOCK,
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          amount - ethers.toBigInt(1) // 999
+        )
+
+        let receipt = await tx.wait()
+        const [subPoolAddress] = receipt.logs[2].args
+
+        await expect(subPoolRouter.additionalDeposit(subPoolAddress, amount)).to.be.revertedWithCustomError(
+          subPoolRouter,
+          'InvalidAdditionalAmount()'
+        )
       })
     })
 
@@ -96,7 +120,8 @@ describe('SubPoolRouter', () => {
           DEFAULT_FEES_FRACTION,
           [invited.address],
           unlockTime,
-          DEFAULT_REQUIRED_INITIAL_BALANCE
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_ADDITIONAL_AMOUNT
         )
         let receipt = await tx.wait()
         const [subPoolAddress] = receipt.logs[3].args
@@ -108,7 +133,8 @@ describe('SubPoolRouter', () => {
           DEFAULT_FEES_FRACTION,
           [],
           unlockTime,
-          DEFAULT_REQUIRED_INITIAL_BALANCE
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_ADDITIONAL_AMOUNT
         )
 
         await expect(

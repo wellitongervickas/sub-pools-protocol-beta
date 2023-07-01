@@ -1,4 +1,4 @@
-import { DEFAULT_REQUIRED_INITIAL_BALANCE } from './../fixtures'
+import { DEFAULT_REQUIRED_INITIAL_AMOUNT, DEFAULT_MAX_ADDITIONAL_AMOUNT } from './../fixtures'
 import { expect } from 'chai'
 
 import {
@@ -73,7 +73,8 @@ describe('SubPoolNode', () => {
           DEFAULT_FEES_FRACTION,
           [node.address],
           DEFAULT_PERIOD_LOCK,
-          DEFAULT_REQUIRED_INITIAL_BALANCE
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_ADDITIONAL_AMOUNT
         )
 
         await expect(subPoolNode.invite(invited.address)).to.be.revertedWithCustomError(
@@ -117,7 +118,8 @@ describe('SubPoolNode', () => {
           DEFAULT_FEES_FRACTION,
           [hacker.address],
           DEFAULT_PERIOD_LOCK,
-          DEFAULT_REQUIRED_INITIAL_BALANCE
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_ADDITIONAL_AMOUNT
         )
         const subPoolNode2 = await SubPoolNode.deploy(
           hacker.address,
@@ -125,7 +127,8 @@ describe('SubPoolNode', () => {
           DEFAULT_FEES_FRACTION,
           [hacker.address],
           DEFAULT_PERIOD_LOCK,
-          DEFAULT_REQUIRED_INITIAL_BALANCE
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_ADDITIONAL_AMOUNT
         )
 
         const subPoolNode2Address = await subPoolNode2.getAddress()
@@ -151,7 +154,8 @@ describe('SubPoolNode', () => {
             DEFAULT_FEES_FRACTION,
             [],
             DEFAULT_PERIOD_LOCK,
-            DEFAULT_REQUIRED_INITIAL_BALANCE
+            DEFAULT_REQUIRED_INITIAL_AMOUNT,
+            DEFAULT_MAX_ADDITIONAL_AMOUNT
           )
         ).to.be.revertedWithCustomError(subPoolNode, 'NotInvited()')
       })
@@ -193,7 +197,8 @@ describe('SubPoolNode', () => {
             DEFAULT_FEES_FRACTION,
             [],
             DEFAULT_PERIOD_LOCK,
-            DEFAULT_REQUIRED_INITIAL_BALANCE
+            DEFAULT_REQUIRED_INITIAL_AMOUNT,
+            DEFAULT_MAX_ADDITIONAL_AMOUNT
           )
         ).to.be.revertedWithCustomError(subPoolNode, 'InvalidInitialAmount()')
       })

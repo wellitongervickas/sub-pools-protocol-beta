@@ -19,6 +19,9 @@ interface ISubPool {
     /// @notice Throws when initial amount is invalid
     error InvalidInitialAmount();
 
+    /// @notice Throws when initial amount is invalid
+    error InvalidAdditionalAmount();
+
     /// @notice Returns the subpool of the given address
     /// @param _address the address of the subpool
     function subPools(address _address) external view returns (SubPoolLib.SubPool memory);

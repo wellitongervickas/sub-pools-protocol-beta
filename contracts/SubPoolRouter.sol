@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {SubPool} from './SubPool.sol';
+import {SubPool, ISubPool} from './SubPool.sol';
 import {SubPoolNode} from './SubPoolNode.sol';
 import {FractionLib} from './lib/Fraction.sol';
 import {ISubPoolRouter, ISubPoolRouter} from './interfaces/ISubPoolRouter.sol';
@@ -20,7 +20,8 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
         FractionLib.Fraction memory _fees,
         address[] memory _invitedAddresses,
         uint256 _lockperiod,
-        uint256 _requiredInitialAmount
+        uint256 _requiredInitialAmount,
+        uint256 _maxAdditionalDeposit
     ) external returns (address) {
         SubPoolNode _node = new SubPoolNode(
             msg.sender,
@@ -28,7 +29,8 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
             _fees,
             _invitedAddresses,
             _lockperiod,
-            _requiredInitialAmount
+            _requiredInitialAmount,
+            _maxAdditionalDeposit
         );
 
         address _nodeAddress = address(_node);
@@ -47,7 +49,8 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
         FractionLib.Fraction memory _fees,
         address[] memory _invitedAddresses,
         uint256 _lockperiod,
-        uint256 _requiredInitialAmount
+        uint256 _requiredInitialAmount,
+        uint256 _maxAdditionalDeposit
     ) external returns (address) {
         SubPoolNode _parentNode = SubPoolNode(_parentNodeAddress);
 
@@ -57,7 +60,8 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
             _fees,
             _invitedAddresses,
             _lockperiod,
-            _requiredInitialAmount
+            _requiredInitialAmount,
+            _maxAdditionalDeposit
         );
 
         address _nodeAddress = address(_node);
@@ -95,7 +99,6 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
 
     /// @notice additional deposit to children node balance
     function additionalDeposit(address _nodeAddress, uint256 _amount) external onlyNodeManager(_nodeAddress) {
-        /// @dev if parent is not router, call node additional deposit
         if (!_checkIsParentRouter(_nodeAddress)) {
             return SubPoolNode(_nodeAddress).additionalDeposit(_amount);
         }
@@ -107,7 +110,6 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
 
     /// @notice withdraw  to children node balance
     function withdrawBalance(address _nodeAddress, uint256 _amount) external onlyNodeManager(_nodeAddress) {
-        /// @dev if parent is not router, call node withdraw balance
         if (!_checkIsParentRouter(_nodeAddress)) {
             return SubPoolNode(_nodeAddress).withdrawBalance(_amount);
         }
@@ -119,7 +121,6 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
 
     /// @notice withdraw  to children node initial balance
     function withdrawInitialBalance(address _nodeAddress, uint256 _amount) external onlyNodeManager(_nodeAddress) {
-        /// @dev if parent is not router, call node withdraw initial balance
         if (!_checkIsParentRouter(_nodeAddress)) {
             return SubPoolNode(_nodeAddress).withdrawInitialBalance(_amount);
         }

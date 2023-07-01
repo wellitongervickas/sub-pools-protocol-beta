@@ -5,7 +5,8 @@ import {
   DEFAULT_FEES_FRACTION,
   ethers,
   DEFAULT_PERIOD_LOCK,
-  DEFAULT_REQUIRED_INITIAL_BALANCE,
+  DEFAULT_REQUIRED_INITIAL_AMOUNT,
+  DEFAULT_MAX_ADDITIONAL_AMOUNT,
 } from '../fixtures'
 
 describe('SubPoolRouter', () => {
@@ -21,7 +22,8 @@ describe('SubPoolRouter', () => {
         DEFAULT_FEES_FRACTION,
         [invited.address],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       let receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[3].args
@@ -33,7 +35,8 @@ describe('SubPoolRouter', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       let receipt2 = await tx1.wait()
       const [invitedSubPoolAddress] = receipt2.logs[5].args
@@ -57,7 +60,8 @@ describe('SubPoolRouter', () => {
         DEFAULT_FEES_FRACTION,
         [invited.address],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       let receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[3].args
@@ -69,7 +73,8 @@ describe('SubPoolRouter', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       let receipt2 = await tx1.wait()
       const [invitedSubPoolAddress] = receipt2.logs[5].args
@@ -92,7 +97,8 @@ describe('SubPoolRouter', () => {
         DEFAULT_FEES_FRACTION,
         [invited.address],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       let receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[3].args
@@ -104,7 +110,8 @@ describe('SubPoolRouter', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       let receipt2 = await tx1.wait()
       const [invitedSubPoolAddress] = receipt2.logs[5].args
@@ -126,7 +133,8 @@ describe('SubPoolRouter', () => {
         DEFAULT_FEES_FRACTION,
         [invited.address],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       let receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[3].args
@@ -138,7 +146,8 @@ describe('SubPoolRouter', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       let receipt2 = await tx1.wait()
 

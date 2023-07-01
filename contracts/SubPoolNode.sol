@@ -10,6 +10,7 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
     address public parent;
     uint256 public lockPeriod;
     uint256 public requiredInitialAmount;
+    uint256 public maxAdditionalAmount;
 
     /// @dev check if the caller is the router contract
     modifier onlyRouter() {
@@ -30,11 +31,13 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         FractionLib.Fraction memory _fees,
         address[] memory _invitedAddresses,
         uint256 _lockPeriod,
-        uint256 _requiredInitialAmount
+        uint256 _requiredInitialAmount,
+        uint256 _maxAdditionalDeposit
     ) SubPoolManager(_managerAddress, _amount, _fees) {
         _grantInitialInvites(_invitedAddresses);
         _setLockPeriod(_lockPeriod);
         _setRequiredInitialAmount(_requiredInitialAmount);
+        _setMaxAdditionalDeposit(_maxAdditionalDeposit);
     }
 
     /// @notice set the lock period of the node
@@ -47,6 +50,12 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
     /// @param _requiredInitialAmount the required initial amount of the node
     function _setRequiredInitialAmount(uint256 _requiredInitialAmount) internal {
         requiredInitialAmount = _requiredInitialAmount;
+    }
+
+    /// @notice set the max additional deposit of the node
+    /// @param _maxAdditionalDeposit the max additional deposit of the node
+    function _setMaxAdditionalDeposit(uint256 _maxAdditionalDeposit) internal {
+        maxAdditionalAmount = _maxAdditionalDeposit;
     }
 
     /// @notice set the parent node address. Only router can set once.
@@ -106,19 +115,19 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         _decreaseParentInitialBalance(_amount);
     }
 
-    /// @dev only router node can call this function
+    /// @dev only router can call this function
     function additionalDeposit(uint256 _amount) external onlyRouter {
         _increaseManagerBalance(_amount);
         _increaseParentBalance(_amount);
     }
 
-    /// @dev only router node can call this function
+    /// @dev only router can call this function
     function withdrawBalance(uint256 _amount) external onlyRouter {
         _decreaseManagerBalance(_amount);
         _decreaseParentBalance(_amount);
     }
 
-    /// @dev only router node can call this function
+    /// @dev only router can call this function
     function withdrawInitialBalance(uint256 _amount) external onlyRouter {
         _decreaseManagerInitialBalance(_amount);
         _decreaseParentInitialBalance(_amount);

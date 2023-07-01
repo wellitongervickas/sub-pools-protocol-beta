@@ -5,7 +5,8 @@ import {
   DEFAULT_FEES_FRACTION,
   ethers,
   DEFAULT_PERIOD_LOCK,
-  DEFAULT_REQUIRED_INITIAL_BALANCE,
+  DEFAULT_REQUIRED_INITIAL_AMOUNT,
+  DEFAULT_MAX_ADDITIONAL_AMOUNT,
 } from '../fixtures'
 
 describe('SubPoolNode', () => {
@@ -23,7 +24,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [node1.address],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const rcpt0 = await tx0.wait()
       const invitedSubPoolNodeAddress = rcpt0.logs[6].args[0]
@@ -35,7 +37,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const rcpt1 = await tx1.wait()
       const node1SubPoolNodeAddress = rcpt1.logs[5].args[0]
@@ -61,7 +64,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [node1.address],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const rcpt0 = await tx0.wait()
       const invitedSubPoolNodeAddress = rcpt0.logs[6].args[0]
@@ -73,7 +77,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const rcpt1 = await tx1.wait()
       const node1SubPoolNodeAddress = rcpt1.logs[5].args[0]

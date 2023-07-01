@@ -7,7 +7,8 @@ import {
   deployRoutedNodeFixture,
   NODE_ROLE,
   DEFAULT_PERIOD_LOCK,
-  DEFAULT_REQUIRED_INITIAL_BALANCE,
+  DEFAULT_REQUIRED_INITIAL_AMOUNT,
+  DEFAULT_MAX_ADDITIONAL_AMOUNT,
 } from '../fixtures'
 
 describe('SubPoolNode', () => {
@@ -24,7 +25,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
 
       expect(await subPoolNode.currentID()).to.equal(1)
@@ -44,7 +46,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [node.address],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const rcpt0 = await tx0.wait()
       const invitedSubNodeAddress = rcpt0.logs[6].args[0]
@@ -56,7 +59,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const rcpt1 = await tx1.wait()
       const nodeAddress = rcpt1.logs[5].args[0]
@@ -79,7 +83,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [node.address],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const rcpt0 = await tx0.wait()
       const invitedSubNodeAddress = rcpt0.logs[6].args[0]
@@ -91,7 +96,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const rcpt1 = await tx1.wait()
       const nodeAddress = rcpt1.logs[5].args[0]
@@ -113,7 +119,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
 
       expect(await subPoolNode.hasRole(NODE_ROLE, other.address)).to.be.true
@@ -132,7 +139,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [node.address],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
 
       const [, , , balance] = await subPoolRouter.subPools(subNodeAddress)
@@ -158,7 +166,8 @@ describe('SubPoolNode', () => {
         customFeesFraction,
         [node.address],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const rcpt0 = await tx0.wait()
       const invitedSubNodeAddress = rcpt0.logs[6].args[0]
@@ -170,7 +179,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const invitedSubPoolNode = await ethers.getContractAt('SubPoolNode', invitedSubNodeAddress)
 
@@ -197,7 +207,8 @@ describe('SubPoolNode', () => {
         customFeesFraction,
         [node.address],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const rcpt0 = await tx0.wait()
       const invitedSubNodeAddress = rcpt0.logs[6].args[0]
@@ -209,7 +220,8 @@ describe('SubPoolNode', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const rcpt1 = await tx1.wait()
       const nodeAddress = rcpt1.logs[5].args[0]

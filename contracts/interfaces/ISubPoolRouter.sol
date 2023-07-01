@@ -22,13 +22,15 @@ interface ISubPoolRouter {
     /// @param _invitedAddresses the addresses to invite as node to the root node
     /// @param _lockperiod the lock period of the root node
     /// @param _requiredInitialAmount the required initial amount of the root node when node join
+    /// @param  _maxAdditionalDeposit the max additional deposit of the root node when node join
     /// @return the address of the new root node
     function create(
         uint256 _amount,
         FractionLib.Fraction memory _fees,
         address[] memory _invitedAddresses,
         uint256 _lockperiod,
-        uint256 _requiredInitialAmount
+        uint256 _requiredInitialAmount,
+        uint256 _maxAdditionalDeposit
     ) external returns (address);
 
     /// @notice join as children node to parent node
@@ -38,6 +40,7 @@ interface ISubPoolRouter {
     /// @param _invitedAddresses the addresses to invite as node to the node
     /// @param _lockperiod the lock period of the node
     /// @param _requiredInitialAmount the required initial amount of the node when node join
+    /// @param  _maxAdditionalDeposit the max additional deposit of the root node when node join
     /// @return the address of the new node
     function join(
         address _parentNodeAddress,
@@ -45,6 +48,7 @@ interface ISubPoolRouter {
         FractionLib.Fraction memory _fees,
         address[] memory _invitedAddresses,
         uint256 _lockperiod,
-        uint256 _requiredInitialAmount
+        uint256 _requiredInitialAmount,
+        uint256 _maxAdditionalDeposit
     ) external returns (address);
 }

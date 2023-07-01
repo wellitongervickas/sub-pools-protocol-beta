@@ -9,7 +9,8 @@ export type { SubPoolNode } from '../typechain-types/contracts/SubPoolNode'
 export { loadFixture, ethers, time }
 
 export const DEFAULT_PERIOD_LOCK = 0
-export const DEFAULT_REQUIRED_INITIAL_BALANCE = ethers.toBigInt(0)
+export const DEFAULT_REQUIRED_INITIAL_AMOUNT = ethers.toBigInt(0)
+export const DEFAULT_MAX_ADDITIONAL_AMOUNT = ethers.toBigInt(0)
 export const DEFAULT_FEES_FRACTION = {
   value: ethers.toBigInt(0),
   divider: ethers.toBigInt(100),
@@ -33,7 +34,8 @@ export async function deployNodeFixture(
   fees: typeof DEFAULT_FEES_FRACTION = DEFAULT_FEES_FRACTION,
   invites: string[] = [],
   lockperiod = DEFAULT_PERIOD_LOCK,
-  requiredInitialBalance = DEFAULT_REQUIRED_INITIAL_BALANCE
+  requiredInitialBalance = DEFAULT_REQUIRED_INITIAL_AMOUNT,
+  maxAdditionalAmount = DEFAULT_MAX_ADDITIONAL_AMOUNT
 ) {
   const [_manager] = await ethers.getSigners()
   const SubPoolNode = await ethers.getContractFactory('SubPoolNode')
@@ -43,7 +45,8 @@ export async function deployNodeFixture(
     fees,
     invites,
     lockperiod,
-    requiredInitialBalance
+    requiredInitialBalance,
+    maxAdditionalAmount
   )
 
   return { subPoolNode }
@@ -54,7 +57,8 @@ export async function deployRoutedNodeFixture(
   fees: typeof DEFAULT_FEES_FRACTION = DEFAULT_FEES_FRACTION,
   invites: string[] = [],
   lockperiod = DEFAULT_PERIOD_LOCK,
-  requiredInitialBalance = DEFAULT_REQUIRED_INITIAL_BALANCE
+  requiredInitialBalance = DEFAULT_REQUIRED_INITIAL_AMOUNT,
+  maxAdditionalAmount = DEFAULT_MAX_ADDITIONAL_AMOUNT
 ) {
   const accounts = await ethers.getSigners()
 
@@ -66,7 +70,8 @@ export async function deployRoutedNodeFixture(
     fees,
     invites.length ? invites : [invited.address],
     lockperiod,
-    requiredInitialBalance
+    requiredInitialBalance,
+    maxAdditionalAmount
   )
 
   let receipt = await tx.wait()

@@ -5,14 +5,22 @@ import {
   DEFAULT_FEES_FRACTION,
   ethers,
   DEFAULT_PERIOD_LOCK,
-  DEFAULT_REQUIRED_INITIAL_BALANCE,
+  DEFAULT_REQUIRED_INITIAL_AMOUNT,
+  DEFAULT_MAX_ADDITIONAL_AMOUNT,
 } from '../fixtures'
 
 describe('SubPoolRouter', () => {
   describe('Create', () => {
     it('should update next ID', async function () {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
-      await subPoolRouter.create(100, DEFAULT_FEES_FRACTION, [], DEFAULT_PERIOD_LOCK, DEFAULT_REQUIRED_INITIAL_BALANCE)
+      await subPoolRouter.create(
+        100,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
+      )
 
       expect(await subPoolRouter.currentID()).to.equal(1)
     })
@@ -26,7 +34,8 @@ describe('SubPoolRouter', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       let receipt = await tx.wait()
 
@@ -45,7 +54,8 @@ describe('SubPoolRouter', () => {
         DEFAULT_FEES_FRACTION,
         [],
         DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_BALANCE
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
       const receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[2].args
