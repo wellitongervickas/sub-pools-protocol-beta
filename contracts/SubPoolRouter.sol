@@ -97,17 +97,17 @@ contract SubPoolRouter is SubPool {
         _node.setParent(_parentNodeAddress);
     }
 
-    function withdraw(uint256 _amount) public override onlySubNode(msg.sender) {
+    function withdraw(uint256 _amount) public override OnlyNode(msg.sender) {
         super.withdraw(_amount);
         emit ManagerWithdrew(msg.sender, _amount);
     }
 
-    function cashback(uint256 _amount) public override onlySubNode(msg.sender) {
+    function cashback(uint256 _amount) public override OnlyNode(msg.sender) {
         super.cashback(_amount);
         emit ManagerWithdrew(msg.sender, _amount);
     }
 
-    function deposit(uint256 _amount) public override onlySubNode(msg.sender) {
+    function deposit(uint256 _amount) public override OnlyNode(msg.sender) {
         super.deposit(_amount);
         emit ManagerDeposited(msg.sender, _amount);
     }

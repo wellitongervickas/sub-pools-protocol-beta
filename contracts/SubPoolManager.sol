@@ -37,7 +37,7 @@ contract SubPoolManager is AccessControl {
     }
 
     function _computeManagerFees(uint256 _amount) internal returns (uint256) {
-        uint256 _managerAmount = manager._computeFees(_amount);
+        uint256 _managerAmount = manager._calculateRatioFees(_amount);
         _increaseManagerBalance(_managerAmount);
 
         return _amount - _managerAmount;

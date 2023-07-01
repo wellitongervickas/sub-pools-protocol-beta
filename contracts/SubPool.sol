@@ -20,8 +20,8 @@ contract SubPool {
         _;
     }
 
-    modifier onlySubNode(address _address) {
-        bool _isNode = subPools[_address]._validateIsNode();
+    modifier OnlyNode(address _nodeAddress) {
+        bool _isNode = subPools[_nodeAddress]._validateIsNode();
         if (!_isNode) revert NotAllowed();
         _;
     }
@@ -31,10 +31,10 @@ contract SubPool {
         return currentID.current();
     }
 
-    function _setupNode(address _subPoolAddress, address _managerAddress, uint256 _amount) internal returns (uint256) {
+    function _setupNode(address _nodeAddress, address _managerAddress, uint256 _amount) internal returns (uint256) {
         uint256 _id = _computeNodeID();
 
-        subPools[_subPoolAddress] = SubPoolLib.SubPool({
+        subPools[_nodeAddress] = SubPoolLib.SubPool({
             managerAddress: _managerAddress,
             id: _id,
             initialBalance: _amount,

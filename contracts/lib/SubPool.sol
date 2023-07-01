@@ -21,7 +21,7 @@ library SubPoolLib {
         _self.initialBalance -= _value;
     }
 
-    // @dev zero is not registered
+    /// @notice zero is not registered
     function _validateIsNode(SubPool storage _self) internal view returns (bool) {
         return _self.id > 0;
     }

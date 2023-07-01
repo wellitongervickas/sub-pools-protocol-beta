@@ -27,7 +27,7 @@ library ManagerLib {
         _self.initialBalance -= _value;
     }
 
-    function _computeFees(Manager storage _self, uint256 _value) internal view returns (uint256) {
+    function _calculateRatioFees(Manager storage _self, uint256 _value) internal view returns (uint256) {
         return _value.mul(_self.fees.value).div(_self.fees.divider);
     }
 }
