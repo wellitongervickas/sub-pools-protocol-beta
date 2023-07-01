@@ -13,7 +13,7 @@ import {
 describe('SubPoolRouter', () => {
   describe('Events', () => {
     describe('Main', () => {
-      it('should emit SubPoolCreated on create a main node', async function () {
+      it('should emit NodeCreated on create a main node', async function () {
         const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
 
         const [, invited] = accounts
@@ -29,13 +29,13 @@ describe('SubPoolRouter', () => {
             DEFAULT_REQUIRED_INITIAL_BALANCE
           )
         )
-          .to.emit(subPoolRouter, 'SubPoolCreated')
+          .to.emit(subPoolRouter, 'NodeCreated')
           .withArgs(anyValue, 1, amount)
       })
     })
 
     describe('Node', () => {
-      it('should emit SubPoolJoined on create a node', async function () {
+      it('should emit NodeJoined on create a node', async function () {
         const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
         const amount = ethers.toBigInt(1000)
         const [, invited] = accounts
@@ -63,7 +63,7 @@ describe('SubPoolRouter', () => {
             DEFAULT_REQUIRED_INITIAL_BALANCE
           )
         )
-          .to.emit(subPoolRouter, 'SubPoolJoined')
+          .to.emit(subPoolRouter, 'NodeJoined')
           .withArgs(anyValue, 1, amount)
       })
 

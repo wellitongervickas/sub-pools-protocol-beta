@@ -7,20 +7,33 @@ import './SubPool.sol';
 import './SubPoolManager.sol';
 
 contract SubPoolNode is SubPool, SubPoolManager, Ownable {
+    /// @notice parent node address
     address public parent;
+    /// @notice lock period of the node relative of its parent
     uint256 public lockPeriod;
+    /// @notice required initial amount of the node when join
     uint256 public requiredInitialAmount;
 
+    /// @notice indicate when parent isi not set
     error ParentNotFound();
+    /// @notice indicate when parent is already set
     error ParentAlreadySet();
+    /// @notice indicate when initial amount is invalid
     error InvalidInitialAmount();
 
-    // @dev same as onlyOwner, the name is to make it clear that this is only used by the router
+    /// @dev check if the caller is the router contract
     modifier onlyRouter() {
         _checkOwner();
         _;
     }
 
+    /// @notice create a new node
+    /// @param _managerAddress the address of the node manager
+    /// @param _amount the amount of the root node as initial deposit
+    /// @param _fees the fees of the root node to use as spli ratio
+    /// @param _invitedAddresses the addresses to invite as node to the root node
+    /// @param _lockPeriod the lock period of the root node
+    /// @param _requiredInitialAmount the required initial amount of the root node when node join
     constructor(
         address _managerAddress,
         uint256 _amount,
@@ -47,13 +60,13 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         parent = _parent;
     }
 
-    function join(address _subPoolAddress, uint256 _amount) external onlyRouter returns (uint256) {
+    function join(address _nodeAddress, uint256 _amount) external onlyRouter returns (uint256) {
         if (!_checkAmountInitialBalance(_amount)) revert InvalidInitialAmount();
         if (!_checkHasParent()) revert ParentNotFound();
         if (!_checkIsInvitedRole(tx.origin)) revert SubPoolManager.NotInvited();
 
         uint256 _amountSubTotal = _computeManagerFees(_amount);
-        uint256 _id = _setupNode(_subPoolAddress, msg.sender, _amountSubTotal);
+        uint256 _id = _setupNode(_nodeAddress, msg.sender, _amountSubTotal);
 
         _updateManagerRole(tx.origin);
         _increaseParentBalance(_amount);
@@ -95,7 +108,7 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         _decreaseParentBalance(_amount);
     }
 
-    function withdrawInitialBalance(uint256 _amount) external onlyUnlockedPeriod(lockPeriod) onlyRouter {
+    function withdrawInitialBalance(uint256 _amount) external onlyRouter {
         _decreaseManagerInitialBalance(_amount);
         _decreaseParentInitialBalance(_amount);
     }
@@ -108,7 +121,7 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         SubPoolNode(parent).withdraw(_amount);
     }
 
-    function _decreaseParentInitialBalance(uint256 _amount) internal {
+    function _decreaseParentInitialBalance(uint256 _amount) internal onlyUnlockedPeriod(lockPeriod) {
         SubPoolNode(parent).cashback(_amount);
     }
 }

@@ -3,7 +3,7 @@ pragma solidity =0.8.18;
 
 import '@openzeppelin/contracts/access/AccessControlEnumerable.sol';
 
-import './lib/ManagerLib.sol';
+import './lib/Manager.sol';
 
 contract SubPoolManager is AccessControl {
     using ManagerLib for ManagerLib.Manager;

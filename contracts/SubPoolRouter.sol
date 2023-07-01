@@ -6,73 +6,95 @@ import './SubPoolNode.sol';
 import './lib/Fraction.sol';
 
 contract SubPoolRouter is SubPool {
-    event SubPoolCreated(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
-    event SubPoolJoined(address indexed _subPoolAddress, uint256 indexed _subPoolId, uint256 _amount);
+    /// @notice indicate when node is created
+    event NodeCreated(address indexed _nodeAddress, uint256 indexed _subPoolId, uint256 _amount);
+    /// @notice indicate when node is joined
+    event NodeJoined(address indexed _nodeAddress, uint256 indexed _subPoolId, uint256 _amount);
+    /// @notice indicate whe node manager ddposited
     event ManagerDeposited(address indexed _managerAddress, uint256 _amount);
+    /// @notice indicate when node manager withdrew
     event ManagerWithdrew(address indexed _managerAddress, uint256 _amount);
 
+    /// @notice indicate when try to call a function that only manager can
     error NotNodeManager();
 
-    modifier onlyNodeManager(address _subPoolAddress) {
-        (address _managerAddress, , , ) = SubPoolNode(_subPoolAddress).manager();
+    /// @dev check if the caller is the manager of the node
+    modifier onlyNodeManager(address _nodeAddress) {
+        (address _managerAddress, , , ) = SubPoolNode(_nodeAddress).manager();
         if (_managerAddress != msg.sender) revert NotNodeManager();
         _;
     }
 
+    /// @notice create a new root node
+    /// @param _amount the amount of the root node as initial deposit
+    /// @param _fees the fees of the root node to use as spli ratio
+    /// @param _invitedAddresses the addresses to invite as node to the root node
+    /// @param _lockperiod the lock period of the root node
+    /// @param _requiredInitialAmount the required initial amount of the root node when node join
+    /// @return the address of the new root node
     function create(
         uint256 _amount,
         FractionLib.Fraction memory _fees,
         address[] memory _invitedAddresses,
-        uint256 _unlockTime,
+        uint256 _lockperiod,
         uint256 _requiredInitialAmount
     ) external returns (address) {
-        SubPoolNode _subPool = new SubPoolNode(
+        SubPoolNode _node = new SubPoolNode(
             msg.sender,
             _amount,
             _fees,
             _invitedAddresses,
-            _unlockTime,
+            _lockperiod,
             _requiredInitialAmount
         );
 
-        address _subPoolAddress = address(_subPool);
-        uint256 _id = _setupNode(_subPoolAddress, msg.sender, _amount);
+        address _nodeAddress = address(_node);
+        uint256 _id = _setupNode(_nodeAddress, msg.sender, _amount);
 
-        _setupNodeParent(_subPool, address(this));
+        /// @dev set the parent of the root node to itself
+        _setupNodeParent(_node, address(this));
 
-        emit SubPoolCreated(_subPoolAddress, _id, _amount);
-        return _subPoolAddress;
+        emit NodeCreated(_nodeAddress, _id, _amount);
+        return _nodeAddress;
     }
 
+    /// @notice create node and join to parent node
+    /// @param _parentNodeAddress the address of the parent node
+    /// @param _amount the amount of the node as initial deposit
+    /// @param _fees the fees of the node to use as split ratio
+    /// @param _invitedAddresses the addresses to invite as node to the node
+    /// @param _lockperiod the lock period of the node
+    /// @param _requiredInitialAmount the required initial amount of the node when node join
     function join(
-        address _parentAddress,
+        address _parentNodeAddress,
         uint256 _amount,
         FractionLib.Fraction memory _fees,
         address[] memory _invitedAddresses,
-        uint256 _unlockTime,
+        uint256 _lockperiod,
         uint256 _requiredInitialAmount
     ) external returns (address) {
-        SubPoolNode _parentSubPool = SubPoolNode(_parentAddress);
-        SubPoolNode _subPool = new SubPoolNode(
+        SubPoolNode _parentNode = SubPoolNode(_parentNodeAddress);
+
+        SubPoolNode _node = new SubPoolNode(
             msg.sender,
             _amount,
             _fees,
             _invitedAddresses,
-            _unlockTime,
+            _lockperiod,
             _requiredInitialAmount
         );
 
-        address _subPoolAddress = address(_subPool);
-        uint256 _subPoolId = _parentSubPool.join(_subPoolAddress, _amount);
+        address _nodeAddress = address(_node);
+        uint256 _nodeId = _parentNode.join(_nodeAddress, _amount);
 
-        _setupNodeParent(_subPool, _parentAddress);
+        _setupNodeParent(_node, _parentNodeAddress);
 
-        emit SubPoolJoined(_subPoolAddress, _subPoolId, _amount);
-        return _subPoolAddress;
+        emit NodeJoined(_nodeAddress, _nodeId, _amount);
+        return _nodeAddress;
     }
 
-    function _setupNodeParent(SubPoolNode _subPool, address _parentAddress) internal {
-        _subPool.setParent(_parentAddress);
+    function _setupNodeParent(SubPoolNode _node, address _parentNodeAddress) internal {
+        _node.setParent(_parentNodeAddress);
     }
 
     function withdraw(uint256 _amount) public override onlySubNode(msg.sender) {
@@ -90,47 +112,47 @@ contract SubPoolRouter is SubPool {
         emit ManagerDeposited(msg.sender, _amount);
     }
 
-    function additionalDeposit(address _subPoolAddress, uint256 _amount) external onlyNodeManager(_subPoolAddress) {
-        if (!_checkIsParentRouter(_subPoolAddress)) {
-            return SubPoolNode(_subPoolAddress).additionalDeposit(_amount);
+    function additionalDeposit(address _nodeAddress, uint256 _amount) external onlyNodeManager(_nodeAddress) {
+        if (!_checkIsParentRouter(_nodeAddress)) {
+            return SubPoolNode(_nodeAddress).additionalDeposit(_amount);
         }
 
-        _increaseSubPoolBalance(_subPoolAddress, _amount);
+        _increaseNodeBalance(_nodeAddress, _amount);
 
-        emit ManagerDeposited(_subPoolAddress, _amount);
+        emit ManagerDeposited(_nodeAddress, _amount);
     }
 
-    function withdrawBalance(address _subPoolAddress, uint256 _amount) external onlyNodeManager(_subPoolAddress) {
-        if (!_checkIsParentRouter(_subPoolAddress)) {
-            return SubPoolNode(_subPoolAddress).withdrawBalance(_amount);
+    function withdrawBalance(address _nodeAddress, uint256 _amount) external onlyNodeManager(_nodeAddress) {
+        if (!_checkIsParentRouter(_nodeAddress)) {
+            return SubPoolNode(_nodeAddress).withdrawBalance(_amount);
         }
 
-        _decreaseSubPoolBalance(_subPoolAddress, _amount);
+        _decreaseNodeBalance(_nodeAddress, _amount);
 
-        emit ManagerWithdrew(_subPoolAddress, _amount);
+        emit ManagerWithdrew(_nodeAddress, _amount);
     }
 
-    function withdrawInitialBalance(
-        address _subPoolAddress,
+    function withdrawInitialBalance(address _nodeAddress, uint256 _amount) external onlyNodeManager(_nodeAddress) {
+        if (!_checkIsParentRouter(_nodeAddress)) {
+            return SubPoolNode(_nodeAddress).withdrawInitialBalance(_amount);
+        }
+
+        _decreaseNodeInitialBalance(_nodeAddress, _amount);
+
+        emit ManagerWithdrew(_nodeAddress, _amount);
+    }
+
+    function _decreaseNodeInitialBalance(
+        address _nodeAddess,
         uint256 _amount
-    ) external onlyNodeManager(_subPoolAddress) {
-        if (!_checkIsParentRouter(_subPoolAddress)) {
-            return SubPoolNode(_subPoolAddress).withdrawInitialBalance(_amount);
-        }
-
-        _decreaseSubPoolInitialBalance(_subPoolAddress, _amount);
-
-        emit ManagerWithdrew(_subPoolAddress, _amount);
+    ) internal override onlyUnlockedPeriod(SubPoolNode(_nodeAddess).lockPeriod()) {
+        super._decreaseNodeInitialBalance(_nodeAddess, _amount);
     }
 
-    function _decreaseSubPoolInitialBalance(
-        address _address,
-        uint256 _amount
-    ) internal override onlyUnlockedPeriod(SubPoolNode(_address).lockPeriod()) {
-        super._decreaseSubPoolInitialBalance(_address, _amount);
-    }
-
-    function _checkIsParentRouter(address _subPoolAddress) internal view returns (bool) {
-        return SubPoolNode(_subPoolAddress).parent() == address(this);
+    /// @notice check if parent is router
+    /// @param _nodeAddress the address of the node
+    /// @return true if parent is router
+    function _checkIsParentRouter(address _nodeAddress) internal view returns (bool) {
+        return SubPoolNode(_nodeAddress).parent() == address(this);
     }
 }
