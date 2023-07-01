@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.18;
+pragma solidity =0.8.19;
 
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 
@@ -27,6 +27,7 @@ library ManagerLib {
         _self.initialBalance -= _value;
     }
 
+    /// @notice calculate the manager fees using the ratio
     function _calculateRatioFees(Manager storage _self, uint256 _value) internal view returns (uint256) {
         return _value.mul(_self.fees.value).div(_self.fees.divider);
     }
