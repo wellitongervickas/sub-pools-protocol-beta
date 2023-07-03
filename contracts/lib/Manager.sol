@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 
-import './Fraction.sol';
+import {FractionLib} from './Fraction.sol';
 
 library ManagerLib {
     using SafeMath for uint256;

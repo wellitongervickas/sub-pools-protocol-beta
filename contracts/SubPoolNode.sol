@@ -97,53 +97,44 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         return _amount == requiredInitialAmount;
     }
 
-    /// @dev only children node can call this function
     function deposit(uint256 _amount) public override OnlyNode(msg.sender) {
         super.deposit(_amount);
         _increaseParentBalance(_amount);
     }
 
-    /// @dev only children node can call this function
     function withdraw(uint256 _amount) public override OnlyNode(msg.sender) {
         super.withdraw(_amount);
         _decreaseParentBalance(_amount);
     }
 
-    /// @dev only children node can call this function
     function cashback(uint256 _amount) public override OnlyNode(msg.sender) {
         super.cashback(_amount);
         _decreaseParentInitialBalance(_amount);
     }
 
-    /// @dev only router can call this function
     function additionalDeposit(uint256 _amount) external onlyRouter {
         _increaseManagerBalance(_amount);
         _increaseParentBalance(_amount);
     }
 
-    /// @dev only router can call this function
     function withdrawBalance(uint256 _amount) external onlyRouter {
         _decreaseManagerBalance(_amount);
         _decreaseParentBalance(_amount);
     }
 
-    /// @dev only router can call this function
     function withdrawInitialBalance(uint256 _amount) external onlyRouter {
         _decreaseManagerInitialBalance(_amount);
         _decreaseParentInitialBalance(_amount);
     }
 
-    /// @dev call deposit parent as children node
     function _increaseParentBalance(uint256 _amount) internal {
         SubPoolNode(parent).deposit(_amount);
     }
 
-    /// @dev call withdraw parent as children node
     function _decreaseParentBalance(uint256 _amount) internal {
         SubPoolNode(parent).withdraw(_amount);
     }
 
-    /// @dev call cashback on parent node only if node is unlocked period
     function _decreaseParentInitialBalance(uint256 _amount) internal onlyUnlockedPeriod(lockPeriod) {
         SubPoolNode(parent).cashback(_amount);
     }

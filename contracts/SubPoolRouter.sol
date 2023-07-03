@@ -74,30 +74,25 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
         return _nodeAddress;
     }
 
-    /// @dev setup node parent of node
     function _setupNodeParent(SubPoolNode _node, address _parentNodeAddress) internal {
         _node.setParent(_parentNodeAddress);
     }
 
-    /// @dev only children node can call this function
     function withdraw(uint256 _amount) public override OnlyNode(msg.sender) {
         super.withdraw(_amount);
         emit ManagerWithdrew(msg.sender, _amount);
     }
 
-    /// @dev only children node can call this function
     function cashback(uint256 _amount) public override OnlyNode(msg.sender) {
         super.cashback(_amount);
         emit ManagerWithdrew(msg.sender, _amount);
     }
 
-    /// @dev only children node can call this function
     function deposit(uint256 _amount) public override OnlyNode(msg.sender) {
         super.deposit(_amount);
         emit ManagerDeposited(msg.sender, _amount);
     }
 
-    /// @notice additional deposit to children node balance
     function additionalDeposit(address _nodeAddress, uint256 _amount) external onlyNodeManager(_nodeAddress) {
         if (!_checkIsParentRouter(_nodeAddress)) {
             return SubPoolNode(_nodeAddress).additionalDeposit(_amount);
@@ -108,7 +103,6 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
         emit ManagerDeposited(_nodeAddress, _amount);
     }
 
-    /// @notice withdraw  to children node balance
     function withdrawBalance(address _nodeAddress, uint256 _amount) external onlyNodeManager(_nodeAddress) {
         if (!_checkIsParentRouter(_nodeAddress)) {
             return SubPoolNode(_nodeAddress).withdrawBalance(_amount);
@@ -119,7 +113,6 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
         emit ManagerWithdrew(_nodeAddress, _amount);
     }
 
-    /// @notice withdraw  to children node initial balance
     function withdrawInitialBalance(address _nodeAddress, uint256 _amount) external onlyNodeManager(_nodeAddress) {
         if (!_checkIsParentRouter(_nodeAddress)) {
             return SubPoolNode(_nodeAddress).withdrawInitialBalance(_amount);
@@ -130,7 +123,6 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
         emit ManagerWithdrew(_nodeAddress, _amount);
     }
 
-    /// @dev only decrease node initial balance when node is unlocked period
     function _decreaseNodeInitialBalance(
         address _nodeAddess,
         uint256 _amount
