@@ -6,6 +6,7 @@ import {SubPool, ISubPool} from './SubPool.sol';
 import {ISubPoolNode} from './interfaces/ISubPoolNode.sol';
 import {SubPoolManager, ISubPoolManager} from './SubPoolManager.sol';
 import {FractionLib} from './lib/Fraction.sol';
+import {SubPoolLib} from './lib/SubPool.sol';
 
 contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
     address public parent;
@@ -94,8 +95,17 @@ contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
         return _amount == requiredInitialAmount;
     }
 
+    modifier checkMaxAdditionalAmount(uint256 _amount) {
+        SubPoolLib.SubPool memory _node = subPools(msg.sender);
+        uint256 _subTotal = _node.balance + _amount;
+        bool isGreaterThanLimit = maxAdditionalAmount > 0 && _subTotal > maxAdditionalAmount;
+
+        if (isGreaterThanLimit) revert ISubPoolNode.ExceedMaxAdditionalDeposit();
+        _;
+    }
+
     /// @inheritdoc ISubPool
-    function deposit(uint256 _amount) public override OnlyNode(msg.sender) {
+    function deposit(uint256 _amount) public override OnlyNode(msg.sender) checkMaxAdditionalAmount(_amount) {
         super.deposit(_amount);
         _increaseParentBalance(_amount);
     }

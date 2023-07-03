@@ -24,28 +24,6 @@ describe('SubPoolRouter', () => {
           anyEntityRouterInstance.additionalDeposit(nodeAddress, ethers.toBigInt(100))
         ).to.be.revertedWithCustomError(subPoolRouter, 'NotNodeManager()')
       })
-
-      it.skip('should revert if try to call additional deposit with amount greater than node max deposit amount', async function () {
-        const { subPoolRouter } = await loadFixture(deployRouterFixture)
-        const amount = ethers.toBigInt(1000)
-
-        const tx = await subPoolRouter.create(
-          amount,
-          DEFAULT_FEES_FRACTION,
-          [],
-          DEFAULT_PERIOD_LOCK,
-          DEFAULT_REQUIRED_INITIAL_AMOUNT,
-          amount - ethers.toBigInt(1) // 999
-        )
-
-        let receipt = await tx.wait()
-        const [subPoolAddress] = receipt.logs[2].args
-
-        await expect(subPoolRouter.additionalDeposit(subPoolAddress, amount)).to.be.revertedWithCustomError(
-          subPoolRouter,
-          'InvalidAdditionalAmount()'
-        )
-      })
     })
 
     describe('Deposit', () => {

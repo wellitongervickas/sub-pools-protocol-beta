@@ -2,6 +2,9 @@
 pragma solidity =0.8.19;
 
 interface ISubPoolNode {
+    /// @notice Throws when try to call only manager function
+    error ExceedMaxAdditionalDeposit();
+
     /// @notice set the parent node address. Only router can set once.
     /// @param _parent the address of the parent node
     function setParent(address _parent) external;

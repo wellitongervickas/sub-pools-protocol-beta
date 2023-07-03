@@ -220,6 +220,49 @@ describe('SubPoolNode', () => {
           'Ownable: caller is not the owner'
         )
       })
+
+      it('should revert if try to call additioanl deposit greater than max additional amount of parent', async function () {
+        const amount = ethers.toBigInt(1000)
+        const [, invited, node1] = await ethers.getSigners()
+        const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
+
+        const subNodeAddress = await subPoolNode.getAddress()
+        const invitedRouterInstance = subPoolRouter.connect(invited) as any
+
+        const maxAdditionalDeposit = ethers.toBigInt(1)
+
+        const tx0 = await invitedRouterInstance.join(
+          subNodeAddress,
+          amount,
+          DEFAULT_FEES_FRACTION,
+          [node1.address],
+          DEFAULT_PERIOD_LOCK,
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          maxAdditionalDeposit
+        )
+
+        const rcpt0 = await tx0.wait()
+        const invitedSubPoolNodeAddress = rcpt0.logs[6].args[0]
+        const node1RouterInstance = subPoolRouter.connect(node1) as any
+
+        const tx1 = await node1RouterInstance.join(
+          invitedSubPoolNodeAddress,
+          amount,
+          DEFAULT_FEES_FRACTION,
+          [],
+          DEFAULT_PERIOD_LOCK,
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_ADDITIONAL_AMOUNT
+        )
+
+        const rcpt1 = await tx1.wait()
+        const node1SubPoolNodeAddress = rcpt1.logs[5].args[0]
+        const newAmount = ethers.toBigInt(1000)
+
+        await expect(
+          node1RouterInstance.additionalDeposit(node1SubPoolNodeAddress, newAmount)
+        ).to.be.revertedWithCustomError(subPoolNode, 'ExceedMaxAdditionalDeposit()')
+      })
     })
 
     describe('Withdraw ', () => {
