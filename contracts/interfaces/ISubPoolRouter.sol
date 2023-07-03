@@ -51,4 +51,16 @@ interface ISubPoolRouter {
         uint256 _requiredInitialAmount,
         uint256 _maxAdditionalDeposit
     ) external returns (address);
+
+    // @notice additional deposit in current or node  context balance
+    /// @param _amount the amount to deposit
+    function additionalDeposit(address _nodeAddress, uint256 _amount) external;
+
+    // @notice decrease deposit in current or node  context balance
+    /// @param _amount the amount to decrease
+    function withdrawBalance(address _nodeAddress, uint256 _amount) external;
+
+    // @notice decrease deposit in current or node  context balance initial balance
+    /// @param _amount the amount to decrease
+    function withdrawInitialBalance(address _nodeAddress, uint256 _amount) external;
 }

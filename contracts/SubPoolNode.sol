@@ -3,10 +3,11 @@ pragma solidity =0.8.19;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {SubPool, ISubPool} from './SubPool.sol';
+import {ISubPoolNode} from './interfaces/ISubPoolNode.sol';
 import {SubPoolManager, ISubPoolManager} from './SubPoolManager.sol';
 import {FractionLib} from './lib/Fraction.sol';
 
-contract SubPoolNode is SubPool, SubPoolManager, Ownable {
+contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
     address public parent;
     uint256 public lockPeriod;
     uint256 public requiredInitialAmount;
@@ -58,17 +59,13 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         maxAdditionalAmount = _maxAdditionalDeposit;
     }
 
-    /// @notice set the parent node address. Only router can set once.
-    /// @param _parent the address of the parent node
+    /// @inheritdoc ISubPoolNode
     function setParent(address _parent) external onlyRouter {
         if (_checkHasParent()) revert ISubPool.ParentAlreadySet();
         parent = _parent;
     }
 
-    /// @notice join as children node
-    /// @param _nodeAddress the address of the node
-    /// @param _amount the amount of the node as initial deposit
-    /// @return the id of the new node
+    /// @inheritdoc ISubPoolNode
     function join(address _nodeAddress, uint256 _amount) external onlyRouter returns (uint256) {
         if (!_checkAmountInitialBalance(_amount)) revert ISubPool.InvalidInitialAmount();
         if (!_checkHasParent()) revert ISubPool.ParentNotFound();
@@ -97,44 +94,56 @@ contract SubPoolNode is SubPool, SubPoolManager, Ownable {
         return _amount == requiredInitialAmount;
     }
 
+    /// @inheritdoc ISubPool
     function deposit(uint256 _amount) public override OnlyNode(msg.sender) {
         super.deposit(_amount);
         _increaseParentBalance(_amount);
     }
 
+    /// @inheritdoc ISubPool
     function withdraw(uint256 _amount) public override OnlyNode(msg.sender) {
         super.withdraw(_amount);
         _decreaseParentBalance(_amount);
     }
 
+    /// @inheritdoc ISubPool
     function cashback(uint256 _amount) public override OnlyNode(msg.sender) {
         super.cashback(_amount);
         _decreaseParentInitialBalance(_amount);
     }
 
+    /// @inheritdoc ISubPoolNode
     function additionalDeposit(uint256 _amount) external onlyRouter {
         _increaseManagerBalance(_amount);
         _increaseParentBalance(_amount);
     }
 
+    /// @inheritdoc ISubPoolNode
     function withdrawBalance(uint256 _amount) external onlyRouter {
         _decreaseManagerBalance(_amount);
         _decreaseParentBalance(_amount);
     }
 
+    /// @inheritdoc ISubPoolNode
     function withdrawInitialBalance(uint256 _amount) external onlyRouter {
         _decreaseManagerInitialBalance(_amount);
         _decreaseParentInitialBalance(_amount);
     }
 
+    /// @notice increase parent balance
+    /// @param _amount the amount to increase
     function _increaseParentBalance(uint256 _amount) internal {
         SubPoolNode(parent).deposit(_amount);
     }
 
+    /// @notice decrease parent balance
+    /// @param _amount the amount to decrease
     function _decreaseParentBalance(uint256 _amount) internal {
         SubPoolNode(parent).withdraw(_amount);
     }
 
+    /// @notice decrease parent initial balance
+    /// @param _amount the amount to decrease
     function _decreaseParentInitialBalance(uint256 _amount) internal onlyUnlockedPeriod(lockPeriod) {
         SubPoolNode(parent).cashback(_amount);
     }
