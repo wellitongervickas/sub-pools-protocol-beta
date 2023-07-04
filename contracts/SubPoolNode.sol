@@ -86,8 +86,8 @@ contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
         if (!_checkHasParent()) revert ISubPool.ParentNotFound();
         if (!_checkIsInvitedRole(_managerAddress)) revert ISubPoolManager.NotInvited();
 
-        uint256 _amountSubTotal = _computeManagerFees(_amount);
-        uint256 _id = _setupNode(_nodeAddress, _managerAddress, _amountSubTotal);
+        uint256 _remainingAmount = _computeManagerFees(_amount);
+        uint256 _id = _setupNode(_nodeAddress, _managerAddress, _remainingAmount);
 
         _updateManagerRole(_managerAddress);
         _increaseParentBalance(_amount);

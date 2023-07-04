@@ -11,6 +11,7 @@ interface ISubPoolNode {
 
     /// @notice join as children node
     /// @param _nodeAddress the address of the node
+    /// @param _managerAddress the address of the manager
     /// @param _amount the amount of the node as initial deposit
     /// @return the id of the new node
     function join(address _nodeAddress, address _managerAddress, uint256 _amount) external returns (uint256);
