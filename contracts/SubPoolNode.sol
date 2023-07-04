@@ -54,19 +54,19 @@ contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
 
     /// @notice set the lock period of the node
     /// @param _lockPeriod the lock period of the node in seconds
-    function _setLockPeriod(uint256 _lockPeriod) internal {
+    function _setLockPeriod(uint256 _lockPeriod) private {
         lockPeriod = _lockPeriod;
     }
 
     /// @notice set the required initial amount of the node
     /// @param _requiredInitialAmount the required initial amount of the node
-    function _setRequiredInitialAmount(uint256 _requiredInitialAmount) internal {
+    function _setRequiredInitialAmount(uint256 _requiredInitialAmount) private {
         requiredInitialAmount = _requiredInitialAmount;
     }
 
     /// @notice set the max additional deposit of the node
     /// @param _maxAdditionalDeposit the max additional deposit of the node
-    function _setMaxAdditionalDeposit(uint256 _maxAdditionalDeposit) internal {
+    function _setMaxAdditionalDeposit(uint256 _maxAdditionalDeposit) private {
         maxAdditionalAmount = _maxAdditionalDeposit;
     }
 
@@ -97,14 +97,14 @@ contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
 
     /// @notice check if node has parent
     /// @return true if node has parent
-    function _checkHasParent() internal view returns (bool) {
+    function _checkHasParent() private view returns (bool) {
         return parent != address(0);
     }
 
     /// @notice check if the amount is equal to required initial amount, if zero is not required
     /// @param _amount the amount to check
     /// @return true if the amount is equal to required initial amount
-    function _checkAmountInitialBalance(uint256 _amount) internal view returns (bool) {
+    function _checkAmountInitialBalance(uint256 _amount) private view returns (bool) {
         if (requiredInitialAmount == 0) return true;
         return _amount == requiredInitialAmount;
     }
@@ -147,19 +147,19 @@ contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
 
     /// @notice increase parent balance
     /// @param _amount the amount to increase
-    function _increaseParentBalance(uint256 _amount) internal {
+    function _increaseParentBalance(uint256 _amount) private {
         SubPoolNode(parent).deposit(_amount);
     }
 
     /// @notice decrease parent balance
     /// @param _amount the amount to decrease
-    function _decreaseParentBalance(uint256 _amount) internal {
+    function _decreaseParentBalance(uint256 _amount) private {
         SubPoolNode(parent).withdraw(_amount);
     }
 
     /// @notice decrease parent initial balance
     /// @param _amount the amount to decrease
-    function _decreaseParentInitialBalance(uint256 _amount) internal onlyUnlockedPeriod(lockPeriod) {
+    function _decreaseParentInitialBalance(uint256 _amount) private onlyUnlockedPeriod(lockPeriod) {
         SubPoolNode(parent).cashback(_amount);
     }
 }

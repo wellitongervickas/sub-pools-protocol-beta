@@ -32,7 +32,7 @@ contract SubPool is ISubPool {
 
     /// @notice compute the node id and update the current ID
     /// @return the current ID
-    function _computeNodeID() internal returns (uint256) {
+    function _computeNodeID() private returns (uint256) {
         currentID.increment();
         return currentID.current();
     }

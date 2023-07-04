@@ -77,7 +77,7 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
     /// @notice setup the parent node of a node
     /// @param _node the node to setup
     /// @param _parentNodeAddress the address of the parent node
-    function _setupNodeParent(SubPoolNode _node, address _parentNodeAddress) internal {
+    function _setupNodeParent(SubPoolNode _node, address _parentNodeAddress) private {
         _node.setParent(_parentNodeAddress);
     }
 
@@ -144,7 +144,7 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
     /// @notice check if parent is router
     /// @param _nodeAddress the address of the node
     /// @return true if parent is router
-    function _checkIsParentRouter(address _nodeAddress) internal view returns (bool) {
+    function _checkIsParentRouter(address _nodeAddress) private view returns (bool) {
         return SubPoolNode(_nodeAddress).parent() == address(this);
     }
 }

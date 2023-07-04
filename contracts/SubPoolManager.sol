@@ -33,7 +33,7 @@ contract SubPoolManager is ISubPoolManager, AccessControl {
 
     /// @notice setup manager role
     /// @param _manager the manager to set as manager role
-    function _setManagerRole(ManagerLib.Manager storage _manager) internal {
+    function _setManagerRole(ManagerLib.Manager storage _manager) private {
         _grantRole(MANAGER_ROLE, _manager.managerAddress);
     }
 
@@ -95,7 +95,7 @@ contract SubPoolManager is ISubPoolManager, AccessControl {
 
     /// @notice check if has manager role
     /// @param _address the address to check if has manager role
-    function _checkIsManagerRole(address _address) internal view returns (bool) {
+    function _checkIsManagerRole(address _address) private view returns (bool) {
         return hasRole(MANAGER_ROLE, _address);
     }
 
@@ -107,7 +107,7 @@ contract SubPoolManager is ISubPoolManager, AccessControl {
 
     /// @notice check if has node role
     /// @param _nodeManagerAddress the address to check if has node role
-    function _checkIsNodeRole(address _nodeManagerAddress) internal view returns (bool) {
+    function _checkIsNodeRole(address _nodeManagerAddress) private view returns (bool) {
         return hasRole(NODE_ROLE, _nodeManagerAddress);
     }
 }
