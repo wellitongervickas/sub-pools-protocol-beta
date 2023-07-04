@@ -20,6 +20,16 @@ contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
         _;
     }
 
+    /// @dev check if amount is less than or equal to max additional amount
+    modifier checkMaxAdditionalAmount(uint256 _amount) {
+        SubPoolLib.SubPool memory _node = subPools(msg.sender);
+        uint256 _subTotal = _node.balance + _amount;
+        bool isGreaterThanLimit = maxAdditionalAmount > 0 && _subTotal > maxAdditionalAmount;
+
+        if (isGreaterThanLimit) revert ISubPoolNode.ExceedMaxAdditionalDeposit();
+        _;
+    }
+
     /// @notice create a new node
     /// @param _managerAddress the address of the node manager
     /// @param _amount the amount of the root node as initial deposit
@@ -36,10 +46,10 @@ contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
         uint256 _requiredInitialAmount,
         uint256 _maxAdditionalDeposit
     ) SubPoolManager(_managerAddress, _amount, _fees) {
-        _grantInitialInvites(_invitedAddresses);
-        _setLockPeriod(_lockPeriod);
         _setRequiredInitialAmount(_requiredInitialAmount);
+        _setLockPeriod(_lockPeriod);
         _setMaxAdditionalDeposit(_maxAdditionalDeposit);
+        _grantInitialInvites(_invitedAddresses);
     }
 
     /// @notice set the lock period of the node
@@ -67,15 +77,19 @@ contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
     }
 
     /// @inheritdoc ISubPoolNode
-    function join(address _nodeAddress, uint256 _amount) external onlyRouter returns (uint256) {
+    function join(
+        address _nodeAddress,
+        address _managerAddress,
+        uint256 _amount
+    ) external onlyRouter returns (uint256) {
         if (!_checkAmountInitialBalance(_amount)) revert ISubPool.InvalidInitialAmount();
         if (!_checkHasParent()) revert ISubPool.ParentNotFound();
-        if (!_checkIsInvitedRole(tx.origin)) revert ISubPoolManager.NotInvited();
+        if (!_checkIsInvitedRole(_managerAddress)) revert ISubPoolManager.NotInvited();
 
         uint256 _amountSubTotal = _computeManagerFees(_amount);
-        uint256 _id = _setupNode(_nodeAddress, msg.sender, _amountSubTotal);
+        uint256 _id = _setupNode(_nodeAddress, _managerAddress, _amountSubTotal);
 
-        _updateManagerRole(tx.origin);
+        _updateManagerRole(_managerAddress);
         _increaseParentBalance(_amount);
 
         return _id;
@@ -95,49 +109,40 @@ contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
         return _amount == requiredInitialAmount;
     }
 
-    modifier checkMaxAdditionalAmount(uint256 _amount) {
-        SubPoolLib.SubPool memory _node = subPools(msg.sender);
-        uint256 _subTotal = _node.balance + _amount;
-        bool isGreaterThanLimit = maxAdditionalAmount > 0 && _subTotal > maxAdditionalAmount;
-
-        if (isGreaterThanLimit) revert ISubPoolNode.ExceedMaxAdditionalDeposit();
-        _;
-    }
-
     /// @inheritdoc ISubPool
     function deposit(uint256 _amount) public override OnlyNode(msg.sender) checkMaxAdditionalAmount(_amount) {
-        super.deposit(_amount);
         _increaseParentBalance(_amount);
+        super.deposit(_amount);
     }
 
     /// @inheritdoc ISubPool
     function withdraw(uint256 _amount) public override OnlyNode(msg.sender) {
-        super.withdraw(_amount);
         _decreaseParentBalance(_amount);
+        super.withdraw(_amount);
     }
 
     /// @inheritdoc ISubPool
     function cashback(uint256 _amount) public override OnlyNode(msg.sender) {
-        super.cashback(_amount);
         _decreaseParentInitialBalance(_amount);
+        super.cashback(_amount);
     }
 
     /// @inheritdoc ISubPoolNode
     function additionalDeposit(uint256 _amount) external onlyRouter {
-        _increaseManagerBalance(_amount);
         _increaseParentBalance(_amount);
+        _increaseManagerBalance(_amount);
     }
 
     /// @inheritdoc ISubPoolNode
     function withdrawBalance(uint256 _amount) external onlyRouter {
-        _decreaseManagerBalance(_amount);
         _decreaseParentBalance(_amount);
+        _decreaseManagerBalance(_amount);
     }
 
     /// @inheritdoc ISubPoolNode
     function withdrawInitialBalance(uint256 _amount) external onlyRouter {
-        _decreaseManagerInitialBalance(_amount);
         _decreaseParentInitialBalance(_amount);
+        _decreaseManagerInitialBalance(_amount);
     }
 
     /// @notice increase parent balance

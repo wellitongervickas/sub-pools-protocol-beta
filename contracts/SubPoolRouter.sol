@@ -66,7 +66,7 @@ contract SubPoolRouter is ISubPoolRouter, SubPool {
 
         address _nodeAddress = address(_node);
         /// @dev join as children node to parent node
-        uint256 _nodeId = _parentNode.join(_nodeAddress, _amount);
+        uint256 _nodeId = _parentNode.join(_nodeAddress, msg.sender, _amount);
 
         _setupNodeParent(_node, _parentNodeAddress);
 

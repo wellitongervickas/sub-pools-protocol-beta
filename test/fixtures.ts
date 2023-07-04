@@ -30,7 +30,7 @@ export async function deployRouterFixture() {
 
 export async function deployNodeFixture(
   manager?: string,
-  amount: string | BigInt = '0',
+  amount: BigInt = ethers.toBigInt(0),
   fees: typeof DEFAULT_FEES_FRACTION = DEFAULT_FEES_FRACTION,
   invites: string[] = [],
   lockperiod = DEFAULT_PERIOD_LOCK,

@@ -97,12 +97,16 @@ describe('SubPoolNode', () => {
 
     describe('Join', () => {
       it('should revert on join as node without a parent subpool', async function () {
+        const [, , hacker] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(deployNodeFixture)
         const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture)
 
         const subPoolAddress = await subPoolNode2.getAddress()
 
-        await expect(subPoolNode.join(subPoolAddress, 0)).to.be.revertedWithCustomError(subPoolNode, 'ParentNotFound()')
+        await expect(subPoolNode.join(subPoolAddress, hacker.address, 0)).to.be.revertedWithCustomError(
+          subPoolNode,
+          'ParentNotFound()'
+        )
       })
 
       it('should revert if try to join setting manually the parent as a main subpool', async function () {
@@ -134,7 +138,7 @@ describe('SubPoolNode', () => {
         const subPoolNode2Address = await subPoolNode2.getAddress()
         await subPoolNode.setParent(defaultSubPoolNodeAddress)
 
-        await expect(subPoolNode.join(subPoolNode2Address, 100)).to.be.revertedWithCustomError(
+        await expect(subPoolNode.join(subPoolNode2Address, hacker.address, 100)).to.be.revertedWithCustomError(
           subPoolNode,
           'NotAllowed()'
         )
@@ -168,7 +172,9 @@ describe('SubPoolNode', () => {
         const subNodeAddress2 = await subPoolNode2.getAddress()
         const newSubPoolInstance = subPoolNode.connect(invited) as SubPoolNode
 
-        await expect(newSubPoolInstance.join(subNodeAddress2, 0)).to.be.rejectedWith('Ownable: caller is not the owner')
+        await expect(newSubPoolInstance.join(subNodeAddress2, invited.address, 0)).to.be.rejectedWith(
+          'Ownable: caller is not the owner'
+        )
       })
 
       it('should revert if try to join without a required initial balance', async function () {
