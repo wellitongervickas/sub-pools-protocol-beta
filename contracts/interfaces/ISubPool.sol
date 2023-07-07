@@ -22,20 +22,20 @@ interface ISubPool {
     /// @notice Throws when initial amount is invalid
     error InvalidAdditionalAmount();
 
-    /// @notice Get subpool by given address
-    /// @param _address the address of the subpool
-    /// @return the subpool
+    /// @notice Get node by given address
+    /// @param _address the address of the node
+    /// @return the node
     function subPools(address _address) external view returns (SubPoolLib.SubPool memory);
 
-    /// @notice deposit balance
+    /// @notice deposit node balance
     /// @param _amount the amount to deposit
     function deposit(uint256 _amount) external;
 
-    /// @notice decrease balance
+    /// @notice decrease node balance
     /// @param _amount the amount to withdraw
     function withdraw(uint256 _amount) external;
 
-    /// @notice decrease initial balance
+    /// @notice decrease node initial balance
     /// @param _amount the amount to cashback
     function cashback(uint256 _amount) external;
 }

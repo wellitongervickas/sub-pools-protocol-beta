@@ -111,38 +111,38 @@ contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
 
     /// @inheritdoc ISubPool
     function deposit(uint256 _amount) public override OnlyNode(msg.sender) checkMaxAdditionalAmount(_amount) {
-        _increaseParentBalance(_amount);
         super.deposit(_amount);
+        _increaseParentBalance(_amount);
     }
 
     /// @inheritdoc ISubPool
     function withdraw(uint256 _amount) public override OnlyNode(msg.sender) {
-        _decreaseParentBalance(_amount);
         super.withdraw(_amount);
+        _decreaseParentBalance(_amount);
     }
 
     /// @inheritdoc ISubPool
     function cashback(uint256 _amount) public override OnlyNode(msg.sender) {
-        _decreaseParentInitialBalance(_amount);
         super.cashback(_amount);
+        _decreaseParentInitialBalance(_amount);
     }
 
     /// @inheritdoc ISubPoolNode
     function additionalDeposit(uint256 _amount) external onlyRouter {
-        _increaseParentBalance(_amount);
         _increaseManagerBalance(_amount);
+        _increaseParentBalance(_amount);
     }
 
     /// @inheritdoc ISubPoolNode
     function withdrawBalance(uint256 _amount) external onlyRouter {
-        _decreaseParentBalance(_amount);
         _decreaseManagerBalance(_amount);
+        _decreaseParentBalance(_amount);
     }
 
     /// @inheritdoc ISubPoolNode
     function withdrawInitialBalance(uint256 _amount) external onlyRouter {
-        _decreaseParentInitialBalance(_amount);
         _decreaseManagerInitialBalance(_amount);
+        _decreaseParentInitialBalance(_amount);
     }
 
     /// @notice increase parent balance
