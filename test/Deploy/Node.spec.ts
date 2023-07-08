@@ -11,11 +11,6 @@ import {
 
 describe('Children', () => {
   describe('Deploy', () => {
-    it('should set initial ID', async function () {
-      const { subPoolNode } = await loadFixture(deployNodeFixture)
-      expect(await subPoolNode.currentID()).to.equal(0)
-    })
-
     it('should set manager by address', async function () {
       const [manager] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(deployNodeFixture)

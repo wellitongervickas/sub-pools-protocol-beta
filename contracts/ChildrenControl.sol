@@ -9,7 +9,7 @@ contract ChildrenControl is IChildrenControl {
     using ChildrenLib for ChildrenLib.Children;
     using Counters for Counters.Counter;
 
-    Counters.Counter public currentID;
+    Counters.Counter private currentID;
     mapping(address => ChildrenLib.Children) private _children;
 
     modifier onlyUnlockedPeriod(uint256 _lockPeriod) {

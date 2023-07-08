@@ -13,25 +13,6 @@ import {
 
 describe('Children', () => {
   describe('Join', () => {
-    it('should update the ID', async function () {
-      const [, invited] = await ethers.getSigners()
-      const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
-
-      const subNodeAddress = await subPoolNode.getAddress()
-      const subPoolRouterInstance = subPoolRouter.connect(invited) as Router
-      await subPoolRouterInstance.join(
-        subNodeAddress,
-        0,
-        DEFAULT_FEES_FRACTION,
-        [],
-        DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_ADDITIONAL_AMOUNT
-      )
-
-      expect(await subPoolNode.currentID()).to.equal(1)
-    })
-
     it('should set initial balance', async function () {
       const amount = ethers.toBigInt(100)
       const [, invited, node] = await ethers.getSigners()

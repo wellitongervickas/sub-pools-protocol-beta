@@ -11,20 +11,6 @@ import {
 
 describe('Router', () => {
   describe('Create', () => {
-    it('should update next ID', async function () {
-      const { subPoolRouter } = await loadFixture(deployRouterFixture)
-      await subPoolRouter.create(
-        100,
-        DEFAULT_FEES_FRACTION,
-        [],
-        DEFAULT_PERIOD_LOCK,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_ADDITIONAL_AMOUNT
-      )
-
-      expect(await subPoolRouter.currentID()).to.equal(1)
-    })
-
     it('should set the main subpool initial balance', async function () {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
 
