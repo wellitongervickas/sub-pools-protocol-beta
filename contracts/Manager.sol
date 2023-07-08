@@ -31,15 +31,10 @@ contract Manager is IManager, AccessControl {
         _setManagerRole(manager);
     }
 
-    /// @notice setup manager role
-    /// @param _manager the manager to set as manager role
     function _setManagerRole(ManagerLib.Manager storage _manager) private {
         _grantRole(MANAGER_ROLE, _manager.managerAddress);
     }
 
-    /// @notice compute the manager fees
-    /// @param _amount the amount to compute the fees
-    /// @return the remaining amount after fees
     function _computeManagerFees(uint256 _amount) internal returns (uint256) {
         uint256 _managerAmount = manager._calculateRatioFees(_amount);
         _increaseManagerBalance(_managerAmount);
@@ -47,38 +42,28 @@ contract Manager is IManager, AccessControl {
         return _amount - _managerAmount;
     }
 
-    /// @notice increase the manager balance
-    /// @param _amount the amount to increase the balance
     function _increaseManagerBalance(uint256 _amount) internal {
         manager._increaseBalance(_amount);
     }
 
-    /// @notice decrease the manager balance
-    /// @param _amount the amount to decrease the balance
     function _decreaseManagerBalance(uint256 _amount) internal {
         manager._decreaseBalance(_amount);
     }
 
-    /// @notice increase the manager initial balance
-    /// @param _amount the amount to increase the initial balance
     function _decreaseManagerInitialBalance(uint256 _amount) internal {
         manager._decreaseInitialBalance(_amount);
     }
 
-    /// @inheritdoc IManager
     function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
         if (_checkIsManagerRole(_invitedAddress)) revert IManager.ManagerNotAllowed();
         if (_checkIsInvitedRole(_invitedAddress)) revert IManager.AlreadyInvited();
         if (_checkIsNodeRole(_invitedAddress)) revert IManager.AlreadyNodeManager();
 
-        /// @dev Grant the invited role to the invited address
         _grantRole(INVITED_ROLE, _invitedAddress);
 
         emit NodeManagerInvited(_invitedAddress);
     }
 
-    /// @notice grant invited role to multiple addresses
-    /// @param _invitedAddresses the addresses to grant the invited role
     function _grantInitialInvites(address[] memory _invitedAddresses) internal {
         for (uint256 i = 0; i < _invitedAddresses.length; i++) {
             /// @dev Grant the invited role to the invited address
@@ -86,27 +71,19 @@ contract Manager is IManager, AccessControl {
         }
     }
 
-    /// @notice revoke invited role to and set as node role
-    /// @param _nodeManagerAddress the addresse to revoke the invited role and set as node role
     function _updateInvitedRole(address _nodeManagerAddress) internal {
         _revokeRole(INVITED_ROLE, _nodeManagerAddress);
         _grantRole(NODE_ROLE, _nodeManagerAddress);
     }
 
-    /// @notice check if has manager role
-    /// @param _address the address to check if has manager role
     function _checkIsManagerRole(address _address) private view returns (bool) {
         return hasRole(MANAGER_ROLE, _address);
     }
 
-    /// @notice check if has invited role
-    /// @param _nodeManagerAddress the address to check if has invited role
     function _checkIsInvitedRole(address _nodeManagerAddress) internal view returns (bool) {
         return hasRole(INVITED_ROLE, _nodeManagerAddress);
     }
 
-    /// @notice check if has node role
-    /// @param _nodeManagerAddress the address to check if has node role
     function _checkIsNodeRole(address _nodeManagerAddress) private view returns (bool) {
         return hasRole(NODE_ROLE, _nodeManagerAddress);
     }
