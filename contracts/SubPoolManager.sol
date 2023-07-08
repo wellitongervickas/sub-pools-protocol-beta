@@ -86,9 +86,9 @@ contract SubPoolManager is ISubPoolManager, AccessControl {
         }
     }
 
-    /// @notice revoke invited role to and set as node manager
-    /// @param _nodeManagerAddress the addresse to revoke the invited role and set as node manager
-    function _updateManagerRole(address _nodeManagerAddress) internal {
+    /// @notice revoke invited role to and set as node role
+    /// @param _nodeManagerAddress the addresse to revoke the invited role and set as node role
+    function _updateInvitedRole(address _nodeManagerAddress) internal {
         _revokeRole(INVITED_ROLE, _nodeManagerAddress);
         _grantRole(NODE_ROLE, _nodeManagerAddress);
     }

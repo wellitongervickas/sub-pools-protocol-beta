@@ -46,6 +46,7 @@ contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
         uint256 _requiredInitialAmount,
         uint256 _maxAdditionalDeposit
     ) SubPoolManager(_managerAddress, _amount, _fees) {
+        // strategy?
         _setRequiredInitialAmount(_requiredInitialAmount);
         _setLockPeriod(_lockPeriod);
         _setMaxAdditionalDeposit(_maxAdditionalDeposit);
@@ -79,17 +80,18 @@ contract SubPoolNode is ISubPoolNode, SubPool, SubPoolManager, Ownable {
     /// @inheritdoc ISubPoolNode
     function join(
         address _nodeAddress,
-        address _managerAddress,
+        address _invitedAddress,
         uint256 _amount
     ) external onlyRouter returns (uint256) {
         if (!_checkAmountInitialBalance(_amount)) revert ISubPool.InvalidInitialAmount();
         if (!_checkHasParent()) revert ISubPool.ParentNotFound();
-        if (!_checkIsInvitedRole(_managerAddress)) revert ISubPoolManager.NotInvited();
+        if (!_checkIsInvitedRole(_invitedAddress)) revert ISubPoolManager.NotInvited();
 
+        // todo: manager strategy?
         uint256 _remainingAmount = _computeManagerFees(_amount);
-        uint256 _id = _setupNode(_nodeAddress, _managerAddress, _remainingAmount);
+        uint256 _id = _setupNode(_nodeAddress, _invitedAddress, _remainingAmount);
 
-        _updateManagerRole(_managerAddress);
+        _updateInvitedRole(_invitedAddress);
         _increaseParentBalance(_amount);
 
         return _id;
