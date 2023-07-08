@@ -2,28 +2,28 @@
 pragma solidity =0.8.19;
 
 import '@openzeppelin/contracts/utils/Counters.sol';
-import {INode} from './interfaces/INode.sol';
-import {NodeLib} from './lib/Node.sol';
+import {IChildrenControl} from './interfaces/IChildrenControl.sol';
+import {ChildrenLib} from './lib/Children.sol';
 
-contract Node is INode {
-    using NodeLib for NodeLib.Node;
+contract ChildrenControl is IChildrenControl {
+    using ChildrenLib for ChildrenLib.Children;
     using Counters for Counters.Counter;
 
     Counters.Counter public currentID;
-    mapping(address => NodeLib.Node) private _children;
+    mapping(address => ChildrenLib.Children) private _children;
 
     modifier onlyUnlockedPeriod(uint256 _lockPeriod) {
-        if (_lockPeriod > block.timestamp) revert INode.LockPeriod();
+        if (_lockPeriod > block.timestamp) revert IChildrenControl.LockPeriod();
         _;
     }
 
     modifier OnlyChildren(address _childrenAddress) {
-        bool isChildren = _children[_childrenAddress]._validateIsNode();
-        if (!isChildren) revert INode.NotAllowed();
+        bool isChildren = _children[_childrenAddress]._validateIsChildren();
+        if (!isChildren) revert IChildrenControl.NotAllowed();
         _;
     }
 
-    function children(address _childrenAddress) public view override returns (NodeLib.Node memory) {
+    function children(address _childrenAddress) public view override returns (ChildrenLib.Children memory) {
         return _children[_childrenAddress];
     }
 
@@ -39,7 +39,7 @@ contract Node is INode {
     ) internal returns (uint256) {
         uint256 _id = _createChildrenID();
 
-        _children[_childrenAddress] = NodeLib.Node({
+        _children[_childrenAddress] = ChildrenLib.Children({
             managerAddress: _managerAddress,
             id: _id,
             initialBalance: _amount,

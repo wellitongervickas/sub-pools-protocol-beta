@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {Node, INode} from './Node.sol';
+import {ChildrenControl, IChildrenControl} from './ChildrenControl.sol';
 import {Children} from './Children.sol';
 import {FractionLib} from './lib/Fraction.sol';
 import {IRouter} from './interfaces/IRouter.sol';
 
-contract Router is IRouter, Node {
+contract Router is IRouter, ChildrenControl {
     modifier onlyChildrenManager(address _childrenAddress) {
         (address _managerAddress, , , ) = Children(_childrenAddress).manager();
         if (_managerAddress != msg.sender) revert IRouter.NotChildrenManager();

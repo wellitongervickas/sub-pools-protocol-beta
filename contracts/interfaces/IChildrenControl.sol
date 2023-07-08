@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {NodeLib} from '../lib/Node.sol';
+import {ChildrenLib} from '../lib/Children.sol';
 
-interface INode {
+interface IChildrenControl {
     error NotAllowed();
     error LockPeriod();
     error ParentNotFound();
@@ -11,7 +11,7 @@ interface INode {
     error InvalidInitialAmount();
     error InvalidAdditionalAmount();
 
-    function children(address _address) external view returns (NodeLib.Node memory);
+    function children(address _address) external view returns (ChildrenLib.Children memory);
 
     function deposit(uint256 _amount) external;
 

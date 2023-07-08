@@ -2,13 +2,13 @@
 pragma solidity =0.8.19;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
-import {Node, INode} from './Node.sol';
+import {ChildrenControl, IChildrenControl} from './ChildrenControl.sol';
 import {IChildren} from './interfaces/IChildren.sol';
 import {Manager, IManager} from './Manager.sol';
 import {FractionLib} from './lib/Fraction.sol';
-import {NodeLib} from './lib/Node.sol';
+import {ChildrenLib} from './lib/Children.sol';
 
-contract Children is IChildren, Node, Manager, Ownable {
+contract Children is IChildren, ChildrenControl, Manager, Ownable {
     address public parent;
     uint256 public lockPeriod;
     uint256 public requiredInitialAmount;
@@ -20,7 +20,7 @@ contract Children is IChildren, Node, Manager, Ownable {
     }
 
     modifier checkMaxAdditionalAmount(uint256 _amount) {
-        NodeLib.Node memory _node = children(msg.sender);
+        ChildrenLib.Children memory _node = children(msg.sender);
         uint256 _subTotal = _node.balance + _amount;
         bool isGreaterThanLimit = maxAdditionalAmount > 0 && _subTotal > maxAdditionalAmount;
 
@@ -56,7 +56,7 @@ contract Children is IChildren, Node, Manager, Ownable {
     }
 
     function setParent(address _parent) external onlyRouter {
-        if (_checkHasParent()) revert INode.ParentAlreadySet();
+        if (_checkHasParent()) revert IChildrenControl.ParentAlreadySet();
         parent = _parent;
     }
 
@@ -65,8 +65,8 @@ contract Children is IChildren, Node, Manager, Ownable {
         address _invitedAddress,
         uint256 _amount
     ) external onlyRouter returns (uint256) {
-        if (!_checkAmountInitialBalance(_amount)) revert INode.InvalidInitialAmount();
-        if (!_checkHasParent()) revert INode.ParentNotFound();
+        if (!_checkAmountInitialBalance(_amount)) revert IChildrenControl.InvalidInitialAmount();
+        if (!_checkHasParent()) revert IChildrenControl.ParentNotFound();
         if (!_checkIsInvitedRole(_invitedAddress)) revert IManager.NotInvited();
 
         uint256 _remainingAmount = _computeManagerFees(_amount);
