@@ -9,10 +9,10 @@ import {FractionLib} from './lib/Fraction.sol';
 import {ChildrenLib} from './lib/Children.sol';
 
 contract Children is IChildren, ChildrenControl, Manager, Ownable {
-    address public parent;
-    uint256 public lockPeriod;
-    uint256 public requiredInitialAmount;
-    uint256 public maxAdditionalAmount;
+    address public parent; // only set once
+    uint256 public immutable lockPeriod;
+    uint256 public immutable requiredInitialAmount;
+    uint256 public immutable maxAdditionalAmount;
 
     modifier onlyRouter() {
         _checkOwner();
@@ -37,22 +37,11 @@ contract Children is IChildren, ChildrenControl, Manager, Ownable {
         uint256 _requiredInitialAmount,
         uint256 _maxAdditionalDeposit
     ) Manager(_managerAddress, _amount, _fees) {
-        _setRequiredInitialAmount(_requiredInitialAmount);
-        _setLockPeriod(_lockPeriod);
-        _setMaxAdditionalDeposit(_maxAdditionalDeposit);
-        _grantInitialInvites(_invitedAddresses);
-    }
-
-    function _setLockPeriod(uint256 _lockPeriod) private {
-        lockPeriod = _lockPeriod;
-    }
-
-    function _setRequiredInitialAmount(uint256 _requiredInitialAmount) private {
         requiredInitialAmount = _requiredInitialAmount;
-    }
-
-    function _setMaxAdditionalDeposit(uint256 _maxAdditionalDeposit) private {
+        lockPeriod = _lockPeriod;
         maxAdditionalAmount = _maxAdditionalDeposit;
+
+        _grantInitialInvites(_invitedAddresses);
     }
 
     function setParent(address _parent) external onlyRouter {
