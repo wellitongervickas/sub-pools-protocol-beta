@@ -4,17 +4,17 @@ import {
   loadFixture,
   DEFAULT_FEES_FRACTION,
   ethers,
-  SubPoolRouter,
+  Router,
   anyValue,
   DEFAULT_PERIOD_LOCK,
   DEFAULT_REQUIRED_INITIAL_AMOUNT,
   DEFAULT_MAX_ADDITIONAL_AMOUNT,
 } from '../fixtures'
 
-describe('SubPoolRouter', () => {
+describe('Router', () => {
   describe('Events', () => {
     describe('Main', () => {
-      it('should emit NodeCreated on create a main node', async function () {
+      it('should emit ChildrenCreated on create a main node', async function () {
         const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
 
         const [, invited] = accounts
@@ -31,13 +31,13 @@ describe('SubPoolRouter', () => {
             DEFAULT_MAX_ADDITIONAL_AMOUNT
           )
         )
-          .to.emit(subPoolRouter, 'NodeCreated')
+          .to.emit(subPoolRouter, 'ChildrenCreated')
           .withArgs(anyValue, 1, amount)
       })
     })
 
     describe('Node', () => {
-      it('should emit NodeJoined on create a node', async function () {
+      it('should emit ChildrenJoined on create a node', async function () {
         const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
         const amount = ethers.toBigInt(1000)
         const [, invited] = accounts
@@ -54,7 +54,7 @@ describe('SubPoolRouter', () => {
 
         const [subPoolAddress] = receipt.logs[3].args
 
-        const newInstance = subPoolRouter.connect(invited) as SubPoolRouter
+        const newInstance = subPoolRouter.connect(invited) as Router
 
         await expect(
           newInstance.join(
@@ -67,7 +67,7 @@ describe('SubPoolRouter', () => {
             DEFAULT_MAX_ADDITIONAL_AMOUNT
           )
         )
-          .to.emit(subPoolRouter, 'NodeJoined')
+          .to.emit(subPoolRouter, 'ChildrenJoined')
           .withArgs(anyValue, 1, amount)
       })
 
@@ -87,7 +87,7 @@ describe('SubPoolRouter', () => {
         let receipt = await tx.wait()
         const [subPoolAddress] = receipt.logs[3].args
 
-        const newInstance = subPoolRouter.connect(invited) as SubPoolRouter
+        const newInstance = subPoolRouter.connect(invited) as Router
 
         await expect(
           newInstance.join(

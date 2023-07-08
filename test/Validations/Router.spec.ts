@@ -11,7 +11,7 @@ import {
   DEFAULT_PERIOD_LOCK,
 } from '../fixtures'
 
-describe('SubPoolRouter', () => {
+describe('Router', () => {
   describe('Additional deposit', () => {
     it('should revert if try to call additional deposit without being the manager', async function () {
       const { subPoolRouter, subPoolNode, accounts } = await loadFixture(deployRoutedNodeFixture)
@@ -21,7 +21,7 @@ describe('SubPoolRouter', () => {
 
       await expect(
         anyEntityRouterInstance.additionalDeposit(nodeAddress, ethers.toBigInt(100))
-      ).to.be.revertedWithCustomError(subPoolRouter, 'NotNodeManager()')
+      ).to.be.revertedWithCustomError(subPoolRouter, 'NotChildrenManager()')
     })
   })
 
@@ -47,7 +47,7 @@ describe('SubPoolRouter', () => {
 
       await expect(
         anyEntityRouterInstance.withdrawBalance(nodeAddress, ethers.toBigInt(100))
-      ).to.be.revertedWithCustomError(subPoolRouter, 'NotNodeManager()')
+      ).to.be.revertedWithCustomError(subPoolRouter, 'NotChildrenManager()')
     })
 
     it('should revert if try to call withdraw initial balance without being the manager', async function () {
@@ -58,7 +58,7 @@ describe('SubPoolRouter', () => {
 
       await expect(
         anyEntityRouterInstance.withdrawInitialBalance(nodeAddress, ethers.toBigInt(100))
-      ).to.be.revertedWithCustomError(subPoolRouter, 'NotNodeManager()')
+      ).to.be.revertedWithCustomError(subPoolRouter, 'NotChildrenManager()')
     })
 
     it('should revert when try to call withdraw if sender is not node', async function () {

@@ -9,7 +9,7 @@ import {
   DEFAULT_MAX_ADDITIONAL_AMOUNT,
 } from '../fixtures'
 
-describe('SubPoolNode', () => {
+describe('Children', () => {
   describe('Additional deposit', () => {
     it('should update manager balance on additional deposit', async function () {
       const amount = ethers.toBigInt(1000)
@@ -46,7 +46,7 @@ describe('SubPoolNode', () => {
       const newAmount = ethers.toBigInt(1000)
       await node1RouterInstance.additionalDeposit(node1SubPoolNodeAddress, newAmount)
 
-      const subPoolNode1 = await ethers.getContractAt('SubPoolNode', node1SubPoolNodeAddress)
+      const subPoolNode1 = await ethers.getContractAt('Children', node1SubPoolNodeAddress)
       const [, , balance] = await subPoolNode1.manager()
       expect(balance).to.be.deep.equal(newAmount)
     })
@@ -86,8 +86,8 @@ describe('SubPoolNode', () => {
       const newAmount = ethers.toBigInt(1000)
       await node1RouterInstance.additionalDeposit(node1SubPoolNodeAddress, newAmount)
 
-      const subPoolInvited = await ethers.getContractAt('SubPoolNode', invitedSubPoolNodeAddress)
-      const [, , , balance] = await subPoolInvited.subPools(node1SubPoolNodeAddress)
+      const subPoolInvited = await ethers.getContractAt('Children', invitedSubPoolNodeAddress)
+      const [, , , balance] = await subPoolInvited.children(node1SubPoolNodeAddress)
       expect(balance).to.be.deep.equal(newAmount)
     })
   })

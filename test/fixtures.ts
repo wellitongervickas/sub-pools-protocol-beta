@@ -3,8 +3,9 @@ import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-help
 
 export { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 
-export type { SubPoolRouter } from '../typechain-types/contracts/SubPoolRouter'
-export type { SubPoolNode } from '../typechain-types/contracts/SubPoolNode'
+export type { Router } from '../typechain-types/contracts/Router'
+export type { Node } from '../typechain-types/contracts/Node'
+export type { Children } from '../typechain-types/contracts/Children'
 
 export { loadFixture, ethers, time }
 
@@ -22,7 +23,7 @@ export const NODE_ROLE = ethers.keccak256(ethers.toUtf8Bytes('NODE_ROLE'))
 
 export async function deployRouterFixture() {
   const accounts = await ethers.getSigners()
-  const SubPoolRouter = await ethers.getContractFactory('SubPoolRouter')
+  const SubPoolRouter = await ethers.getContractFactory('Router')
   const subPoolRouter = await SubPoolRouter.deploy()
 
   return { accounts, subPoolRouter }
@@ -38,7 +39,7 @@ export async function deployNodeFixture(
   maxAdditionalAmount = DEFAULT_MAX_ADDITIONAL_AMOUNT
 ) {
   const [_manager] = await ethers.getSigners()
-  const SubPoolNode = await ethers.getContractFactory('SubPoolNode')
+  const SubPoolNode = await ethers.getContractFactory('Children')
   const subPoolNode = await SubPoolNode.deploy(
     manager || _manager,
     amount,
@@ -76,7 +77,7 @@ export async function deployRoutedNodeFixture(
 
   let receipt = await tx.wait()
   const [subPoolAddress] = receipt.logs[3].args
-  const subPoolNode = await ethers.getContractAt('SubPoolNode', subPoolAddress)
+  const subPoolNode = await ethers.getContractAt('Children', subPoolAddress)
 
   return { subPoolRouter, subPoolNode, accounts }
 }

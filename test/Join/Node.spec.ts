@@ -3,7 +3,7 @@ import {
   loadFixture,
   DEFAULT_FEES_FRACTION,
   ethers,
-  SubPoolRouter,
+  Router,
   deployRoutedNodeFixture,
   NODE_ROLE,
   DEFAULT_PERIOD_LOCK,
@@ -11,14 +11,14 @@ import {
   DEFAULT_MAX_ADDITIONAL_AMOUNT,
 } from '../fixtures'
 
-describe('SubPoolNode', () => {
+describe('Children', () => {
   describe('Join', () => {
     it('should update the ID', async function () {
       const [, invited] = await ethers.getSigners()
       const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
 
       const subNodeAddress = await subPoolNode.getAddress()
-      const subPoolRouterInstance = subPoolRouter.connect(invited) as SubPoolRouter
+      const subPoolRouterInstance = subPoolRouter.connect(invited) as Router
       await subPoolRouterInstance.join(
         subNodeAddress,
         0,
@@ -65,8 +65,8 @@ describe('SubPoolNode', () => {
       const rcpt1 = await tx1.wait()
       const nodeAddress = rcpt1.logs[5].args[0]
 
-      const invitedSubPoolNode = await ethers.getContractAt('SubPoolNode', invitedSubNodeAddress)
-      const [, , initialBalance] = await invitedSubPoolNode.subPools(nodeAddress)
+      const invitedSubPoolNode = await ethers.getContractAt('Children', invitedSubNodeAddress)
+      const [, , initialBalance] = await invitedSubPoolNode.children(nodeAddress)
       expect(initialBalance).to.be.equal(ethers.toBigInt(amount))
     })
 
@@ -102,8 +102,8 @@ describe('SubPoolNode', () => {
       const rcpt1 = await tx1.wait()
       const nodeAddress = rcpt1.logs[5].args[0]
 
-      const invitedSubPoolNode = await ethers.getContractAt('SubPoolNode', invitedSubNodeAddress)
-      const [, , , balance] = await invitedSubPoolNode.subPools(nodeAddress)
+      const invitedSubPoolNode = await ethers.getContractAt('Children', invitedSubNodeAddress)
+      const [, , , balance] = await invitedSubPoolNode.children(nodeAddress)
       expect(balance).to.be.equal(ethers.toBigInt(0))
     })
 
@@ -112,7 +112,7 @@ describe('SubPoolNode', () => {
       const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
 
       const subNodeAddress = await subPoolNode.getAddress()
-      const subPoolRouterInstance = subPoolRouter.connect(other) as SubPoolRouter
+      const subPoolRouterInstance = subPoolRouter.connect(other) as Router
       await subPoolRouterInstance.join(
         subNodeAddress,
         0,
@@ -143,7 +143,7 @@ describe('SubPoolNode', () => {
         DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
 
-      const [, , , balance] = await subPoolRouter.subPools(subNodeAddress)
+      const [, , , balance] = await subPoolRouter.children(subNodeAddress)
       expect(balance).to.be.equal(ethers.toBigInt(amount))
     })
 
@@ -182,7 +182,7 @@ describe('SubPoolNode', () => {
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
         DEFAULT_MAX_ADDITIONAL_AMOUNT
       )
-      const invitedSubPoolNode = await ethers.getContractAt('SubPoolNode', invitedSubNodeAddress)
+      const invitedSubPoolNode = await ethers.getContractAt('Children', invitedSubNodeAddress)
 
       const [, , balance] = await invitedSubPoolNode.manager()
       expect(balance).to.be.equal('500000000000000000')
@@ -226,9 +226,9 @@ describe('SubPoolNode', () => {
       const rcpt1 = await tx1.wait()
       const nodeAddress = rcpt1.logs[5].args[0]
 
-      const invitedSubPoolNode = await ethers.getContractAt('SubPoolNode', invitedSubNodeAddress)
+      const invitedSubPoolNode = await ethers.getContractAt('Children', invitedSubNodeAddress)
 
-      const [, , initialBalance] = await invitedSubPoolNode.subPools(nodeAddress)
+      const [, , initialBalance] = await invitedSubPoolNode.children(nodeAddress)
       expect(initialBalance).to.be.equal('99000000000000000000')
     })
   })

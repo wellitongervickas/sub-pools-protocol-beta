@@ -9,7 +9,7 @@ import {
   DEFAULT_MAX_ADDITIONAL_AMOUNT,
 } from '../fixtures'
 
-describe('SubPoolRouter', () => {
+describe('Router', () => {
   describe('Additional deposit', () => {
     it('should update main subpool balance on additional deposit', async function () {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
@@ -28,7 +28,7 @@ describe('SubPoolRouter', () => {
 
       await subPoolRouter.additionalDeposit(subPoolAddress, amount)
 
-      const [, , , balance] = await subPoolRouter.subPools(subPoolAddress)
+      const [, , , balance] = await subPoolRouter.children(subPoolAddress)
       expect(balance).to.deep.equal(amount)
     })
   })

@@ -9,7 +9,7 @@ import {
   time,
 } from '../fixtures'
 
-describe('SubPoolNode', () => {
+describe('Children', () => {
   describe('Deploy', () => {
     it('should set initial ID', async function () {
       const { subPoolNode } = await loadFixture(deployNodeFixture)
@@ -57,7 +57,7 @@ describe('SubPoolNode', () => {
     it('should set role to invited addresses', async function () {
       const [manager, invited] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(
-        deployNodeFixture.bind(this, manager.address, '0', DEFAULT_FEES_FRACTION, [invited.address])
+        deployNodeFixture.bind(this, manager.address, ethers.toBigInt(0), DEFAULT_FEES_FRACTION, [invited.address])
       )
 
       expect(await subPoolNode.hasRole(INVITED_ROLE, invited.address)).to.be.true

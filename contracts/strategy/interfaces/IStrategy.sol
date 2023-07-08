@@ -7,4 +7,6 @@ interface IStrategy {
     function deposit(uint256 _amount) external;
 
     function harvest() external;
+
+    function withdraw(uint256 _amount) external;
 }

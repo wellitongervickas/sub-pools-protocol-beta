@@ -9,7 +9,7 @@ import {
   DEFAULT_MAX_ADDITIONAL_AMOUNT,
 } from '../fixtures'
 
-describe('SubPoolRouter', () => {
+describe('Router', () => {
   describe('Withdraw', () => {
     it('should update manager balance on withdraw', async function () {
       const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
@@ -44,7 +44,7 @@ describe('SubPoolRouter', () => {
       await invitedRouterInstance.additionalDeposit(invitedSubPoolAddress, additionalAmount)
       await invitedRouterInstance.withdrawBalance(invitedSubPoolAddress, additionalAmount)
 
-      const invitedSubPoolNodeContract = await ethers.getContractAt('SubPoolNode', invitedSubPoolAddress)
+      const invitedSubPoolNodeContract = await ethers.getContractAt('Children', invitedSubPoolAddress)
       const [, , balance] = await invitedSubPoolNodeContract.manager()
       expect(balance).to.deep.equal(0)
     })
@@ -82,8 +82,8 @@ describe('SubPoolRouter', () => {
       await invitedRouterInstance.additionalDeposit(invitedSubPoolAddress, additionalAmount)
       await invitedRouterInstance.withdrawBalance(invitedSubPoolAddress, additionalAmount)
 
-      const subPoolNodeContract = await ethers.getContractAt('SubPoolNode', subPoolAddress)
-      const [, , , balance] = await subPoolNodeContract.subPools(invitedSubPoolAddress)
+      const subPoolNodeContract = await ethers.getContractAt('Children', subPoolAddress)
+      const [, , , balance] = await subPoolNodeContract.children(invitedSubPoolAddress)
       expect(balance).to.deep.equal(0)
     })
 
@@ -117,7 +117,7 @@ describe('SubPoolRouter', () => {
       const [invitedSubPoolAddress] = receipt2.logs[5].args
 
       await invitedRouterInstance.withdrawInitialBalance(invitedSubPoolAddress, amount)
-      const invitedSubPoolNodeContract = await ethers.getContractAt('SubPoolNode', invitedSubPoolAddress)
+      const invitedSubPoolNodeContract = await ethers.getContractAt('Children', invitedSubPoolAddress)
 
       const [, initialBalance] = await invitedSubPoolNodeContract.manager()
       expect(initialBalance).to.deep.equal(0)
@@ -155,8 +155,8 @@ describe('SubPoolRouter', () => {
 
       await invitedRouterInstance.withdrawInitialBalance(invitedSubPoolAddress, amount)
 
-      const subPoolNodeContract = await ethers.getContractAt('SubPoolNode', subPoolAddress)
-      const [, , balance] = await subPoolNodeContract.subPools(invitedSubPoolAddress)
+      const subPoolNodeContract = await ethers.getContractAt('Children', subPoolAddress)
+      const [, , balance] = await subPoolNodeContract.children(invitedSubPoolAddress)
       expect(balance).to.deep.equal(0)
     })
   })

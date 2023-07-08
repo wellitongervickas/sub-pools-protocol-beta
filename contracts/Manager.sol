@@ -3,11 +3,11 @@ pragma solidity =0.8.19;
 
 import '@openzeppelin/contracts/access/AccessControlEnumerable.sol';
 
-import {ISubPoolManager} from './interfaces/ISubPoolManager.sol';
+import {IManager} from './interfaces/IManager.sol';
 import {ManagerLib} from './lib/Manager.sol';
 import {FractionLib} from './lib/Fraction.sol';
 
-contract SubPoolManager is ISubPoolManager, AccessControl {
+contract Manager is IManager, AccessControl {
     using ManagerLib for ManagerLib.Manager;
 
     bytes32 private constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
@@ -65,11 +65,11 @@ contract SubPoolManager is ISubPoolManager, AccessControl {
         manager._decreaseInitialBalance(_amount);
     }
 
-    /// @inheritdoc ISubPoolManager
+    /// @inheritdoc IManager
     function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
-        if (_checkIsManagerRole(_invitedAddress)) revert ISubPoolManager.ManagerNotAllowed();
-        if (_checkIsInvitedRole(_invitedAddress)) revert ISubPoolManager.AlreadyInvited();
-        if (_checkIsNodeRole(_invitedAddress)) revert ISubPoolManager.AlreadyNodeManager();
+        if (_checkIsManagerRole(_invitedAddress)) revert IManager.ManagerNotAllowed();
+        if (_checkIsInvitedRole(_invitedAddress)) revert IManager.AlreadyInvited();
+        if (_checkIsNodeRole(_invitedAddress)) revert IManager.AlreadyNodeManager();
 
         /// @dev Grant the invited role to the invited address
         _grantRole(INVITED_ROLE, _invitedAddress);

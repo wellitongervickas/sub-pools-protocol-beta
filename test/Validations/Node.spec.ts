@@ -8,13 +8,13 @@ import {
   DEFAULT_FEES_FRACTION,
   MANAGER_ROLE,
   ethers,
-  SubPoolRouter,
-  SubPoolNode,
+  Router,
+  Children,
   time,
   DEFAULT_PERIOD_LOCK,
 } from '../fixtures'
 
-describe('SubPoolNode', () => {
+describe('Children', () => {
   describe('Parent', () => {
     it('should revert if try to update parent twice', async function () {
       const [, anyEntity] = await ethers.getSigners()
@@ -31,7 +31,7 @@ describe('SubPoolNode', () => {
       const [, anyEntity] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(deployNodeFixture)
 
-      const subPoolInstance = subPoolNode.connect(anyEntity) as SubPoolNode
+      const subPoolInstance = subPoolNode.connect(anyEntity) as Children
 
       await expect(subPoolInstance.setParent(anyEntity.address)).to.be.rejectedWith('Ownable: caller is not the owner')
     })
@@ -84,7 +84,7 @@ describe('SubPoolNode', () => {
       const [, invited] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(deployNodeFixture)
 
-      const subPoolInstance = subPoolNode.connect(invited) as SubPoolNode
+      const subPoolInstance = subPoolNode.connect(invited) as Children
 
       await expect(subPoolInstance.invite(invited.address)).to.be.rejectedWith(
         `AccessControl: account ${invited.address.toLowerCase()} is missing role ${MANAGER_ROLE}`
@@ -111,7 +111,7 @@ describe('SubPoolNode', () => {
       const { subPoolNode: subPoolNodeDefault } = await loadFixture(deployRoutedNodeFixture)
 
       const defaultSubPoolNodeAddress = await subPoolNodeDefault.getAddress()
-      const SubPoolNode = await ethers.getContractFactory('SubPoolNode', hacker)
+      const SubPoolNode = await ethers.getContractFactory('Children', hacker)
 
       const subPoolNode = await SubPoolNode.deploy(
         hacker.address,
@@ -146,7 +146,7 @@ describe('SubPoolNode', () => {
       const { subPoolNode, subPoolRouter } = await loadFixture(deployRoutedNodeFixture)
 
       const subNodeAddress = await subPoolNode.getAddress()
-      const subPoolRouterInstance = subPoolRouter.connect(hacker) as SubPoolRouter
+      const subPoolRouterInstance = subPoolRouter.connect(hacker) as Router
 
       await expect(
         subPoolRouterInstance.join(
@@ -167,7 +167,7 @@ describe('SubPoolNode', () => {
       const { subPoolNode: subPoolNode2 } = await loadFixture(deployNodeFixture.bind(this, invited.address))
 
       const subNodeAddress2 = await subPoolNode2.getAddress()
-      const newSubPoolInstance = subPoolNode.connect(invited) as SubPoolNode
+      const newSubPoolInstance = subPoolNode.connect(invited) as Children
 
       await expect(newSubPoolInstance.join(subNodeAddress2, invited.address, 0)).to.be.rejectedWith(
         'Ownable: caller is not the owner'
@@ -191,7 +191,7 @@ describe('SubPoolNode', () => {
 
       await subPoolNode.invite(otherInvited.address)
 
-      const invitedRouterInstance = subPoolRouter.connect(otherInvited) as SubPoolRouter
+      const invitedRouterInstance = subPoolRouter.connect(otherInvited) as Router
 
       await expect(
         invitedRouterInstance.join(

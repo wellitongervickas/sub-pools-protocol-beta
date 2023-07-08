@@ -9,7 +9,7 @@ import {
   DEFAULT_MAX_ADDITIONAL_AMOUNT,
 } from '../fixtures'
 
-describe('SubPoolRouter', () => {
+describe('Router', () => {
   describe('Create', () => {
     it('should update next ID', async function () {
       const { subPoolRouter } = await loadFixture(deployRouterFixture)
@@ -40,7 +40,7 @@ describe('SubPoolRouter', () => {
       let receipt = await tx.wait()
 
       const [subPoolAddress] = receipt.logs[2].args
-      const [, , initialBalance] = await subPoolRouter.subPools(subPoolAddress)
+      const [, , initialBalance] = await subPoolRouter.children(subPoolAddress)
 
       expect(initialBalance).to.deep.equal(ethers.toBigInt(amount))
     })
@@ -60,7 +60,7 @@ describe('SubPoolRouter', () => {
       const receipt = await tx.wait()
       const [subPoolAddress] = receipt.logs[2].args
 
-      const subPoolNode = await ethers.getContractAt('SubPoolNode', subPoolAddress)
+      const subPoolNode = await ethers.getContractAt('Children', subPoolAddress)
       const parent = await subPoolNode.parent()
 
       expect(await subPoolRouter.getAddress()).to.equal(parent)

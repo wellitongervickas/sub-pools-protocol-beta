@@ -4,13 +4,13 @@ import {
   loadFixture,
   DEFAULT_FEES_FRACTION,
   ethers,
-  SubPoolRouter,
+  Router,
   DEFAULT_PERIOD_LOCK,
   DEFAULT_REQUIRED_INITIAL_AMOUNT,
   DEFAULT_MAX_ADDITIONAL_AMOUNT,
 } from '../fixtures'
 
-describe('SubPoolRouter', () => {
+describe('Router', () => {
   describe('Join', () => {
     it('should join a parent subpool as node', async function () {
       const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
@@ -29,7 +29,7 @@ describe('SubPoolRouter', () => {
 
       const [subPoolAddress] = receipt.logs[3].args
 
-      const invitedRouterInstance = subPoolRouter.connect(invited) as SubPoolRouter
+      const invitedRouterInstance = subPoolRouter.connect(invited) as Router
 
       await expect(
         invitedRouterInstance.join(
@@ -72,7 +72,7 @@ describe('SubPoolRouter', () => {
       )
       let receipt2 = await tx2.wait()
       const [subPoolAddress2] = receipt2.logs[5].args
-      const subPoolNode = await ethers.getContractAt('SubPoolNode', subPoolAddress2)
+      const subPoolNode = await ethers.getContractAt('Children', subPoolAddress2)
       const parentAddress = await subPoolNode.parent()
 
       expect(parentAddress).to.equal(subPoolAddress)
