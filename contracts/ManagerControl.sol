@@ -72,7 +72,7 @@ contract ManagerControl is IManagerControl, AccessControl {
     }
 
     function _grantInvites(address[] memory _invitedAddresses) internal {
-        if (!invitedOnly && _invitedAddresses.length > 0) {
+        if (_invitedAddresses.length > 0) {
             _setIsInvitedOnly(true);
         }
 

@@ -56,7 +56,7 @@ export async function deployNodeFixture(
 export async function deployRoutedNodeFixture(
   amount: string | BigInt = ethers.toBigInt(100),
   fees: typeof DEFAULT_FEES_FRACTION = DEFAULT_FEES_FRACTION,
-  invites: string[] = [],
+  invites: null | string[] = [],
   lockperiod = DEFAULT_PERIOD_LOCK,
   requiredInitialBalance = DEFAULT_REQUIRED_INITIAL_AMOUNT,
   maxAdditionalAmount = DEFAULT_MAX_ADDITIONAL_AMOUNT
@@ -69,14 +69,14 @@ export async function deployRoutedNodeFixture(
   const tx = await subPoolRouter.create(
     amount,
     fees,
-    invites.length ? invites : [invited.address],
+    invites === null ? [] : invites.length ? invites : [invited.address],
     lockperiod,
     requiredInitialBalance,
     maxAdditionalAmount
   )
 
   let receipt = await tx.wait()
-  const [subPoolAddress] = receipt.logs[3].args
+  const [subPoolAddress] = receipt.logs[2]?.args || receipt.logs[3]?.args
   const subPoolNode = await ethers.getContractAt('Children', subPoolAddress)
 
   return { subPoolRouter, subPoolNode, accounts }
