@@ -9,6 +9,7 @@ interface IManagerControl {
     error ManagerNotAllowed();
     error AlreadyNodeManager();
     error NotInvited();
+    error NotInvitedOnly();
     error AlreadyInvited();
     error NotEnoughBalance();
 

@@ -90,6 +90,25 @@ describe('Children', () => {
         `AccessControl: account ${invited.address.toLowerCase()} is missing role ${MANAGER_ROLE}`
       )
     })
+
+    it('should revert on invite when not invited only', async function () {
+      const [, , invited] = await ethers.getSigners()
+      const { subPoolNode } = await loadFixture(deployNodeFixture)
+
+      await subPoolNode.setIsInvitedOnly(false)
+      await expect(subPoolNode.invite(invited.address)).to.be.revertedWithCustomError(subPoolNode, 'NotInvitedOnly()')
+    })
+
+    it('should revert if try to setup invited only without being the manager', async function () {
+      const [, , invited] = await ethers.getSigners()
+      const { subPoolNode } = await loadFixture(deployNodeFixture)
+
+      const subPoolInstance = subPoolNode.connect(invited) as Children
+
+      await expect(subPoolInstance.setIsInvitedOnly(true)).to.be.rejectedWith(
+        `AccessControl: account ${invited.address.toLowerCase()} is missing role ${MANAGER_ROLE}`
+      )
+    })
   })
 
   describe('Join', () => {

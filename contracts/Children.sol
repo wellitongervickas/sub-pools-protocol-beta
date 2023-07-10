@@ -41,7 +41,11 @@ contract Children is IChildren, ChildrenControl, ManagerControl, Ownable {
         lockPeriod = _lockPeriod;
         maxAdditionalAmount = _maxAdditionalDeposit;
 
-        _grantInitialInvites(_invitedAddresses);
+        _setupManagerInitialInvites(_invitedAddresses);
+    }
+
+    function _setupManagerInitialInvites(address[] memory _invitedAddresses) private {
+        _grantInvites(_invitedAddresses);
     }
 
     function setParent(address _parent) external onlyRouter {

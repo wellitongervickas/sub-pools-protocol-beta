@@ -13,8 +13,14 @@ contract ManagerControl is IManagerControl, AccessControl {
     bytes32 private constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
     bytes32 private constant INVITED_ROLE = keccak256('INVITED_ROLE');
     bytes32 private constant NODE_ROLE = keccak256('NODE_ROLE');
+    bool public invitedOnly = true;
 
     ManagerLib.Manager public manager;
+
+    modifier whenNotInvitedOnly() {
+        if (!invitedOnly) revert IManagerControl.NotInvitedOnly();
+        _;
+    }
 
     constructor(address _managerAddress, uint256 _amount, FractionLib.Fraction memory _fees) {
         manager = ManagerLib.Manager({
@@ -50,7 +56,15 @@ contract ManagerControl is IManagerControl, AccessControl {
         manager._decreaseInitialBalance(_amount);
     }
 
-    function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
+    function _setIsInvitedOnly(bool _invitedOnly) private {
+        invitedOnly = _invitedOnly;
+    }
+
+    function setIsInvitedOnly(bool _invitedOnly) public onlyRole(MANAGER_ROLE) {
+        _setIsInvitedOnly(_invitedOnly);
+    }
+
+    function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) whenNotInvitedOnly {
         if (_checkIsManagerRole(_invitedAddress)) revert IManagerControl.ManagerNotAllowed();
         if (_checkIsInvitedRole(_invitedAddress)) revert IManagerControl.AlreadyInvited();
         if (_checkIsNodeRole(_invitedAddress)) revert IManagerControl.AlreadyNodeManager();
@@ -60,7 +74,7 @@ contract ManagerControl is IManagerControl, AccessControl {
         emit NodeManagerInvited(_invitedAddress);
     }
 
-    function _grantInitialInvites(address[] memory _invitedAddresses) internal {
+    function _grantInvites(address[] memory _invitedAddresses) internal {
         for (uint256 i = 0; i < _invitedAddresses.length; i++) {
             _grantRole(INVITED_ROLE, _invitedAddresses[i]);
         }
