@@ -3,11 +3,11 @@ pragma solidity =0.8.19;
 
 import '@openzeppelin/contracts/access/AccessControlEnumerable.sol';
 
-import {IManager} from './interfaces/IManager.sol';
+import {IManagerControl} from './interfaces/IManagerControl.sol';
 import {ManagerLib} from './lib/Manager.sol';
 import {FractionLib} from './lib/Fraction.sol';
 
-contract Manager is IManager, AccessControl {
+contract ManagerControl is IManagerControl, AccessControl {
     using ManagerLib for ManagerLib.Manager;
 
     bytes32 private constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
@@ -42,18 +42,18 @@ contract Manager is IManager, AccessControl {
         manager._increaseBalance(_amount);
     }
 
-    function _decreaseManagerBalance(uint256 _amount) internal {
+    function _decreaseManagerBalance(uint256 _amount) internal virtual {
         manager._decreaseBalance(_amount);
     }
 
-    function _decreaseManagerInitialBalance(uint256 _amount) internal {
+    function _decreaseManagerInitialBalance(uint256 _amount) internal virtual {
         manager._decreaseInitialBalance(_amount);
     }
 
     function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
-        if (_checkIsManagerRole(_invitedAddress)) revert IManager.ManagerNotAllowed();
-        if (_checkIsInvitedRole(_invitedAddress)) revert IManager.AlreadyInvited();
-        if (_checkIsNodeRole(_invitedAddress)) revert IManager.AlreadyNodeManager();
+        if (_checkIsManagerRole(_invitedAddress)) revert IManagerControl.ManagerNotAllowed();
+        if (_checkIsInvitedRole(_invitedAddress)) revert IManagerControl.AlreadyInvited();
+        if (_checkIsNodeRole(_invitedAddress)) revert IManagerControl.AlreadyNodeManager();
 
         _grantRole(INVITED_ROLE, _invitedAddress);
 

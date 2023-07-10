@@ -1,4 +1,4 @@
-import { DEFAULT_REQUIRED_INITIAL_AMOUNT, DEFAULT_MAX_ADDITIONAL_AMOUNT } from './../fixtures'
+import { DEFAULT_REQUIRED_INITIAL_AMOUNT, DEFAULT_MAX_ADDITIONAL_AMOUNT, deployRouterFixture } from './../fixtures'
 import { expect } from 'chai'
 
 import {
@@ -269,6 +269,86 @@ describe('Children', () => {
   })
 
   describe('Withdraw ', () => {
+    it('should revert if try to withdraw greater than balance', async function () {
+      const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
+      const [, invited] = accounts
+      const amount = ethers.toBigInt(1000)
+      const additionalAmount = ethers.toBigInt(100)
+
+      const tx = await subPoolRouter.create(
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [invited.address],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
+      )
+
+      let receipt = await tx.wait()
+      const [subPoolAddress] = receipt.logs[3].args
+
+      const invitedRouterInstance = subPoolRouter.connect(invited) as any
+      const tx1 = await invitedRouterInstance.join(
+        subPoolAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
+      )
+      let receipt2 = await tx1.wait()
+
+      const [invitedSubPoolAddress] = receipt2.logs[5].args
+
+      await invitedRouterInstance.additionalDeposit(invitedSubPoolAddress, additionalAmount)
+
+      const subPoolNodeContract = await ethers.getContractAt('Children', subPoolAddress)
+      const extraValue = ethers.toBigInt(100)
+
+      await expect(
+        invitedRouterInstance.withdrawBalance(invitedSubPoolAddress, additionalAmount + extraValue)
+      ).to.be.revertedWithCustomError(subPoolNodeContract, 'NotAllowed()')
+    })
+
+    it('should revert if try to withdraw greater than initial balance', async function () {
+      const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
+      const [, invited] = accounts
+      const amount = ethers.toBigInt(1000)
+
+      const tx = await subPoolRouter.create(
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [invited.address],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
+      )
+      let receipt = await tx.wait()
+      const [subPoolAddress] = receipt.logs[3].args
+
+      const invitedRouterInstance = subPoolRouter.connect(invited) as any
+      const tx1 = await invitedRouterInstance.join(
+        subPoolAddress,
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
+      )
+      let receipt2 = await tx1.wait()
+      const [invitedSubPoolAddress] = receipt2.logs[5].args
+
+      const invitedSubPoolNodeContract = await ethers.getContractAt('Children', invitedSubPoolAddress)
+
+      const extraValue = ethers.toBigInt(100)
+
+      await expect(
+        invitedRouterInstance.withdrawInitialBalance(invitedSubPoolAddress, amount + extraValue)
+      ).to.be.revertedWithCustomError(invitedSubPoolNodeContract, 'NotAllowed()')
+    })
+
     it('should revert if try to withdraw balance without being the owner', async function () {
       const { subPoolNode } = await loadFixture(deployRoutedNodeFixture)
 

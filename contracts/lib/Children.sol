@@ -25,12 +25,4 @@ library ChildrenLib {
     function _validateIsChildren(Children storage _self) internal view returns (bool) {
         return _self.id > 0;
     }
-
-    function _isBalanceEnought(Children storage _self, uint256 _amount) internal view returns (bool) {
-        return _self.balance >= _amount;
-    }
-
-    function _isInitialBalanceEnought(Children storage _self, uint256 _amount) internal view returns (bool) {
-        return _self.initialBalance >= _amount;
-    }
 }

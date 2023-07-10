@@ -39,6 +39,54 @@ describe('Router', () => {
   })
 
   describe('Withdraw Balance', () => {
+    it('should revert if try to call withdraw greater than balance', async function () {
+      const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
+      const [, invited] = accounts
+      const amount = ethers.toBigInt(1000)
+      const additionalAmount = ethers.toBigInt(100)
+
+      const tx = await subPoolRouter.create(
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [invited.address],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
+      )
+      let receipt = await tx.wait()
+      const [subPoolAddress] = receipt.logs[3].args
+
+      await subPoolRouter.additionalDeposit(subPoolAddress, additionalAmount)
+
+      const extraValue = ethers.toBigInt(100)
+
+      await expect(
+        subPoolRouter.withdrawBalance(subPoolAddress, additionalAmount + extraValue)
+      ).to.be.revertedWithCustomError(subPoolRouter, 'NotAllowed()')
+    })
+
+    it('should revert if try to call withdraw greater than initial balance', async function () {
+      const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
+      const [, invited] = accounts
+      const amount = ethers.toBigInt(1000)
+
+      const tx = await subPoolRouter.create(
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [invited.address],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
+      )
+      let receipt = await tx.wait()
+      const [subPoolAddress] = receipt.logs[3].args
+      const extraValue = ethers.toBigInt(100)
+
+      await expect(
+        subPoolRouter.withdrawInitialBalance(subPoolAddress, amount + extraValue)
+      ).to.be.revertedWithCustomError(subPoolRouter, 'NotAllowed()')
+    })
+
     it('should revert if try to call withdraw balance without being the manager', async function () {
       const { subPoolRouter, subPoolNode, accounts } = await loadFixture(deployRoutedNodeFixture)
       const [, anyEntity] = accounts

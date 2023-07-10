@@ -4,11 +4,11 @@ pragma solidity =0.8.19;
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {ChildrenControl, IChildrenControl} from './ChildrenControl.sol';
 import {IChildren} from './interfaces/IChildren.sol';
-import {Manager, IManager} from './Manager.sol';
+import {ManagerControl, IManagerControl} from './ManagerControl.sol';
 import {FractionLib} from './lib/Fraction.sol';
 import {ChildrenLib} from './lib/Children.sol';
 
-contract Children is IChildren, ChildrenControl, Manager, Ownable {
+contract Children is IChildren, ChildrenControl, ManagerControl, Ownable {
     address public parent; // only set once
     uint256 public immutable lockPeriod;
     uint256 public immutable requiredInitialAmount;
@@ -36,7 +36,7 @@ contract Children is IChildren, ChildrenControl, Manager, Ownable {
         uint256 _lockPeriod,
         uint256 _requiredInitialAmount,
         uint256 _maxAdditionalDeposit
-    ) Manager(_managerAddress, _amount, _fees) {
+    ) ManagerControl(_managerAddress, _amount, _fees) {
         requiredInitialAmount = _requiredInitialAmount;
         lockPeriod = _lockPeriod;
         maxAdditionalAmount = _maxAdditionalDeposit;
@@ -56,7 +56,7 @@ contract Children is IChildren, ChildrenControl, Manager, Ownable {
     ) external onlyRouter returns (uint256) {
         if (!_checkAmountInitialBalance(_amount)) revert IChildrenControl.InvalidInitialAmount();
         if (!_checkHasParent()) revert IChildrenControl.ParentNotFound();
-        if (!_checkIsInvitedRole(_invitedAddress)) revert IManager.NotInvited();
+        if (!_checkIsInvitedRole(_invitedAddress)) revert IManagerControl.NotInvited();
 
         uint256 _remainingAmount = _computeManagerFees(_amount);
         uint256 _id = _setupChildren(_nodeAddress, _invitedAddress, _remainingAmount);
@@ -104,6 +104,16 @@ contract Children is IChildren, ChildrenControl, Manager, Ownable {
     function withdrawInitialBalance(uint256 _amount) external onlyRouter {
         _decreaseManagerInitialBalance(_amount);
         _decreaseParentInitialBalance(_amount);
+    }
+
+    function _decreaseManagerBalance(uint256 _amount) internal override checkOverflow(manager.balance, _amount) {
+        super._decreaseManagerBalance(_amount);
+    }
+
+    function _decreaseManagerInitialBalance(
+        uint256 _amount
+    ) internal override checkOverflow(manager.initialBalance, _amount) {
+        super._decreaseManagerInitialBalance(_amount);
     }
 
     function _increaseParentBalance(uint256 _amount) private {

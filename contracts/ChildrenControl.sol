@@ -23,15 +23,9 @@ contract ChildrenControl is IChildrenControl {
         _;
     }
 
-    modifier whenEnoughBalance(address _childrenAddress, uint256 _amount) {
-        bool isEnoughBalance = _children[_childrenAddress]._isBalanceEnought(_amount);
-        if (!isEnoughBalance) revert IChildrenControl.NotEnoughBalance();
-        _;
-    }
-
-    modifier whenEnoughInitialBalance(address _childrenAddress, uint256 _amount) {
-        bool isEnoughBalance = _children[_childrenAddress]._isInitialBalanceEnought(_amount);
-        if (!isEnoughBalance) revert IChildrenControl.NotEnoughBalance();
+    modifier checkOverflow(uint256 _value, uint256 _amount) {
+        bool _isGreaterThanOrEqualToAmount = _value >= _amount;
+        if (!_isGreaterThanOrEqualToAmount) revert IChildrenControl.NotAllowed();
         _;
     }
 
@@ -80,14 +74,14 @@ contract ChildrenControl is IChildrenControl {
     function _decreaseChildrenBalance(
         address _childrenAddress,
         uint256 _amount
-    ) internal whenEnoughBalance(_childrenAddress, _amount) {
+    ) internal checkOverflow(_children[_childrenAddress].balance, _amount) {
         _children[_childrenAddress]._decreaseBalance(_amount);
     }
 
     function _decreaseChildrenInitialBalance(
         address _childrenAddress,
         uint256 _amount
-    ) internal virtual whenEnoughInitialBalance(_childrenAddress, _amount) {
+    ) internal virtual checkOverflow(_children[_childrenAddress].initialBalance, _amount) {
         _children[_childrenAddress]._decreaseInitialBalance(_amount);
     }
 }
