@@ -16,10 +16,6 @@ contract Manager is IManager, AccessControl {
 
     ManagerLib.Manager public manager;
 
-    /// @notice create a new manager
-    /// @param _managerAddress the address of the manager
-    /// @param _amount the amount of the manager as initial deposit
-    /// @param _fees the fees of the manager to use as split ratio
     constructor(address _managerAddress, uint256 _amount, FractionLib.Fraction memory _fees) {
         manager = ManagerLib.Manager({
             managerAddress: _managerAddress,
@@ -66,7 +62,6 @@ contract Manager is IManager, AccessControl {
 
     function _grantInitialInvites(address[] memory _invitedAddresses) internal {
         for (uint256 i = 0; i < _invitedAddresses.length; i++) {
-            /// @dev Grant the invited role to the invited address
             _grantRole(INVITED_ROLE, _invitedAddresses[i]);
         }
     }

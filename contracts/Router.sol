@@ -74,17 +74,17 @@ contract Router is IRouter, ChildrenControl {
         _children.setParent(_parentAddress);
     }
 
-    function withdraw(uint256 _amount) public override OnlyChildren(msg.sender) {
+    function withdraw(uint256 _amount) public override onlyChildren(msg.sender) {
         super.withdraw(_amount);
         emit ManagerWithdrew(msg.sender, _amount);
     }
 
-    function cashback(uint256 _amount) public override OnlyChildren(msg.sender) {
+    function cashback(uint256 _amount) public override onlyChildren(msg.sender) {
         super.cashback(_amount);
         emit ManagerWithdrew(msg.sender, _amount);
     }
 
-    function deposit(uint256 _amount) public override OnlyChildren(msg.sender) {
+    function deposit(uint256 _amount) public override onlyChildren(msg.sender) {
         super.deposit(_amount);
         emit ManagerDeposited(msg.sender, _amount);
     }

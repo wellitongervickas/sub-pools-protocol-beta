@@ -8,6 +8,7 @@ interface IChildrenControl {
     error LockPeriod();
     error ParentNotFound();
     error ParentAlreadySet();
+    error NotEnoughBalance();
     error InvalidInitialAmount();
     error InvalidAdditionalAmount();
 

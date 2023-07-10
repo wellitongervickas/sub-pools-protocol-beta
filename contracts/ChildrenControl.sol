@@ -17,9 +17,21 @@ contract ChildrenControl is IChildrenControl {
         _;
     }
 
-    modifier OnlyChildren(address _childrenAddress) {
+    modifier onlyChildren(address _childrenAddress) {
         bool isChildren = _children[_childrenAddress]._validateIsChildren();
         if (!isChildren) revert IChildrenControl.NotAllowed();
+        _;
+    }
+
+    modifier whenEnoughBalance(address _childrenAddress, uint256 _amount) {
+        bool isEnoughBalance = _children[_childrenAddress]._isBalanceEnought(_amount);
+        if (!isEnoughBalance) revert IChildrenControl.NotEnoughBalance();
+        _;
+    }
+
+    modifier whenEnoughInitialBalance(address _childrenAddress, uint256 _amount) {
+        bool isEnoughBalance = _children[_childrenAddress]._isInitialBalanceEnought(_amount);
+        if (!isEnoughBalance) revert IChildrenControl.NotEnoughBalance();
         _;
     }
 
@@ -65,11 +77,17 @@ contract ChildrenControl is IChildrenControl {
         _children[_childrenAddress]._increaseBalance(_amount);
     }
 
-    function _decreaseChildrenBalance(address _childrenAddress, uint256 _amount) internal {
+    function _decreaseChildrenBalance(
+        address _childrenAddress,
+        uint256 _amount
+    ) internal whenEnoughBalance(_childrenAddress, _amount) {
         _children[_childrenAddress]._decreaseBalance(_amount);
     }
 
-    function _decreaseChildrenInitialBalance(address _childrenAddress, uint256 _amount) internal virtual {
+    function _decreaseChildrenInitialBalance(
+        address _childrenAddress,
+        uint256 _amount
+    ) internal virtual whenEnoughInitialBalance(_childrenAddress, _amount) {
         _children[_childrenAddress]._decreaseInitialBalance(_amount);
     }
 }

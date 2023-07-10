@@ -76,17 +76,17 @@ contract Children is IChildren, ChildrenControl, Manager, Ownable {
         return _amount == requiredInitialAmount;
     }
 
-    function deposit(uint256 _amount) public override OnlyChildren(msg.sender) checkMaxAdditionalAmount(_amount) {
+    function deposit(uint256 _amount) public override onlyChildren(msg.sender) checkMaxAdditionalAmount(_amount) {
         super.deposit(_amount);
         _increaseParentBalance(_amount);
     }
 
-    function withdraw(uint256 _amount) public override OnlyChildren(msg.sender) {
+    function withdraw(uint256 _amount) public override onlyChildren(msg.sender) {
         super.withdraw(_amount);
         _decreaseParentBalance(_amount);
     }
 
-    function cashback(uint256 _amount) public override OnlyChildren(msg.sender) {
+    function cashback(uint256 _amount) public override onlyChildren(msg.sender) {
         super.cashback(_amount);
         _decreaseParentInitialBalance(_amount);
     }
