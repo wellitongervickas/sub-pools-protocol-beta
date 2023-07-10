@@ -42,8 +42,6 @@ describe('Children', () => {
       const [manager] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(deployNodeFixture)
 
-      await subPoolNode.setIsInvitedOnly(true)
-
       await expect(subPoolNode.invite(manager.address)).to.be.revertedWithCustomError(
         subPoolNode,
         'ManagerNotAllowed()'
@@ -53,10 +51,6 @@ describe('Children', () => {
     it('should revert on invite an already invited node manager', async function () {
       const [, invited] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(deployNodeFixture)
-
-      await subPoolNode.setIsInvitedOnly(true)
-
-      await subPoolNode.invite(invited.address)
 
       await expect(subPoolNode.invite(invited.address)).to.be.revertedWithCustomError(subPoolNode, 'AlreadyInvited()')
     })
@@ -96,22 +90,12 @@ describe('Children', () => {
     })
 
     it('should revert on invite when not invited only', async function () {
-      const [, , invited] = await ethers.getSigners()
-      const { subPoolNode } = await loadFixture(deployNodeFixture)
-
-      await subPoolNode.setIsInvitedOnly(false)
-      await expect(subPoolNode.invite(invited.address)).to.be.revertedWithCustomError(subPoolNode, 'NotInvitedOnly()')
-    })
-
-    it('should revert if try to setup invited only without being the manager', async function () {
-      const [, , invited] = await ethers.getSigners()
-      const { subPoolNode } = await loadFixture(deployNodeFixture)
-
-      const subPoolInstance = subPoolNode.connect(invited) as Children
-
-      await expect(subPoolInstance.setIsInvitedOnly(true)).to.be.rejectedWith(
-        `AccessControl: account ${invited.address.toLowerCase()} is missing role ${MANAGER_ROLE}`
+      const [manager, , invited] = await ethers.getSigners()
+      const { subPoolNode } = await loadFixture(
+        deployNodeFixture.bind(this, manager.address, ethers.toBigInt(0), DEFAULT_FEES_FRACTION, null)
       )
+
+      await expect(subPoolNode.invite(invited.address)).to.be.revertedWithCustomError(subPoolNode, 'NotInvitedOnly()')
     })
   })
 

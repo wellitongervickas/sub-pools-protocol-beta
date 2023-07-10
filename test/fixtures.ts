@@ -33,18 +33,18 @@ export async function deployNodeFixture(
   manager?: string,
   amount: BigInt = ethers.toBigInt(0),
   fees: typeof DEFAULT_FEES_FRACTION = DEFAULT_FEES_FRACTION,
-  invites: string[] = [],
+  invites: string[] | null = [],
   lockperiod = DEFAULT_PERIOD_LOCK,
   requiredInitialBalance = DEFAULT_REQUIRED_INITIAL_AMOUNT,
   maxAdditionalAmount = DEFAULT_MAX_ADDITIONAL_AMOUNT
 ) {
-  const [_manager] = await ethers.getSigners()
+  const [_manager, invited] = await ethers.getSigners()
   const SubPoolNode = await ethers.getContractFactory('Children')
   const subPoolNode = await SubPoolNode.deploy(
     manager || _manager,
     amount,
     fees,
-    invites,
+    invites === null ? [] : invites.length ? invites : [invited.address],
     lockperiod,
     requiredInitialBalance,
     maxAdditionalAmount

@@ -14,6 +14,4 @@ interface IManagerControl {
     error NotEnoughBalance();
 
     function invite(address _invitedAddress) external;
-
-    function setIsInvitedOnly(bool _invitedOnly) external;
 }

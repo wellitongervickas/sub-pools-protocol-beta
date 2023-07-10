@@ -77,5 +77,38 @@ describe('Router', () => {
 
       expect(parentAddress).to.equal(subPoolAddress)
     })
+
+    it('should join without invite when is not only invited', async function () {
+      const { subPoolRouter, accounts } = await loadFixture(deployRouterFixture)
+      const amount = ethers.toBigInt(1000)
+      const [, invited] = accounts
+
+      const tx = await subPoolRouter.create(
+        amount,
+        DEFAULT_FEES_FRACTION,
+        [],
+        DEFAULT_PERIOD_LOCK,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_ADDITIONAL_AMOUNT
+      )
+
+      let receipt = await tx.wait()
+
+      const [subPoolAddress] = receipt.logs[2].args
+
+      const invitedRouterInstance = subPoolRouter.connect(invited) as any
+
+      await expect(
+        invitedRouterInstance.join(
+          subPoolAddress,
+          amount,
+          DEFAULT_FEES_FRACTION,
+          [],
+          DEFAULT_PERIOD_LOCK,
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_ADDITIONAL_AMOUNT
+        )
+      ).to.not.be.reverted
+    })
   })
 })

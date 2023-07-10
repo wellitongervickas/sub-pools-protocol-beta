@@ -19,7 +19,7 @@ contract Children is IChildren, ChildrenControl, ManagerControl, Ownable {
         _;
     }
 
-    modifier checkMaxAdditionalAmount(uint256 _amount) {
+    modifier whenInRangeOfMaxAdditionalAmount(uint256 _amount) {
         ChildrenLib.Children memory _node = children(msg.sender);
         uint256 _subTotal = _node.balance + _amount;
         bool isGreaterThanLimit = maxAdditionalAmount > 0 && _subTotal > maxAdditionalAmount;
@@ -53,6 +53,11 @@ contract Children is IChildren, ChildrenControl, ManagerControl, Ownable {
         parent = _parent;
     }
 
+    function _validateInvitation(address _invitedAddress) private view {
+        bool _isInvited = _checkIsInvitedRole(_invitedAddress);
+        if (invitedOnly && !_isInvited) revert IManagerControl.NotInvited();
+    }
+
     function join(
         address _nodeAddress,
         address _invitedAddress,
@@ -60,7 +65,8 @@ contract Children is IChildren, ChildrenControl, ManagerControl, Ownable {
     ) external onlyRouter returns (uint256) {
         if (!_checkAmountInitialBalance(_amount)) revert IChildrenControl.InvalidInitialAmount();
         if (!_checkHasParent()) revert IChildrenControl.ParentNotFound();
-        if (!_checkIsInvitedRole(_invitedAddress)) revert IManagerControl.NotInvited();
+
+        _validateInvitation(_invitedAddress);
 
         uint256 _remainingAmount = _computeManagerFees(_amount);
         uint256 _id = _setupChildren(_nodeAddress, _invitedAddress, _remainingAmount);
@@ -80,7 +86,9 @@ contract Children is IChildren, ChildrenControl, ManagerControl, Ownable {
         return _amount == requiredInitialAmount;
     }
 
-    function deposit(uint256 _amount) public override onlyChildren(msg.sender) checkMaxAdditionalAmount(_amount) {
+    function deposit(
+        uint256 _amount
+    ) public override onlyChildren(msg.sender) whenInRangeOfMaxAdditionalAmount(_amount) {
         super.deposit(_amount);
         _increaseParentBalance(_amount);
     }
