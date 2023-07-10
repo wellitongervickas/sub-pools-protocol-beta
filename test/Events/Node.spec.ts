@@ -8,6 +8,8 @@ describe('Children', () => {
         const [, invited] = await ethers.getSigners()
         const { subPoolNode } = await loadFixture(deployNodeFixture)
 
+        await subPoolNode.setIsInvitedOnly(true)
+
         await expect(subPoolNode.invite(invited.address))
           .to.emit(subPoolNode, 'NodeManagerInvited')
           .withArgs(invited.address)

@@ -42,6 +42,8 @@ describe('Children', () => {
       const [manager] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(deployNodeFixture)
 
+      await subPoolNode.setIsInvitedOnly(true)
+
       await expect(subPoolNode.invite(manager.address)).to.be.revertedWithCustomError(
         subPoolNode,
         'ManagerNotAllowed()'
@@ -51,6 +53,8 @@ describe('Children', () => {
     it('should revert on invite an already invited node manager', async function () {
       const [, invited] = await ethers.getSigners()
       const { subPoolNode } = await loadFixture(deployNodeFixture)
+
+      await subPoolNode.setIsInvitedOnly(true)
 
       await subPoolNode.invite(invited.address)
 
