@@ -3,10 +3,10 @@ pragma solidity =0.8.19;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {ChildrenControl, IChildrenControl} from './ChildrenControl.sol';
-import {IChildren} from './interfaces/IChildren.sol';
-import {ManagerControl, IManagerControl} from './ManagerControl.sol';
-import {FractionLib} from './lib/Fraction.sol';
-import {ChildrenLib} from './lib/Children.sol';
+import {IChildren} from '../interfaces/children/IChildren.sol';
+import {ManagerControl, IManagerControl} from '../manager/ManagerControl.sol';
+import {FractionLib} from '../lib/Fraction.sol';
+import {ChildrenLib} from '../lib/Children.sol';
 
 contract Children is IChildren, ChildrenControl, ManagerControl, Ownable {
     address public parent; // only set once

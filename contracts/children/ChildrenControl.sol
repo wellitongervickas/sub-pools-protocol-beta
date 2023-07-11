@@ -2,8 +2,8 @@
 pragma solidity =0.8.19;
 
 import '@openzeppelin/contracts/utils/Counters.sol';
-import {IChildrenControl} from './interfaces/IChildrenControl.sol';
-import {ChildrenLib} from './lib/Children.sol';
+import {IChildrenControl} from '../interfaces/children/IChildrenControl.sol';
+import {ChildrenLib} from '../lib/Children.sol';
 
 contract ChildrenControl is IChildrenControl {
     using ChildrenLib for ChildrenLib.Children;

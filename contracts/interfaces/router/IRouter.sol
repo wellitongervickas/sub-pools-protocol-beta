@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {FractionLib} from '../lib/Fraction.sol';
+import {FractionLib} from '../../lib/Fraction.sol';
 
 interface IRouter {
     event ChildrenCreated(address indexed _nodeAddress, uint256 indexed _subPoolId, uint256 _amount);

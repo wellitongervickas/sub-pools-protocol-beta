@@ -3,9 +3,9 @@ pragma solidity =0.8.19;
 
 import '@openzeppelin/contracts/access/AccessControlEnumerable.sol';
 
-import {IManagerControl} from './interfaces/IManagerControl.sol';
-import {ManagerLib} from './lib/Manager.sol';
-import {FractionLib} from './lib/Fraction.sol';
+import {IManagerControl} from '../interfaces/manager/IManagerControl.sol';
+import {ManagerLib} from '../lib/Manager.sol';
+import {FractionLib} from '../lib/Fraction.sol';
 
 contract ManagerControl is IManagerControl, AccessControl {
     using ManagerLib for ManagerLib.Manager;

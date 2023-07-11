@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {IStrategy} from './interfaces/IStrategy.sol';
+import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 
 contract StrategySingleProxy is IStrategy {
     address public immutable strategy;

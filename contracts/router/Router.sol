@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {ChildrenControl, IChildrenControl} from './ChildrenControl.sol';
-import {Children} from './Children.sol';
-import {FractionLib} from './lib/Fraction.sol';
-import {IRouter} from './interfaces/IRouter.sol';
+import {ChildrenControl, IChildrenControl} from '../children/ChildrenControl.sol';
+import {Children} from '../children/Children.sol';
+import {FractionLib} from '../lib/Fraction.sol';
+import {IRouter} from '../interfaces/router/IRouter.sol';
 
 contract Router is IRouter, ChildrenControl {
     modifier onlyChildrenManager(address _childrenAddress) {
