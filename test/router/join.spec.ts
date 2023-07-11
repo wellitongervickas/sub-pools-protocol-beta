@@ -33,14 +33,14 @@ describe('Router', () => {
     const receipt1 = await tx1.wait()
     const [children2Address] = getReceiptArgs(receipt1)
 
-    const childrenContract = await ethers.getContractAt('Children', children2Address)
-    const childrenManager = await childrenContract.manager()
+    const children2Contract = await ethers.getContractAt('Children', children2Address)
+    const childrenManager = await children2Contract.manager()
 
     expect(childrenManager).to.equal(manager.address)
   })
 
   it('should set children parent on join', async function () {
-    const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
+    const { routerContract } = await loadFixture(router.deployRouterFixture)
 
     const tx = await routerContract.create()
     const receipt = await tx.wait()
@@ -50,8 +50,8 @@ describe('Router', () => {
     const receipt1 = await tx1.wait()
     const [children2Address] = getReceiptArgs(receipt1)
 
-    const childrenContract = await ethers.getContractAt('Children', children2Address)
-    const parentAddress = await childrenContract.parent()
+    const children2Contract = await ethers.getContractAt('Children', children2Address)
+    const parentAddress = await children2Contract.parent()
 
     expect(parentAddress).to.equal(childrenAddress)
   })
