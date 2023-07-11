@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 
 contract StrategySingleProxy is IStrategy {
-    address public immutable strategy;
+    address private strategy;
 
     constructor(address _strategy) {
         strategy = _strategy;
@@ -14,7 +14,7 @@ contract StrategySingleProxy is IStrategy {
         IStrategy(strategy).setup(_setup);
     }
 
-    function deposit(uint256 _amount) external {
+    function deposit(bytes calldata _amount) external {
         IStrategy(strategy).deposit(_amount);
     }
 
@@ -22,7 +22,7 @@ contract StrategySingleProxy is IStrategy {
         IStrategy(strategy).harvest();
     }
 
-    function withdraw(uint256 _amount) external {
+    function withdraw(bytes calldata _amount) external {
         IStrategy(strategy).withdraw(_amount);
     }
 }

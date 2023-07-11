@@ -19,7 +19,7 @@ contract Children is IChildren, ChildrenControl, ManagerControl, Ownable {
         _;
     }
 
-    modifier whenInRangeOfMaxAdditionalAmount(uint256 _amount) {
+    modifier whenMaxAdditionalRange(uint256 _amount) {
         ChildrenLib.Children memory _node = children(msg.sender);
         uint256 _subTotal = _node.balance + _amount;
         bool isGreaterThanLimit = maxAdditionalAmount > 0 && _subTotal > maxAdditionalAmount;
@@ -86,9 +86,7 @@ contract Children is IChildren, ChildrenControl, ManagerControl, Ownable {
         return _amount == requiredInitialAmount;
     }
 
-    function deposit(
-        uint256 _amount
-    ) public override onlyChildren(msg.sender) whenInRangeOfMaxAdditionalAmount(_amount) {
+    function deposit(uint256 _amount) public override onlyChildren(msg.sender) whenMaxAdditionalRange(_amount) {
         super.deposit(_amount);
         _increaseParentBalance(_amount);
     }

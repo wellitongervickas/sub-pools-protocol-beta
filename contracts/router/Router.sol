@@ -21,7 +21,8 @@ contract Router is IRouter, ChildrenControl {
         uint256 _requiredInitialAmount,
         uint256 _maxAdditionalDeposit
     ) external returns (address) {
-        Children _children = new Children(
+        address _childrenAddress = _createChildren(
+            address(this),
             msg.sender,
             _amount,
             _fees,
@@ -31,10 +32,7 @@ contract Router is IRouter, ChildrenControl {
             _maxAdditionalDeposit
         );
 
-        address _childrenAddress = address(_children);
         uint256 _id = _setupChildren(_childrenAddress, msg.sender, _amount);
-
-        _setupChildrenParent(_children, address(this));
 
         emit ChildrenCreated(_childrenAddress, _id, _amount);
         return _childrenAddress;
@@ -51,7 +49,8 @@ contract Router is IRouter, ChildrenControl {
     ) external returns (address) {
         Children _parentChildren = Children(_parentAddress);
 
-        Children _children = new Children(
+        address _childrenAddress = _createChildren(
+            _parentAddress,
             msg.sender,
             _amount,
             _fees,
@@ -61,17 +60,36 @@ contract Router is IRouter, ChildrenControl {
             _maxAdditionalDeposit
         );
 
-        address _childrenAddress = address(_children);
-        uint256 _childrenId = _parentChildren.join(_childrenAddress, msg.sender, _amount);
+        uint256 _id = _parentChildren.join(_childrenAddress, msg.sender, _amount);
 
-        _setupChildrenParent(_children, _parentAddress);
-
-        emit ChildrenJoined(_childrenAddress, _childrenId, _amount);
+        emit ChildrenJoined(_childrenAddress, _id, _amount);
         return _childrenAddress;
     }
 
-    function _setupChildrenParent(Children _children, address _parentAddress) private {
+    function _createChildren(
+        address _parentAddress,
+        address _managerAddress,
+        uint256 _amount,
+        FractionLib.Fraction memory _fees,
+        address[] memory _invitedAddresses,
+        uint256 _lockperiod,
+        uint256 _requiredInitialAmount,
+        uint256 _maxAdditionalDeposit
+    ) internal returns (address) {
+        Children _children = new Children(
+            _managerAddress,
+            _amount,
+            _fees,
+            _invitedAddresses,
+            _lockperiod,
+            _requiredInitialAmount,
+            _maxAdditionalDeposit
+        );
+
+        address _childrenAddress = address(_children);
         _children.setParent(_parentAddress);
+
+        return _childrenAddress;
     }
 
     function withdraw(uint256 _amount) public override onlyChildren(msg.sender) {
