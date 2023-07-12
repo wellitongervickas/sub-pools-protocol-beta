@@ -1,20 +1,12 @@
 import { expect } from 'chai'
-import { router, loadFixture, ethers } from '../fixtures'
+import { router, loadFixture, ethers, anyValue } from '../fixtures'
 import { getReceiptArgs } from '../helpers/receiptArgs'
 
 describe('Router', () => {
   describe('Create', () => {
-    it('should setup node on create', async function () {
-      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
-      const [manager] = accounts
-
-      const tx = await routerContract.create()
-      const receipt = await tx.wait()
-      const [nodeAddress] = getReceiptArgs(receipt)
-
-      const [nodeManager] = await routerContract.node(nodeAddress)
-
-      expect(nodeManager).to.equal(manager.address)
+    it('should emit NodeCreated on create', async function () {
+      const { routerContract } = await loadFixture(router.deployRouterFixture)
+      await expect(routerContract.create()).to.emit(routerContract, 'NodeCreated').withArgs(anyValue)
     })
 
     it('should setup node manager on create', async function () {
