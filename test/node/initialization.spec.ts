@@ -7,7 +7,7 @@ describe('Node', () => {
     it('should setup node parent on deploy', async function () {
       const accounts = await ethers.getSigners()
       const Node = await ethers.getContractFactory('Node')
-      const nodeContract = await Node.deploy(ZERO_ADDRESS, accounts[0].address)
+      const nodeContract = await Node.deploy(ZERO_ADDRESS, accounts[0].address, [])
 
       const parentAddress = await nodeContract.parent()
 

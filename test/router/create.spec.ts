@@ -6,13 +6,13 @@ describe('Router', () => {
   describe('Create', () => {
     it('should emit NodeCreated on create', async function () {
       const { routerContract } = await loadFixture(router.deployRouterFixture)
-      await expect(routerContract.create()).to.emit(routerContract, 'NodeCreated').withArgs(anyValue)
+      await expect(routerContract.create([])).to.emit(routerContract, 'NodeCreated').withArgs(anyValue)
     })
 
     it('should set node parent as itself on create', async function () {
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-      const tx1 = await routerContract.create()
+      const tx1 = await routerContract.create([])
       const receipt1 = await tx1.wait()
       const [nodeAddress] = getReceiptArgs(receipt1)
 

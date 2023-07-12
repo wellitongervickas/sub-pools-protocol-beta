@@ -5,10 +5,10 @@ import { ZERO_ADDRESS } from '../helpers/address'
 
 export { ethers, loadFixture }
 
-export async function deployNodeFixture() {
+export async function deployNodeFixture(invitedAddresses: string[] = []) {
   const accounts = await ethers.getSigners()
   const Node = await ethers.getContractFactory('Node')
-  const nodeContract = await Node.deploy(ZERO_ADDRESS, accounts[0].address)
+  const nodeContract = await Node.deploy(ZERO_ADDRESS, accounts[0].address, invitedAddresses)
 
   return { accounts, nodeContract }
 }

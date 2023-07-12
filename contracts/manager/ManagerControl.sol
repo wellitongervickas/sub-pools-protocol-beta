@@ -13,6 +13,8 @@ contract ManagerControl is AccessControl {
 
     bool public invitedOnly = true;
 
+    event NodeManagerInvited(address indexed _invitedAddress);
+
     error NotAllowed();
     error AlreadyInvited();
 
@@ -26,9 +28,10 @@ contract ManagerControl is AccessControl {
         _;
     }
 
-    constructor(address _managerAddress) {
+    constructor(address _managerAddress, address[] memory _invitedAddresses) {
         manager = ManagerLib.Manager({managerAddress: _managerAddress});
         _setManagerRole(manager);
+        _grantInvites(_invitedAddresses);
     }
 
     function _setManagerRole(ManagerLib.Manager storage _manager) private {
@@ -39,6 +42,14 @@ contract ManagerControl is AccessControl {
         address _invitedAddress
     ) external onlyRole(MANAGER_ROLE) whenNotManager(_invitedAddress) whenNotInvited(_invitedAddress) {
         _grantRole(INVITED_ROLE, _invitedAddress);
+        emit NodeManagerInvited(_invitedAddress);
+    }
+
+    function _grantInvites(address[] memory _invitedAddresses) internal {
+        for (uint256 i = 0; i < _invitedAddresses.length; i++) {
+            _grantRole(INVITED_ROLE, _invitedAddresses[i]);
+            emit NodeManagerInvited(_invitedAddresses[i]);
+        }
     }
 
     function setInvitedOnly(bool _invitedOnly) external onlyRole(MANAGER_ROLE) {

@@ -64,5 +64,14 @@ describe('ManagerControl', () => {
         'AlreadyInvited()'
       )
     })
+
+    it('should emit NodeManagerInvited on invite', async function () {
+      const { managerControlContract, accounts } = await loadFixture(managerControl.deployManagerControlFixture)
+      const [, invited] = accounts
+
+      await expect(managerControlContract.invite(invited.address))
+        .to.emit(managerControlContract, 'NodeManagerInvited')
+        .withArgs(invited.address)
+    })
   })
 })
