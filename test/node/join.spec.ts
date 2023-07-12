@@ -43,5 +43,17 @@ describe('Node', () => {
         'AlreadyNode()'
       )
     })
+
+    it('should revert if try to call join without bein the owner', async function () {
+      const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)
+      const [, otherManager] = accounts
+
+      const node2Address = await nodeContract.getAddress()
+      const nodeContractInstance = nodeContract.connect(otherManager) as any
+
+      await expect(nodeContractInstance.join(node2Address, otherManager.address)).to.be.revertedWith(
+        'Ownable: caller is not the owner'
+      )
+    })
   })
 })
