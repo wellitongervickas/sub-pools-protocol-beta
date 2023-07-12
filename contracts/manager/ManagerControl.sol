@@ -46,7 +46,7 @@ contract ManagerControl is AccessControl {
         emit NodeManagerInvited(_invitedAddress);
     }
 
-    function _grantInvites(address[] memory _invitedAddresses) internal {
+    function _grantInvites(address[] memory _invitedAddresses) private {
         for (uint256 i = 0; i < _invitedAddresses.length; i++) {
             _grantRole(INVITED_ROLE, _invitedAddresses[i]);
             emit NodeManagerInvited(_invitedAddresses[i]);
