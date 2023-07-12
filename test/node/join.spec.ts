@@ -8,8 +8,6 @@ describe('Node', () => {
       const { nodeContract: nodeContract2 } = await loadFixture(node.deployNodeFixture)
       const [, otherManager] = accounts
 
-      await nodeContract.setInvitedOnly(false)
-
       const node2Address = await nodeContract2.getAddress()
       await nodeContract.join(node2Address, otherManager.address)
 
@@ -21,6 +19,8 @@ describe('Node', () => {
       const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)
       const { nodeContract: nodeContract2 } = await loadFixture(node.deployNodeFixture)
       const [, otherManager] = accounts
+
+      await nodeContract.setInvitedOnly(true)
 
       const node2Address = await nodeContract2.getAddress()
       await expect(nodeContract.join(node2Address, otherManager.address)).to.be.revertedWithCustomError(

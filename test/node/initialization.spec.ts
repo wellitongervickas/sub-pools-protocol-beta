@@ -25,7 +25,7 @@ describe('Node', () => {
 
   describe('Invite', () => {
     it('should initialize as invited only', async function () {
-      const { nodeContract } = await loadFixture(node.deployNodeFixture)
+      const { nodeContract } = await loadFixture(node.deployNodeFixture.bind(this, [], true))
       expect(await nodeContract.invitedOnly()).to.equal(true)
     })
 

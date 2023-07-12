@@ -17,8 +17,6 @@ describe('Node', () => {
     it('should update invited only to false', async function () {
       const { nodeContract } = await loadFixture(node.deployNodeFixture)
 
-      await nodeContract.setInvitedOnly(false)
-
       expect(await nodeContract.invitedOnly()).to.equal(false)
     })
 

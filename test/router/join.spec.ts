@@ -12,7 +12,7 @@ describe('Router', () => {
       const [nodeAddress] = getReceiptArgs(receipt)
 
       const nodeContract = await ethers.getContractAt('Node', nodeAddress)
-      await nodeContract.setInvitedOnly(false)
+      await nodeContract.setInvitedOnly(false) // must be public to join without issue
 
       await expect(routerContract.join(nodeAddress, [])).to.emit(routerContract, 'NodeCreated').withArgs(anyValue)
     })
