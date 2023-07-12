@@ -8,6 +8,7 @@ import {ManagerLib} from '../libraries/Manager.sol';
 contract ManagerControl is AccessControl {
     bytes32 private constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
     bytes32 private constant INVITED_ROLE = keccak256('INVITED_ROLE');
+    bytes32 private constant NODE_ROLE = keccak256('NODE_ROLE');
 
     ManagerLib.Manager public manager;
 
@@ -18,6 +19,7 @@ contract ManagerControl is AccessControl {
     error NotAllowed();
     error AlreadyInvited();
     error NotInvited();
+    error AlreadyNode();
 
     modifier whenNotManager(address _address) {
         if (hasRoleManager(_address)) revert NotAllowed();
@@ -26,6 +28,11 @@ contract ManagerControl is AccessControl {
 
     modifier whenNotInvited(address _address) {
         if (hasInvitedRole(_address)) revert AlreadyInvited();
+        _;
+    }
+
+    modifier whenNotNode(address _address) {
+        if (hasNodeRole(_address)) revert AlreadyNode();
         _;
     }
 
@@ -41,7 +48,13 @@ contract ManagerControl is AccessControl {
 
     function invite(
         address _invitedAddress
-    ) external onlyRole(MANAGER_ROLE) whenNotManager(_invitedAddress) whenNotInvited(_invitedAddress) {
+    )
+        external
+        onlyRole(MANAGER_ROLE)
+        whenNotInvited(_invitedAddress)
+        whenNotNode(_invitedAddress)
+        whenNotManager(_invitedAddress)
+    {
         _grantRole(INVITED_ROLE, _invitedAddress);
         emit NodeManagerInvited(_invitedAddress);
     }
@@ -57,11 +70,20 @@ contract ManagerControl is AccessControl {
         invitedOnly = _invitedOnly;
     }
 
-    function hasInvitedRole(address _invitedAddress) public view returns (bool) {
-        return hasRole(INVITED_ROLE, _invitedAddress);
+    function _updateInvitedRole(address _address) internal {
+        _revokeRole(INVITED_ROLE, _address);
+        _grantRole(NODE_ROLE, _address);
+    }
+
+    function hasInvitedRole(address _address) public view returns (bool) {
+        return hasRole(INVITED_ROLE, _address);
     }
 
     function hasRoleManager(address _address) public view returns (bool) {
         return hasRole(MANAGER_ROLE, _address);
+    }
+
+    function hasNodeRole(address _address) private view returns (bool) {
+        return hasRole(NODE_ROLE, _address);
     }
 }

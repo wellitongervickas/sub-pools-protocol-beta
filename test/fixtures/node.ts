@@ -5,14 +5,12 @@ import { ZERO_ADDRESS } from '../helpers/address'
 
 export { ethers, loadFixture }
 
-export async function deployNodeFixture(invitedAddresses: string[] = [], defaultInitialization: boolean = false) {
+export async function deployNodeFixture(invitedAddresses: string[] = [], invitedOnly: boolean = false) {
   const accounts = await ethers.getSigners()
   const Node = await ethers.getContractFactory('Node')
   const nodeContract = await Node.deploy(ZERO_ADDRESS, accounts[0].address, invitedAddresses)
 
-  if (defaultInitialization === false) {
-    await nodeContract.setInvitedOnly(false)
-  }
+  await nodeContract.setInvitedOnly(invitedOnly)
 
   return { accounts, nodeContract }
 }

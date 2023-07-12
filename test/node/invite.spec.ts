@@ -6,6 +6,15 @@ const { MANAGER_ROLE } = managerControl
 
 describe('Node', () => {
   describe('Invite', () => {
+    it('should emit NodeManagerInvited on invite', async function () {
+      const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)
+      const [, invited] = accounts
+
+      await expect(nodeContract.invite(invited.address))
+        .to.emit(nodeContract, 'NodeManagerInvited')
+        .withArgs(invited.address)
+    })
+
     it('should invite children manager', async function () {
       const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)
       const [, invited] = accounts
@@ -57,13 +66,16 @@ describe('Node', () => {
       await expect(nodeContract.invite(invited.address)).to.be.revertedWithCustomError(nodeContract, 'AlreadyInvited()')
     })
 
-    it('should emit NodeManagerInvited on invite', async function () {
-      const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)
+    it('should revert if try to invite already node manager', async function () {
+      const { nodeContract: nodeContract2, accounts } = await loadFixture(node.deployNodeFixture.bind(this, [], true))
       const [, invited] = accounts
 
-      await expect(nodeContract.invite(invited.address))
-        .to.emit(nodeContract, 'NodeManagerInvited')
-        .withArgs(invited.address)
+      const { nodeContract } = await loadFixture(node.deployNodeFixture.bind(this, [invited.address], true))
+
+      const node2Address = await nodeContract2.getAddress()
+      await nodeContract.join(node2Address, invited.address)
+
+      await expect(nodeContract.invite(invited.address)).to.be.revertedWithCustomError(nodeContract, 'AlreadyNode()')
     })
   })
 })
