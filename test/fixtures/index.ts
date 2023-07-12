@@ -5,4 +5,5 @@ export { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 export { ethers, loadFixture }
 
 export { default as router } from './router'
+export { default as node } from './node'
 export { default as managerControl } from './managerControl'

@@ -9,21 +9,7 @@ describe('Router', () => {
       await expect(routerContract.create()).to.emit(routerContract, 'NodeCreated').withArgs(anyValue)
     })
 
-    it('should setup node manager on create', async function () {
-      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
-      const [manager] = accounts
-
-      const tx1 = await routerContract.create()
-      const receipt1 = await tx1.wait()
-      const [nodeAddress] = getReceiptArgs(receipt1)
-
-      const nodeContract = await ethers.getContractAt('Node', nodeAddress)
-      const nodeManager = await nodeContract.manager()
-
-      expect(nodeManager).to.equal(manager.address)
-    })
-
-    it('should set node parent on create', async function () {
+    it('should set node parent as itself on create', async function () {
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
       const tx1 = await routerContract.create()
