@@ -11,6 +11,21 @@ contract ManagerControl is AccessControl {
 
     ManagerLib.Manager public manager;
 
+    bool public invitedOnly = true;
+
+    error NotAllowed();
+    error AlreadyInvited();
+
+    modifier whenNotManager(address _address) {
+        if (hasRoleManager(_address)) revert NotAllowed();
+        _;
+    }
+
+    modifier whenNotInvited(address _address) {
+        if (hasInvitedRole(_address)) revert AlreadyInvited();
+        _;
+    }
+
     constructor(address _managerAddress) {
         manager = ManagerLib.Manager({managerAddress: _managerAddress});
         _setManagerRole(manager);
@@ -20,11 +35,21 @@ contract ManagerControl is AccessControl {
         _grantRole(MANAGER_ROLE, _manager.managerAddress);
     }
 
-    function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) {
+    function invite(
+        address _invitedAddress
+    ) external onlyRole(MANAGER_ROLE) whenNotManager(_invitedAddress) whenNotInvited(_invitedAddress) {
         _grantRole(INVITED_ROLE, _invitedAddress);
+    }
+
+    function setInvitedOnly(bool _invitedOnly) external onlyRole(MANAGER_ROLE) {
+        invitedOnly = _invitedOnly;
     }
 
     function hasInvitedRole(address _invitedAddress) public view returns (bool) {
         return hasRole(INVITED_ROLE, _invitedAddress);
+    }
+
+    function hasRoleManager(address _address) public view returns (bool) {
+        return hasRole(MANAGER_ROLE, _address);
     }
 }

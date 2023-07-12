@@ -61,6 +61,7 @@ contract ManagerControl is IManagerControl, AccessControl {
     }
 
     function invite(address _invitedAddress) external onlyRole(MANAGER_ROLE) whenNotInvitedOnly {
+        /// reverts using modifiers
         if (_checkIsManagerRole(_invitedAddress)) revert IManagerControl.ManagerNotAllowed();
         if (_checkIsInvitedRole(_invitedAddress)) revert IManagerControl.AlreadyInvited();
         if (_checkIsNodeRole(_invitedAddress)) revert IManagerControl.AlreadyNodeManager();
@@ -71,6 +72,7 @@ contract ManagerControl is IManagerControl, AccessControl {
         emit NodeManagerInvited(_invitedAddress);
     }
 
+    /// call here instead of parent contract
     function _grantInvites(address[] memory _invitedAddresses) internal {
         if (_invitedAddresses.length > 0) {
             _setIsInvitedOnly(true);

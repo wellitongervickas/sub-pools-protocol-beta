@@ -6,4 +6,5 @@ export { ethers, loadFixture }
 
 export { default as router } from './router'
 export { default as node } from './node'
+export { default as nodeControl } from './nodeControl'
 export { default as managerControl } from './managerControl'
