@@ -3,56 +3,58 @@ import { router, loadFixture, ethers } from '../fixtures'
 import { getReceiptArgs } from '../helpers/receiptArgs'
 
 describe('Router', () => {
-  it('should create children on join', async function () {
-    const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
-    const [manager] = accounts
+  describe('Join', () => {
+    it('should create node on join', async function () {
+      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
+      const [manager] = accounts
 
-    const tx = await routerContract.create()
-    const receipt = await tx.wait()
-    const [childrenAddress] = getReceiptArgs(receipt)
+      const tx = await routerContract.create()
+      const receipt = await tx.wait()
+      const [nodeAddress] = getReceiptArgs(receipt)
 
-    const tx1 = await routerContract.join(childrenAddress)
-    const receipt1 = await tx1.wait()
-    const [children2Address] = getReceiptArgs(receipt1)
+      const tx1 = await routerContract.join(nodeAddress)
+      const receipt1 = await tx1.wait()
+      const [node2Address] = getReceiptArgs(receipt1)
 
-    const childrenContract = await ethers.getContractAt('Children', childrenAddress)
-    const [childrenManager] = await childrenContract.children(children2Address)
+      const nodeContract = await ethers.getContractAt('Node', nodeAddress)
+      const [nodeManager] = await nodeContract.node(node2Address)
 
-    expect(childrenManager).to.equal(manager.address)
-  })
+      expect(nodeManager).to.equal(manager.address)
+    })
 
-  it('should set children manager on join', async function () {
-    const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
-    const [manager] = accounts
+    it('should set node manager on join', async function () {
+      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
+      const [manager] = accounts
 
-    const tx = await routerContract.create()
-    const receipt = await tx.wait()
-    const [childrenAddress] = getReceiptArgs(receipt)
+      const tx = await routerContract.create()
+      const receipt = await tx.wait()
+      const [nodeAddress] = getReceiptArgs(receipt)
 
-    const tx1 = await routerContract.join(childrenAddress)
-    const receipt1 = await tx1.wait()
-    const [children2Address] = getReceiptArgs(receipt1)
+      const tx1 = await routerContract.join(nodeAddress)
+      const receipt1 = await tx1.wait()
+      const [node2Address] = getReceiptArgs(receipt1)
 
-    const children2Contract = await ethers.getContractAt('Children', children2Address)
-    const childrenManager = await children2Contract.manager()
+      const node2Contract = await ethers.getContractAt('Node', node2Address)
+      const nodeManager = await node2Contract.manager()
 
-    expect(childrenManager).to.equal(manager.address)
-  })
+      expect(nodeManager).to.equal(manager.address)
+    })
 
-  it('should set children parent on join', async function () {
-    const { routerContract } = await loadFixture(router.deployRouterFixture)
+    it('should set node parent on join', async function () {
+      const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-    const tx = await routerContract.create()
-    const receipt = await tx.wait()
-    const [childrenAddress] = getReceiptArgs(receipt)
+      const tx = await routerContract.create()
+      const receipt = await tx.wait()
+      const [nodeAddress] = getReceiptArgs(receipt)
 
-    const tx1 = await routerContract.join(childrenAddress)
-    const receipt1 = await tx1.wait()
-    const [children2Address] = getReceiptArgs(receipt1)
+      const tx1 = await routerContract.join(nodeAddress)
+      const receipt1 = await tx1.wait()
+      const [node2Address] = getReceiptArgs(receipt1)
 
-    const children2Contract = await ethers.getContractAt('Children', children2Address)
-    const parentAddress = await children2Contract.parent()
+      const node2Contract = await ethers.getContractAt('Node', node2Address)
+      const parentAddress = await node2Contract.parent()
 
-    expect(parentAddress).to.equal(childrenAddress)
+      expect(parentAddress).to.equal(nodeAddress)
+    })
   })
 })

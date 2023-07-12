@@ -1,32 +1,32 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {Children} from '../children/Children.sol';
-import {ChildrenControl} from '../children/ChildrenControl.sol';
+import {Node} from '../node/Node.sol';
+import {NodeControl} from '../node/NodeControl.sol';
 
-contract Router is ChildrenControl {
+contract Router is NodeControl {
     event NodeCreated(address indexed node);
 
     function create() external returns (address) {
-        address _childrenAddress = _deployChildren(address(this), msg.sender);
-        _setupChildren(_childrenAddress, msg.sender);
+        address _nodeAddress = _deployNode(address(this), msg.sender);
+        _setupNode(_nodeAddress, msg.sender);
 
-        emit NodeCreated(_childrenAddress);
-        return _childrenAddress;
+        emit NodeCreated(_nodeAddress);
+        return _nodeAddress;
     }
 
     function join(address _parentAddress) external returns (address) {
-        Children _parent = Children(_parentAddress);
+        Node _parent = Node(_parentAddress);
 
-        address _childrenAddress = _deployChildren(_parentAddress, msg.sender);
-        _parent.join(_childrenAddress, msg.sender);
+        address _nodeAddress = _deployNode(_parentAddress, msg.sender);
+        _parent.join(_nodeAddress, msg.sender);
 
-        emit NodeCreated(_childrenAddress);
-        return _childrenAddress;
+        emit NodeCreated(_nodeAddress);
+        return _nodeAddress;
     }
 
-    function _deployChildren(address _parentAddress, address _managerAddress) private returns (address) {
-        Children _children = new Children(_parentAddress, _managerAddress);
-        return address(_children);
+    function _deployNode(address _parentAddress, address _managerAddress) private returns (address) {
+        Node _node = new Node(_parentAddress, _managerAddress);
+        return address(_node);
     }
 }
