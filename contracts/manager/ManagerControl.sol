@@ -16,13 +16,13 @@ contract ManagerControl is AccessControl {
 
     event NodeManagerInvited(address indexed _invitedAddress);
 
-    error NotAllowed();
+    error ManagerNotAllowed();
     error AlreadyInvited();
     error NotInvited();
     error AlreadyNode();
 
     modifier whenNotManager(address _address) {
-        if (hasRoleManager(_address)) revert NotAllowed();
+        if (hasRoleManager(_address)) revert ManagerNotAllowed();
         _;
     }
 
@@ -79,7 +79,7 @@ contract ManagerControl is AccessControl {
         return hasRole(INVITED_ROLE, _address);
     }
 
-    function hasRoleManager(address _address) public view returns (bool) {
+    function hasRoleManager(address _address) private view returns (bool) {
         return hasRole(MANAGER_ROLE, _address);
     }
 

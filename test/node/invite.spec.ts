@@ -55,7 +55,10 @@ describe('Node', () => {
       const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)
       const [manager] = accounts
 
-      await expect(nodeContract.invite(manager.address)).to.be.revertedWithCustomError(nodeContract, 'NotAllowed()')
+      await expect(nodeContract.invite(manager.address)).to.be.revertedWithCustomError(
+        nodeContract,
+        'ManagerNotAllowed()'
+      )
     })
 
     it('should revert if try to invite already invited manager', async function () {
