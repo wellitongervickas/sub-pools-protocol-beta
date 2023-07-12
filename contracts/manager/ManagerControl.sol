@@ -17,6 +17,7 @@ contract ManagerControl is AccessControl {
 
     error NotAllowed();
     error AlreadyInvited();
+    error NotInvited();
 
     modifier whenNotManager(address _address) {
         if (hasRoleManager(_address)) revert NotAllowed();

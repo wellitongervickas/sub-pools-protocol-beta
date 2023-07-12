@@ -15,7 +15,13 @@ contract Node is NodeControl, ManagerControl {
         parent = Node(_parentAddress);
     }
 
-    function join(address _nodeAddress, address _managerAddress) public {
+    modifier checkInvitation(address _invitedAddress) {
+        bool _isInvited = hasInvitedRole(_invitedAddress);
+        if (invitedOnly && !_isInvited) revert NotInvited();
+        _;
+    }
+
+    function join(address _nodeAddress, address _managerAddress) public checkInvitation(_managerAddress) {
         _setupNode(_nodeAddress, _managerAddress);
     }
 }
