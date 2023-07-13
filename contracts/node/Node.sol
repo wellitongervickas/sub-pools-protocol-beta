@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
+import {INode} from '../interfaces/node/INode.sol';
 
+import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {NodeControl} from './NodeControl.sol';
 import {ManagerControl} from '../manager/ManagerControl.sol';
 
-contract Node is NodeControl, ManagerControl, Ownable {
-    Node public immutable parent;
+contract Node is INode, NodeControl, ManagerControl, Ownable {
+    address public immutable parent;
 
     constructor(
         address _parentAddress,
         address _managerAddress,
         address[] memory _invitedAddresses
     ) ManagerControl(_managerAddress, _invitedAddresses) {
-        parent = Node(_parentAddress);
+        parent = _parentAddress;
     }
 
     modifier onlyRouter() {

@@ -1,18 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {NodeLib} from '../libraries/Node.sol';
+import {INodeControl} from '../interfaces/node/INodeControl.sol';
 
-contract NodeControl {
-    using NodeLib for NodeLib.Node;
-
-    mapping(address => NodeLib.Node) private _node;
+contract NodeControl is INodeControl {
+    mapping(address => INodeControl.Setup) private _node;
 
     function _setupNode(address _nodeAddress, address _managerAddress) internal {
-        _node[_nodeAddress] = NodeLib.Node({managerAddress: _managerAddress});
+        _node[_nodeAddress] = INodeControl.Setup(_managerAddress);
     }
 
-    function node(address _nodeAddress) public view returns (NodeLib.Node memory) {
+    function node(address _nodeAddress) public view returns (INodeControl.Setup memory) {
         return _node[_nodeAddress];
     }
 }
