@@ -2,5 +2,5 @@
 pragma solidity =0.8.19;
 
 interface INode {
-    function join(address _nodeAddress, address _managerAddress) external;
+    function join(address _nodeAddress, address _nodeOwnerAddress) external;
 }

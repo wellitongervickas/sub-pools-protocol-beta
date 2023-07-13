@@ -12,9 +12,9 @@ contract Node is INode, NodeControl, ManagerControl, Ownable {
 
     constructor(
         address _parentNodeAddress,
-        address _nodeOwnerAddress,
+        address _ownerAddress,
         address[] memory _invitedAddresses
-    ) ManagerControl(_nodeOwnerAddress, _invitedAddresses) {
+    ) ManagerControl(_ownerAddress, _invitedAddresses) {
         parent = _parentNodeAddress;
     }
 
