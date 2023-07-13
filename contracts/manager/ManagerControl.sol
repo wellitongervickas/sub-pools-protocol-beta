@@ -29,14 +29,14 @@ contract ManagerControl is IManagerControl, AccessControl {
         _;
     }
 
-    constructor(address _managerAddress, address[] memory _invitedAddresses) {
-        manager = IManagerControl.Manager({managerAddress: _managerAddress});
+    constructor(address _ownerAddress, address[] memory _invitedAddresses) {
+        manager = IManagerControl.Manager({ownerAddress: _ownerAddress});
         _setManagerRole(manager);
         _grantInvites(_invitedAddresses);
     }
 
     function _setManagerRole(Manager storage _manager) private {
-        _grantRole(MANAGER_ROLE, _manager.managerAddress);
+        _grantRole(MANAGER_ROLE, _manager.ownerAddress);
     }
 
     function invite(

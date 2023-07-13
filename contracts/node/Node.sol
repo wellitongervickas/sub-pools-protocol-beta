@@ -11,11 +11,11 @@ contract Node is INode, NodeControl, ManagerControl, Ownable {
     address public immutable parent;
 
     constructor(
-        address _parentAddress,
-        address _managerAddress,
+        address _parentNodeAddress,
+        address _nodeOwnerAddress,
         address[] memory _invitedAddresses
-    ) ManagerControl(_managerAddress, _invitedAddresses) {
-        parent = _parentAddress;
+    ) ManagerControl(_nodeOwnerAddress, _invitedAddresses) {
+        parent = _parentNodeAddress;
     }
 
     modifier onlyRouter() {
@@ -31,9 +31,9 @@ contract Node is INode, NodeControl, ManagerControl, Ownable {
 
     function join(
         address _nodeAddress,
-        address _managerAddress
-    ) external checkInvitation(_managerAddress) whenNotNode(_managerAddress) onlyRouter {
-        _setupNode(_nodeAddress, _managerAddress);
-        _updateInvitedRole(_managerAddress);
+        address _nodeOwnerAddress
+    ) external checkInvitation(_nodeOwnerAddress) whenNotNode(_nodeOwnerAddress) onlyRouter {
+        _setupNode(_nodeAddress, _nodeOwnerAddress);
+        _updateInvitedRole(_nodeOwnerAddress);
     }
 }

@@ -25,10 +25,10 @@ contract Router is IRouter, NodeControl {
 
     function _deployNode(
         address _parentAddress,
-        address _managerAddress,
+        address _nodeOwnerAddress,
         address[] memory _invitedAddresses
     ) private returns (address) {
-        Node _node = new Node(_parentAddress, _managerAddress, _invitedAddresses);
+        Node _node = new Node(_parentAddress, _nodeOwnerAddress, _invitedAddresses);
 
         address _nodeAddress = address(_node);
 
