@@ -47,10 +47,7 @@ contract Router is IRouter, NodeControl {
 
     function registryAndJoin(address _parentAddress, address[] memory _invitedAddresses) external returns (address) {
         INode _parent = INode(_parentAddress);
-        Registry _parentRegistry = Registry(_parent.registry());
-
-        address _registryAddress = _registry(_parentRegistry.registryType(), _parentRegistry.tokenData());
-        address _nodeAddress = _join(_parent, _invitedAddresses, _registryAddress);
+        address _nodeAddress = _join(_parent, _invitedAddresses, _parent.registry());
 
         return _nodeAddress;
     }

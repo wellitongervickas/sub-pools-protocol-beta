@@ -7,13 +7,40 @@ import { buildBytesSingleToken } from '../helpers/tokens'
 
 describe('Router', () => {
   describe('Join', () => {
-    it('should set registry token type as same as parent on join', async function () {
+    it('should set registry address as same as parent on join', async function () {
       const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
       const [, invited] = accounts
+
       const customAddress = createRandomAddress()
       const tokenData = buildBytesSingleToken(customAddress)
-      const tx = await routerContract.registryAndCreate(RegistryType.SingleTokenRegistry, tokenData, [invited.address])
 
+      const tx = await routerContract.registryAndCreate(RegistryType.SingleTokenRegistry, tokenData, [invited.address])
+      const receipt = await tx.wait()
+      const [nodeAddress] = getReceiptArgs(receipt)
+      const rootNodeContract = await ethers.getContractAt('Node', nodeAddress)
+      const rootNodeRegistryAddress = await rootNodeContract.registry()
+      // const rootNodeRegistryContract = await ethers.getContractAt('Registry', rootNodeRegistryAddress)
+      // const rootNodeRegistryType = await rootNodeRegistryContract.registryType()
+
+      const routerContractInvitedInstance = routerContract.connect(invited) as any
+      const tx1 = await routerContractInvitedInstance.registryAndJoin(nodeAddress, [])
+      const receipt1 = await tx1.wait()
+      const [nodeAddress1] = getReceiptArgs(receipt1)
+      const nodeContract = await ethers.getContractAt('Node', nodeAddress1)
+      const nodeRegistryAddress = await nodeContract.registry()
+      // const nodeRegistryContract = await ethers.getContractAt('Registry', nodeRegistryAddress)
+      // const nodeRegistryType = await nodeRegistryContract.registryType()
+      expect(nodeRegistryAddress).to.equal(rootNodeRegistryAddress)
+    })
+
+    it('should set registry token data as same as parent on join', async function () {
+      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
+      const [, invited] = accounts
+
+      const customAddress = createRandomAddress()
+      const tokenData = buildBytesSingleToken(customAddress)
+
+      const tx = await routerContract.registryAndCreate(RegistryType.SingleTokenRegistry, tokenData, [invited.address])
       const receipt = await tx.wait()
       const [nodeAddress] = getReceiptArgs(receipt)
       const rootNodeContract = await ethers.getContractAt('Node', nodeAddress)
@@ -26,39 +53,10 @@ describe('Router', () => {
       const receipt1 = await tx1.wait()
       const [nodeAddress1] = getReceiptArgs(receipt1)
       const nodeContract = await ethers.getContractAt('Node', nodeAddress1)
-
       const nodeRegistryAddress = await nodeContract.registry()
       const nodeRegistryContract = await ethers.getContractAt('Registry', nodeRegistryAddress)
       const nodeRegistryTokenData = await nodeRegistryContract.tokenData()
-
       expect(nodeRegistryTokenData).to.equal(rootNodeRegistryTokenData)
-    })
-
-    it('should set registry type as same as parent on join', async function () {
-      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
-      const [, invited] = accounts
-      const customAddress = createRandomAddress()
-      const tokenData = buildBytesSingleToken(customAddress)
-      const tx = await routerContract.registryAndCreate(RegistryType.SingleTokenRegistry, tokenData, [invited.address])
-
-      const receipt = await tx.wait()
-      const [nodeAddress] = getReceiptArgs(receipt)
-      const rootNodeContract = await ethers.getContractAt('Node', nodeAddress)
-      const rootNodeRegistryAddress = await rootNodeContract.registry()
-      const rootNodeRegistryContract = await ethers.getContractAt('Registry', rootNodeRegistryAddress)
-      const rootNodeRegistryType = await rootNodeRegistryContract.registryType()
-
-      const routerContractInvitedInstance = routerContract.connect(invited) as any
-      const tx1 = await routerContractInvitedInstance.registryAndJoin(nodeAddress, [])
-      const receipt1 = await tx1.wait()
-      const [nodeAddress1] = getReceiptArgs(receipt1)
-      const nodeContract = await ethers.getContractAt('Node', nodeAddress1)
-
-      const nodeRegistryAddress = await nodeContract.registry()
-      const nodeRegistryContract = await ethers.getContractAt('Registry', nodeRegistryAddress)
-      const nodeRegistryType = await nodeRegistryContract.registryType()
-
-      expect(nodeRegistryType).to.equal(rootNodeRegistryType)
     })
 
     it('should emit NodeCreated on join', async function () {
