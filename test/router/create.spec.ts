@@ -1,18 +1,21 @@
 import { expect } from 'chai'
 import { router, loadFixture, ethers, anyValue } from '../fixtures'
 import { getReceiptArgs } from '../helpers/receiptArgs'
+import { RegistryType } from '../fixtures/types'
 
 describe('Router', () => {
   describe('Create', () => {
     it('should emit NodeCreated on create', async function () {
       const { routerContract } = await loadFixture(router.deployRouterFixture)
-      await expect(routerContract.create([])).to.emit(routerContract, 'NodeCreated').withArgs(anyValue)
+      await expect(routerContract.registryAndCreate(RegistryType.SingleTokenRegistry, []))
+        .to.emit(routerContract, 'NodeCreated')
+        .withArgs(anyValue)
     })
 
     it('should set node parent as itself on create', async function () {
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-      const tx1 = await routerContract.create([])
+      const tx1 = await routerContract.registryAndCreate(RegistryType.SingleTokenRegistry, [])
       const receipt1 = await tx1.wait()
       const [nodeAddress] = getReceiptArgs(receipt1)
 

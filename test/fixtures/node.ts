@@ -1,14 +1,15 @@
 import { ethers } from 'hardhat'
 
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers'
-import { ZERO_ADDRESS } from '../helpers/address'
+import { FAKE_PARENT, FAKE_REGISTRY } from '../helpers/address'
 
 export { ethers, loadFixture }
 
 export async function deployNodeFixture(invitedAddresses: string[] = [], invitedOnly: boolean = false) {
   const accounts = await ethers.getSigners()
   const Node = await ethers.getContractFactory('Node')
-  const nodeContract = await Node.deploy(ZERO_ADDRESS, accounts[0].address, invitedAddresses)
+
+  const nodeContract = await Node.deploy(FAKE_PARENT, accounts[0].address, invitedAddresses, FAKE_REGISTRY)
 
   await nodeContract.setInvitedOnly(invitedOnly)
 

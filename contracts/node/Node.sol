@@ -9,13 +9,16 @@ import {ManagerControl} from '../manager/ManagerControl.sol';
 
 contract Node is INode, NodeControl, ManagerControl, Ownable {
     address public immutable parent;
+    address public immutable registry;
 
     constructor(
         address _parentNodeAddress,
         address _ownerAddress,
-        address[] memory _invitedAddresses
+        address[] memory _invitedAddresses,
+        address _registryAddress
     ) ManagerControl(_ownerAddress, _invitedAddresses) {
         parent = _parentNodeAddress;
+        registry = _registryAddress;
     }
 
     modifier onlyRouter() {

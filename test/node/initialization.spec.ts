@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { ethers, loadFixture, node } from '../fixtures'
-import { ZERO_ADDRESS } from '../helpers/address'
+import { FAKE_PARENT, FAKE_REGISTRY, ZERO_ADDRESS } from '../helpers/address'
 
 describe('Node', () => {
   describe('Deploy', () => {
@@ -12,14 +12,21 @@ describe('Node', () => {
       expect(nodeManager).to.equal(manager.address)
     })
 
+    it('should setup node registry on create', async function () {
+      const { nodeContract } = await loadFixture(node.deployNodeFixture)
+      const registryAddress = await nodeContract.registry()
+
+      expect(registryAddress).to.equal(ZERO_ADDRESS)
+    })
+
     it('should setup node parent on deploy', async function () {
       const accounts = await ethers.getSigners()
       const Node = await ethers.getContractFactory('Node')
-      const nodeContract = await Node.deploy(ZERO_ADDRESS, accounts[0].address, [])
+      const nodeContract = await Node.deploy(FAKE_PARENT, accounts[0].address, [], FAKE_REGISTRY)
 
       const parentAddress = await nodeContract.parent()
 
-      expect(parentAddress).to.equal(ZERO_ADDRESS)
+      expect(parentAddress).to.equal(FAKE_PARENT)
     })
   })
 
