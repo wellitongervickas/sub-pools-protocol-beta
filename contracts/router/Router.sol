@@ -4,13 +4,13 @@ pragma solidity =0.8.19;
 import {IRouter} from '../interfaces/router/IRouter.sol';
 import {Node, INode} from '../node/Node.sol';
 import {NodeControl} from '../node/NodeControl.sol';
-import {Registry, IRegistry} from '../registry/Registry.sol';
+import {Registry, RegistryLib, IRegistry} from '../registry/Registry.sol';
 
 contract Router is IRouter, NodeControl {
     constructor() {}
 
     function registryAndCreate(
-        IRegistry.RegistryType _registryType,
+        RegistryLib.RegistryType _registryType,
         bytes memory _tokenData,
         address[] memory _invitedAddresses
     ) external returns (address) {
@@ -20,7 +20,7 @@ contract Router is IRouter, NodeControl {
         return _nodeAddress;
     }
 
-    function _registry(IRegistry.RegistryType _registryType, bytes memory _tokenData) private returns (address) {
+    function _registry(RegistryLib.RegistryType _registryType, bytes memory _tokenData) private returns (address) {
         address _registryAddress = address(new Registry(_registryType, _tokenData));
         return _registryAddress;
     }

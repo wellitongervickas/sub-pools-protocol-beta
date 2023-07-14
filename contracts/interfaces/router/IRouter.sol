@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {IRegistry} from '../registry/IRegistry.sol';
+import {RegistryLib} from '../../libraries/Registry.sol';
 
 interface IRouter {
     event NodeCreated(address indexed _nodeAddress);
 
     function registryAndCreate(
-        IRegistry.RegistryType _registryType,
+        RegistryLib.RegistryType _registryType,
         bytes memory _tokenData,
         address[] memory _invitedAddresses
     ) external returns (address);

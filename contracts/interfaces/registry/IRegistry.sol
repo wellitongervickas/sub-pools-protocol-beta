@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-interface IRegistry {
-    enum RegistryType {
-        SingleTokenRegistry
-    }
+import {RegistryLib} from '../../libraries/Registry.sol';
 
-    function registryType() external view returns (RegistryType);
+interface IRegistry {
+    function registryType() external view returns (RegistryLib.RegistryType);
 
     function tokenData() external view returns (bytes memory);
 }

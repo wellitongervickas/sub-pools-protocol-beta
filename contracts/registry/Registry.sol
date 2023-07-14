@@ -8,12 +8,14 @@ pragma solidity =0.8.19;
 // }
 
 import {IRegistry} from '../interfaces/registry/IRegistry.sol';
+import {RegistryControl} from './RegistryControl.sol';
+import {RegistryLib} from '../libraries/Registry.sol';
 
-contract Registry is IRegistry {
-    IRegistry.RegistryType public registryType;
+contract Registry is IRegistry, RegistryControl {
+    RegistryLib.RegistryType public registryType;
     bytes public tokenData;
 
-    constructor(IRegistry.RegistryType _registryType, bytes memory _tokenData) {
+    constructor(RegistryLib.RegistryType _registryType, bytes memory _tokenData) {
         registryType = _registryType;
         tokenData = _tokenData;
     }
