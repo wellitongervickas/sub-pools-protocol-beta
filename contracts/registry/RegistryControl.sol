@@ -8,6 +8,7 @@ import {RegistryLib} from '../libraries/Registry.sol';
 contract RegistryControl is IRegistryControl {
     using RegistryLib for RegistryLib.Account;
     using Counters for Counters.Counter;
+
     Counters.Counter private currentID;
 
     mapping(address => RegistryLib.Account) private _accounts;
