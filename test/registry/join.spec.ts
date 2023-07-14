@@ -29,5 +29,18 @@ describe('Registry', () => {
       const [, initialBalance] = await registryContract.accounts(accountAddress)
       expect(initialBalance).to.equal(0)
     })
+
+    it('should revert if try to join without being the owner', async function () {
+      const { registryContract, accounts } = await loadFixture(
+        registry.deployRegistryFixture.bind(this, RegistryType.SingleTokenRegistry)
+      )
+      const [, account] = accounts
+
+      const accountAddress = createRandomAddress()
+      const registryContractAccountInstance = registryContract.connect(account) as any
+      await expect(registryContractAccountInstance.join(accountAddress)).to.be.revertedWith(
+        'Ownable: caller is not the owner'
+      )
+    })
   })
 })
