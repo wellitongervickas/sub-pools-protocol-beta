@@ -7,12 +7,14 @@ pragma solidity =0.8.19;
 //     IERC20 token1;
 // }
 
-import {IRegistry, RegistryType} from '../interfaces/registry/IRegistry.sol';
+import {IRegistry} from '../interfaces/registry/IRegistry.sol';
 
-contract Registry {
-    RegistryType private registryType;
+contract Registry is IRegistry {
+    IRegistry.RegistryType public registryType;
+    bytes public tokenData;
 
-    constructor(RegistryType _registryType) {
+    constructor(IRegistry.RegistryType _registryType, bytes memory _tokenData) {
         registryType = _registryType;
+        tokenData = _tokenData;
     }
 }

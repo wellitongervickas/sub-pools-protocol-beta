@@ -2,31 +2,30 @@
 pragma solidity =0.8.19;
 
 import {IRouter} from '../interfaces/router/IRouter.sol';
-
 import {Node, INode} from '../node/Node.sol';
 import {NodeControl} from '../node/NodeControl.sol';
-
-import {Registry, RegistryType} from '../registry/Registry.sol';
+import {Registry, IRegistry} from '../registry/Registry.sol';
 
 contract Router is IRouter, NodeControl {
     constructor() {}
 
     function registryAndCreate(
-        RegistryType _registryType,
+        IRegistry.RegistryType _registryType,
+        bytes memory _tokenData,
         address[] memory _invitedAddresses
     ) external returns (address) {
-        address _registryAddress = _registry(_registryType);
+        address _registryAddress = _registry(_registryType, _tokenData);
         address _nodeAddress = _create(_invitedAddresses, _registryAddress);
 
         return _nodeAddress;
     }
 
-    function _registry(RegistryType _registryType) private returns (address) {
-        address _registryAddress = address(new Registry(_registryType));
+    function _registry(IRegistry.RegistryType _registryType, bytes memory _tokenData) private returns (address) {
+        address _registryAddress = address(new Registry(_registryType, _tokenData));
         return _registryAddress;
     }
 
-    function _create(address[] memory _invitedAddresses, address _registryAddress) public returns (address) {
+    function _create(address[] memory _invitedAddresses, address _registryAddress) private returns (address) {
         address _nodeAddress = _deployNode(address(this), msg.sender, _invitedAddresses, _registryAddress);
         _setupNode(_nodeAddress, msg.sender);
 
@@ -46,25 +45,22 @@ contract Router is IRouter, NodeControl {
         return _nodeAddress;
     }
 
-    function registryAndJoin(
-        address _parentAddress,
-        RegistryType _registryType,
-        address[] memory _invitedAddresses
-    ) external returns (address) {
-        address _registryAddress = _registry(_registryType);
-        address _nodeAddress = _join(_parentAddress, _invitedAddresses, _registryAddress);
+    function registryAndJoin(address _parentAddress, address[] memory _invitedAddresses) external returns (address) {
+        INode _parent = INode(_parentAddress);
+        Registry _parentRegistry = Registry(_parent.registry());
+
+        address _registryAddress = _registry(_parentRegistry.registryType(), _parentRegistry.tokenData());
+        address _nodeAddress = _join(_parent, _invitedAddresses, _registryAddress);
 
         return _nodeAddress;
     }
 
     function _join(
-        address _parentAddress,
+        INode _parent,
         address[] memory _invitedAddresses,
         address _registryAddress
     ) private returns (address) {
-        INode _parent = INode(_parentAddress);
-
-        address _nodeAddress = _deployNode(_parentAddress, msg.sender, _invitedAddresses, _registryAddress);
+        address _nodeAddress = _deployNode(address(_parent), msg.sender, _invitedAddresses, _registryAddress);
         _parent.join(_nodeAddress, msg.sender);
 
         return _nodeAddress;

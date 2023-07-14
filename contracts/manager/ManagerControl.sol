@@ -10,7 +10,7 @@ contract ManagerControl is IManagerControl, AccessControl {
     bytes32 private constant INVITED_ROLE = keccak256('INVITED_ROLE');
     bytes32 private constant NODE_ROLE = keccak256('NODE_ROLE');
 
-    Manager public manager;
+    IManagerControl.Manager public manager;
 
     bool public invitedOnly = true;
 
@@ -39,6 +39,10 @@ contract ManagerControl is IManagerControl, AccessControl {
         _grantRole(MANAGER_ROLE, _manager.ownerAddress);
     }
 
+    function setInvitedOnly(bool _invitedOnly) external onlyRole(MANAGER_ROLE) {
+        invitedOnly = _invitedOnly;
+    }
+
     function invite(
         address _invitedAddress
     )
@@ -57,10 +61,6 @@ contract ManagerControl is IManagerControl, AccessControl {
             _grantRole(INVITED_ROLE, _invitedAddresses[i]);
             emit IManagerControl.NodeManagerInvited(_invitedAddresses[i]);
         }
-    }
-
-    function setInvitedOnly(bool _invitedOnly) external onlyRole(MANAGER_ROLE) {
-        invitedOnly = _invitedOnly;
     }
 
     function _updateInvitedRole(address _address) internal {
