@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {INode} from '../interfaces/node/INode.sol';
-
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
+
+import {INode} from '../interfaces/node/INode.sol';
 import {NodeControl} from './NodeControl.sol';
 import {ManagerControl} from '../manager/ManagerControl.sol';
 

@@ -5,4 +5,9 @@ library RegistryLib {
     enum RegistryType {
         SingleTokenRegistry
     }
+
+    struct Account {
+        uint256 id;
+        uint256 initialBalance;
+    }
 }

@@ -17,6 +17,8 @@ contract Router is IRouter, NodeControl {
         address _registryAddress = _registry(_registryType, _tokenData);
         address _nodeAddress = _create(_invitedAddresses, _registryAddress);
 
+        IRegistry(_registryAddress).join(_nodeAddress);
+
         return _nodeAddress;
     }
 
@@ -47,7 +49,10 @@ contract Router is IRouter, NodeControl {
 
     function registryAndJoin(address _parentAddress, address[] memory _invitedAddresses) external returns (address) {
         INode _parent = INode(_parentAddress);
-        address _nodeAddress = _join(_parent, _invitedAddresses, _parent.registry());
+        address _parentRegistry = _parent.registry();
+        address _nodeAddress = _join(_parent, _invitedAddresses, _parentRegistry);
+
+        IRegistry(_parentRegistry).join(_nodeAddress);
 
         return _nodeAddress;
     }

@@ -8,8 +8,8 @@ contract NodeControl is INodeControl {
 
     constructor() {}
 
-    function _setupNode(address _nodeAddress, address _nodeOwnerAddress) internal {
-        _node[_nodeAddress] = INodeControl.Setup(_nodeOwnerAddress);
+    function _setupNode(address _nodeAddress, address _ownerAddress) internal {
+        _node[_nodeAddress] = INodeControl.Setup(_ownerAddress);
     }
 
     function node(address _nodeAddress) public view returns (INodeControl.Setup memory) {
