@@ -12,12 +12,12 @@ contract Node is INode, NodeControl, ManagerControl, Ownable {
     address public immutable registry;
 
     constructor(
-        address _parentNodeAddress,
+        address _parentAddress,
         address _ownerAddress,
         address[] memory _invitedAddresses,
         address _registryAddress
     ) ManagerControl(_ownerAddress, _invitedAddresses) {
-        parent = _parentNodeAddress;
+        parent = _parentAddress;
         registry = _registryAddress;
     }
 
