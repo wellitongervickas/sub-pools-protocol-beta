@@ -6,8 +6,6 @@ import {INodeControl} from '../interfaces/node/INodeControl.sol';
 contract NodeControl is INodeControl {
     mapping(address => INodeControl.Setup) private _node;
 
-    constructor() {}
-
     function _setupNode(address _nodeAddress, address _ownerAddress) internal {
         _node[_nodeAddress] = INodeControl.Setup(_ownerAddress);
     }

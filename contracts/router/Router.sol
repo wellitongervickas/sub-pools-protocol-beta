@@ -7,8 +7,6 @@ import {NodeControl} from '../node/NodeControl.sol';
 import {Registry, RegistryLib, IRegistry} from '../registry/Registry.sol';
 
 contract Router is IRouter, NodeControl {
-    constructor() {}
-
     function registryAndCreate(
         RegistryLib.RegistryType _registryType,
         bytes memory _tokenData,
