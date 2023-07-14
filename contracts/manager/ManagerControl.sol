@@ -12,32 +12,17 @@ contract ManagerControl is IManagerControl, AccessControl {
 
     IManagerControl.Manager public manager;
 
-    modifier whenNotManager(address _address) {
-        if (hasRoleManager(_address)) revert IManagerControl.ManagerNotAllowed();
-        _;
-    }
-
-    modifier whenNotInvited(address _address) {
-        if (hasInvitedRole(_address)) revert IManagerControl.AlreadyInvited();
-        _;
-    }
-
-    modifier whenNotNode(address _address) {
-        if (hasNodeRole(_address)) revert IManagerControl.AlreadyNode();
-        _;
-    }
-
     function _setupManager(address _managerAddress, address[] memory _invitedAddresses) internal {
         manager = IManagerControl.Manager({ownerAddress: _managerAddress});
         _setManagerRole(manager);
         _grantInvites(_invitedAddresses);
     }
 
-    function _setManagerRole(IManagerControl.Manager storage _manager) internal {
+    function _setManagerRole(IManagerControl.Manager storage _manager) private {
         _grantRole(MANAGER_ROLE, _manager.ownerAddress);
     }
 
-    function _grantInvites(address[] memory _invitedAddresses) internal {
+    function _grantInvites(address[] memory _invitedAddresses) private {
         for (uint256 i = 0; i < _invitedAddresses.length; i++) {
             _grantRole(INVITED_ROLE, _invitedAddresses[i]);
         }
