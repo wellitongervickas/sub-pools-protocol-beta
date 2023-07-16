@@ -25,10 +25,11 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     constructor(RegistryLib.RegistryType _registryType, bytes memory _tokenData) {
         registryType = _registryType;
         tokenData = _tokenData;
+        join(msg.sender);
     }
 
     /// check joined to avoid twice
-    function join(address _accountAddress) external onlyRouter {
+    function join(address _accountAddress) public onlyRouter {
         _setupAccount(_accountAddress);
         /// ToDo: event
     }

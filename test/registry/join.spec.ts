@@ -6,7 +6,7 @@ import { buildBytesSingleToken } from '../helpers/tokens'
 
 describe('Registry', () => {
   describe('Join', () => {
-    it('should set account ID on join', async function () {
+    it('should set account ID 2 on join as root', async function () {
       const { registryContract } = await loadFixture(
         registry.deployRegistryFixture.bind(this, RegistryType.SingleTokenRegistry)
       )
@@ -15,7 +15,7 @@ describe('Registry', () => {
       await registryContract.join(accountAddress)
 
       const [id] = await registryContract.accounts(accountAddress)
-      expect(id).to.equal(1)
+      expect(id).to.equal(2)
     })
 
     it.skip('should set account initial balance on join', async function () {
