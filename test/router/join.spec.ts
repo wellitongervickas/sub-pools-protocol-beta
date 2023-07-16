@@ -23,7 +23,7 @@ describe('Router', () => {
       // const rootNodeRegistryType = await rootNodeRegistryContract.registryType()
 
       const routerContractInvitedInstance = routerContract.connect(invited) as any
-      const tx1 = await routerContractInvitedInstance.registryAndJoin(nodeAddress, [])
+      const tx1 = await routerContractInvitedInstance.join(nodeAddress, [])
       const receipt1 = await tx1.wait()
       const [nodeAddress1] = getReceiptArgs(receipt1)
       const nodeContract = await ethers.getContractAt('Node', nodeAddress1)
@@ -49,7 +49,7 @@ describe('Router', () => {
       const rootNodeRegistryTokenData = await rootNodeRegistryContract.tokenData()
 
       const routerContractInvitedInstance = routerContract.connect(invited) as any
-      const tx1 = await routerContractInvitedInstance.registryAndJoin(nodeAddress, [])
+      const tx1 = await routerContractInvitedInstance.join(nodeAddress, [])
       const receipt1 = await tx1.wait()
       const [nodeAddress1] = getReceiptArgs(receipt1)
       const nodeContract = await ethers.getContractAt('Node', nodeAddress1)
@@ -69,9 +69,7 @@ describe('Router', () => {
       const nodeContract = await ethers.getContractAt('Node', nodeAddress)
       await nodeContract.setInvitedOnly(false) // must be public to join without issue
 
-      await expect(routerContract.registryAndJoin(nodeAddress, []))
-        .to.emit(routerContract, 'NodeCreated')
-        .withArgs(anyValue)
+      await expect(routerContract.join(nodeAddress, [])).to.emit(routerContract, 'NodeCreated').withArgs(anyValue)
     })
   })
 })

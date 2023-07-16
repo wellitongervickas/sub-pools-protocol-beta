@@ -25,6 +25,7 @@ contract ManagerControl is IManagerControl, AccessControl {
     function _grantInvites(address[] memory _invitedAddresses) private {
         for (uint256 i = 0; i < _invitedAddresses.length; i++) {
             _grantRole(INVITED_ROLE, _invitedAddresses[i]);
+            emit IManagerControl.NodeManagerInvited(_invitedAddresses[i]);
         }
     }
 

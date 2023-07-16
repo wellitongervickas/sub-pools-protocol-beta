@@ -12,5 +12,5 @@ interface IRouter {
         address[] memory _invitedAddresses
     ) external returns (address);
 
-    function registryAndJoin(address _parentAddress, address[] memory _invitedAddresses) external returns (address);
+    function join(address _parentAddress, address[] memory _invitedAddresses) external returns (address);
 }

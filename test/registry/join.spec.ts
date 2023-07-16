@@ -18,7 +18,7 @@ describe('Registry', () => {
       expect(id).to.equal(1)
     })
 
-    it('should set account initial balance on join', async function () {
+    it.skip('should set account initial balance on join', async function () {
       const { registryContract } = await loadFixture(
         registry.deployRegistryFixture.bind(this, RegistryType.SingleTokenRegistry)
       )

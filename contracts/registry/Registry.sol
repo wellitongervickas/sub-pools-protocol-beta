@@ -27,7 +27,9 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         tokenData = _tokenData;
     }
 
+    /// check joined to avoid twice
     function join(address _accountAddress) external onlyRouter {
         _setupAccount(_accountAddress);
+        /// ToDo: event
     }
 }

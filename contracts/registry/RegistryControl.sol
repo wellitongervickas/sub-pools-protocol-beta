@@ -15,7 +15,7 @@ contract RegistryControl is IRegistryControl {
 
     function _setupAccount(address _accountAddress) internal {
         uint256 _childrenID = _createChildrenID();
-        _accounts[_accountAddress] = RegistryLib.Account({id: _childrenID, initialBalance: 0});
+        _accounts[_accountAddress] = RegistryLib.Account({id: _childrenID});
     }
 
     function _createChildrenID() private returns (uint256) {
