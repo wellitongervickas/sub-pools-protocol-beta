@@ -23,20 +23,16 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
-        _join(_msgSender());
+        _setupAccount(_msgSender());
     }
 
-    function _join(address _accountAddress) private {
+    function setupAccount(address _accountAddress) public onlyRouter whenNotAccount(_accountAddress) {
         _setupAccount(_accountAddress);
-    }
-
-    function join(address _accountAddress) public onlyRouter whenNotAccount(_accountAddress) {
-        _join(_accountAddress);
         emit Joined(_accountAddress);
     }
 
-    function deposit(address _accountAddress, bytes memory _amount) external onlyRouter {
-        _deposit(_accountAddress, _amount);
+    function depositAccount(address _accountAddress, bytes memory _amount) external onlyRouter {
+        _depositAccount(_accountAddress, _amount);
         emit Deposited(_accountAddress, _amount);
     }
 }

@@ -1,7 +1,5 @@
 import { expect } from 'chai'
 import { router, loadFixture, ethers, anyValue, token } from '../fixtures'
-import { getReceiptArgs } from '../helpers/receiptArgs'
-import { ZERO_ADDRESS } from '../helpers/address'
 import coderUtils from '../helpers/coder'
 
 describe('Router', () => {
@@ -16,7 +14,15 @@ describe('Router', () => {
 
       const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
       const [, invited] = accounts
-      const amount = coderUtils.build([100], ['uint256'])
+      const routerContractAddress = await routerContract.getAddress()
+
+      const amountValue = '1000000000000000000'
+      const amount = coderUtils.build([amountValue], ['uint256'])
+
+      await tokenContract.approve(routerContractAddress, amountValue)
+      await tokenContract.transfer(invited.address, amountValue)
+      await (tokenContract.connect(invited) as any).approve(routerContractAddress, amountValue)
+
       const tx = await routerContract.registryAndCreate(fakeStrategyAddress, [invited.address], amount)
       const receipt = await tx.wait()
       const [nodeAddress] = receipt.logs[6].args
@@ -41,13 +47,21 @@ describe('Router', () => {
       const fakeStrategyAddress = await fakeStrategy.getAddress()
 
       const { routerContract } = await loadFixture(router.deployRouterFixture)
-      const amount = coderUtils.build([100], ['uint256'])
+      const routerContractAddress = await routerContract.getAddress()
+
+      const amountValue = '1000000000000000000'
+      const amount = coderUtils.build([amountValue], ['uint256'])
+
+      await tokenContract.approve(routerContractAddress, amountValue)
+
       const tx = await routerContract.registryAndCreate(fakeStrategyAddress, [], amount)
       const receipt = await tx.wait()
       const [nodeAddress] = receipt.logs[4].args
 
       const nodeContract = await ethers.getContractAt('Node', nodeAddress)
       await nodeContract.setInvitedOnly(false) // must be public to join without issue
+
+      await tokenContract.approve(routerContractAddress, amountValue)
 
       await expect(routerContract.join(nodeAddress, [], amount))
         .to.emit(routerContract, 'NodeCreated')

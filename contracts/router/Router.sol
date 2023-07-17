@@ -5,8 +5,13 @@ import {IRouter} from '../interfaces/router/IRouter.sol';
 import {Node} from '../node/Node.sol';
 import {NodeControl} from '../node/NodeControl.sol';
 import {Registry} from '../registry/Registry.sol';
+import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 
 contract Router is IRouter, NodeControl {
+    using SafeERC20 for IERC20;
+
     function registryAndCreate(
         address _strategyAddress,
         address[] memory _invitedAddresses,
@@ -15,7 +20,7 @@ contract Router is IRouter, NodeControl {
         address _registryAddress = _createRegistry(_strategyAddress);
         address _nodeAddress = _createRootNode(_invitedAddresses, _registryAddress);
 
-        _joinRegistry(_registryAddress, _nodeAddress, _amount);
+        _setupRegistryAccount(_registryAddress, _nodeAddress, _amount);
 
         return _nodeAddress;
     }
@@ -59,16 +64,30 @@ contract Router is IRouter, NodeControl {
         address _nodeAddress = _deployNode(address(_parent), msg.sender, _invitedAddresses, _parentRegistry);
 
         _parent.join(_nodeAddress, msg.sender);
-        _joinRegistry(_parentRegistry, _nodeAddress, _amount);
+        _setupRegistryAccount(_parentRegistry, _nodeAddress, _amount);
 
         return _nodeAddress;
     }
 
-    function _joinRegistry(address _registryAddress, address _nodeAddress, bytes memory _amount) private {
+    function _computeRequiredDeposit(Registry _registry, bytes memory _amount) private {
+        IStrategy _strategy = _registry.strategy();
+
+        address _decodedTokenAddress = abi.decode(_strategy.token(), (address));
+
+        IERC20 _token = IERC20(_decodedTokenAddress);
+
+        uint256 _decodedAmount = abi.decode(_amount, (uint256));
+
+        _token.safeTransferFrom(msg.sender, address(this), _decodedAmount);
+    }
+
+    function _setupRegistryAccount(address _registryAddress, address _nodeAddress, bytes memory _amount) private {
         Registry _registry = Registry(_registryAddress);
 
-        _registry.join(_nodeAddress);
-        _registry.deposit(_nodeAddress, _amount);
+        _computeRequiredDeposit(_registry, _amount);
+
+        _registry.setupAccount(_nodeAddress);
+        _registry.depositAccount(_nodeAddress, _amount);
 
         emit IRouter.RegistryJoined(_registryAddress, _nodeAddress, _amount);
     }

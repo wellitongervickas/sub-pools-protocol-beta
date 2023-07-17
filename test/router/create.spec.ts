@@ -13,7 +13,12 @@ describe('Router', () => {
       const fakeStrategyAddress = await fakeStrategy.getAddress()
 
       const { routerContract } = await loadFixture(router.deployRouterFixture)
-      const amount = coderUtils.build(['100'], ['uint256'])
+      const routerContractAddress = await routerContract.getAddress()
+
+      const amountValue = '1000000000000000000'
+      const amount = coderUtils.build([amountValue], ['uint256'])
+
+      await tokenContract.approve(routerContractAddress, amountValue)
 
       const tx1 = await routerContract.registryAndCreate(fakeStrategyAddress, [], amount)
       const receipt1 = await tx1.wait()
@@ -35,7 +40,12 @@ describe('Router', () => {
       const fakeStrategyAddress = await fakeStrategy.getAddress()
 
       const { routerContract } = await loadFixture(router.deployRouterFixture)
-      const amount = coderUtils.build([100], ['uint256'])
+      const routerContractAddress = await routerContract.getAddress()
+
+      const amountValue = '1000000000000000000'
+      const amount = coderUtils.build([amountValue], ['uint256'])
+
+      await tokenContract.approve(routerContractAddress, amountValue)
       await expect(routerContract.registryAndCreate(fakeStrategyAddress, [], amount))
         .to.emit(routerContract, 'NodeCreated')
         .withArgs(anyValue)

@@ -15,7 +15,8 @@ contract RegistryControl is IRegistryControl {
 
     function _setupAccount(address _accountAddress) internal {
         uint256 _id = _createID();
-        _accounts[_accountAddress] = RegistryLib.Account({id: _id, initialBalance: abi.encode(0, ['uint256'])});
+        bytes memory _initialBalance = abi.encode(0, ['uint256']);
+        _accounts[_accountAddress] = RegistryLib.Account({id: _id, initialBalance: _initialBalance});
     }
 
     function _createID() private returns (uint256) {
@@ -27,7 +28,7 @@ contract RegistryControl is IRegistryControl {
         return _accounts[_accountAddress];
     }
 
-    function _deposit(address _accountAddress, bytes memory _amount) internal {
+    function _depositAccount(address _accountAddress, bytes memory _amount) internal {
         _accounts[_accountAddress]._deposit(_amount);
     }
 }
