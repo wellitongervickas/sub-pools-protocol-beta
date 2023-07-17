@@ -11,5 +11,5 @@ interface IRegistry {
 
     function setupAccount(address _accountAddress) external;
 
-    function depositAccount(address _accountAddress, bytes memory _amount) external;
+    function deposit(address _accountAddress, bytes memory _amount) external;
 }

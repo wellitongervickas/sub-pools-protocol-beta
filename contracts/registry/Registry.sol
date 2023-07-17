@@ -31,7 +31,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         emit Joined(_accountAddress);
     }
 
-    function depositAccount(address _accountAddress, bytes memory _amount) external onlyRouter {
+    function deposit(address _accountAddress, bytes memory _amount) external onlyRouter {
         _depositAccount(_accountAddress, _amount);
         emit Deposited(_accountAddress, _amount);
     }

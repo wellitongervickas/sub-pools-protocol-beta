@@ -67,5 +67,35 @@ describe('Router', () => {
         .to.emit(routerContract, 'NodeCreated')
         .withArgs(anyValue)
     })
+
+    it.skip('poc', async function () {
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const tokenAddress = await tokenContract.getAddress()
+
+      const FakeStrategy = await ethers.getContractFactory('FakeStrategy')
+      const fakeStrategy = await FakeStrategy.deploy(coderUtils.build([tokenAddress], ['address']))
+      const fakeStrategyAddress = await fakeStrategy.getAddress()
+
+      const { routerContract } = await loadFixture(router.deployRouterFixture)
+      const routerContractAddress = await routerContract.getAddress()
+
+      const amountValue = '1000000000000000000'
+      const amount = coderUtils.build([amountValue], ['uint256'])
+
+      await tokenContract.approve(routerContractAddress, amountValue)
+
+      const tx = await routerContract.registryAndCreate(fakeStrategyAddress, [], amount)
+      const receipt = await tx.wait()
+      const [nodeAddress] = receipt.logs[4].args
+
+      const nodeContract = await ethers.getContractAt('Node', nodeAddress)
+      await nodeContract.setInvitedOnly(false) // must be public to join without issue
+
+      await tokenContract.approve(routerContractAddress, amountValue)
+
+      await routerContract.join(nodeAddress, [], amount)
+
+      console.log(await tokenContract.balanceOf(await nodeContract.registry()))
+    })
   })
 })
