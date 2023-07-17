@@ -2,7 +2,6 @@
 pragma solidity =0.8.19;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
-
 import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 import {IRegistry} from '../interfaces/registry/IRegistry.sol';
 import {RegistryControl} from './RegistryControl.sol';
@@ -22,7 +21,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
-        _join(msg.sender, abi.encode(0));
+        _join(_msgSender(), abi.encode(0));
     }
 
     function _join(address _accountAddress, bytes memory _amount) private {
@@ -34,6 +33,11 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         bytes memory _amount
     ) public onlyRouter whenNotAccount(_accountAddress) {
         _join(_accountAddress, _amount);
-        emit Joined(_accountAddress);
+        strategy.deposit(_amount);
+        emit Joined(_accountAddress, _amount);
+    }
+
+    function _depositToStrategy(bytes memory _amount) private {
+        strategy.deposit(_amount);
     }
 }

@@ -1,10 +1,16 @@
 import { ethers } from 'hardhat'
 
-export async function deployTokenFixture(initialSupply: number, decimals = 18, name = 'ERC20 Token', symbol = 'ERC20') {
+const DEFAULT_DECIMALS = 18
+
+export async function deployTokenFixture(
+  initialSupply = `${1 * 10 ** DEFAULT_DECIMALS}`,
+  decimals = DEFAULT_DECIMALS,
+  name = 'ERC20 Token',
+  symbol = 'ERC20'
+) {
   const accounts = await ethers.getSigners()
   const Token = await ethers.getContractFactory('Token')
-  const _initialSupply = ethers.toBigInt(initialSupply * 10 ** decimals)
-  const tokenContract = await Token.deploy(_initialSupply, name, symbol, decimals)
+  const tokenContract = await Token.deploy(initialSupply, name, symbol, decimals)
 
   return { accounts, tokenContract }
 }

@@ -39,6 +39,7 @@ contract Router is IRouter, NodeControl {
         address _registryAddress
     ) private returns (address) {
         Node _node = new Node(_parentAddress, _nodeOwnerAddress, _invitedAddresses, _registryAddress);
+
         address _nodeAddress = address(_node);
 
         emit IRouter.NodeCreated(_nodeAddress);
@@ -51,16 +52,14 @@ contract Router is IRouter, NodeControl {
         bytes memory _amount
     ) external returns (address) {
         Node _parent = Node(_parentAddress);
+
         address _parentRegistry = _parent.registry();
         address _nodeAddress = _deployNode(address(_parent), msg.sender, _invitedAddresses, _parentRegistry);
 
-        _joinParentNode(_parent, _nodeAddress);
+        _parent.join(_nodeAddress, msg.sender);
+
         Registry(_parentRegistry).joinAndDeposit(_nodeAddress, _amount);
 
         return _nodeAddress;
-    }
-
-    function _joinParentNode(Node _parent, address _nodeAddress) private {
-        _parent.join(_nodeAddress, msg.sender);
     }
 }

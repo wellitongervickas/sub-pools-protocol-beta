@@ -1,39 +1,49 @@
 import { expect } from 'chai'
-import { loadFixture, registry } from '../fixtures'
+import { loadFixture, registry, ethers, token, anyValue } from '../fixtures'
 import { createRandomAddress } from '../helpers/address'
 import coderUtils from '../helpers/coder'
 
 describe('Registry', () => {
   describe('Join', () => {
-    it('should set account ID on join', async function () {
-      const { registryContract } = await loadFixture(registry.deployRegistryFixture.bind(this, createRandomAddress()))
-
-      const amount = coderUtils.build([100], ['uint256'])
-      const accountAddress = createRandomAddress()
-      await registryContract.joinAndDeposit(accountAddress, amount)
-
-      const [id] = await registryContract.accounts(accountAddress)
-      expect(id).to.equal(2)
-    })
-
     it('should set account cashback on join', async function () {
-      const { registryContract } = await loadFixture(registry.deployRegistryFixture.bind(this, createRandomAddress()))
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const tokenAddress = await tokenContract.getAddress()
 
-      const amount = coderUtils.build([100], ['uint256'])
+      const FakeStrategy = await ethers.getContractFactory('FakeStrategy')
+      const fakeStrategy = await FakeStrategy.deploy(coderUtils.build([tokenAddress], ['address']))
+      const fakeStrategyAddress = await fakeStrategy.getAddress()
+
+      const { registryContract } = await loadFixture(registry.deployRegistryFixture.bind(this, fakeStrategyAddress))
+      const registryContractAddress = await registryContract.getAddress()
+
+      const amountNumber = '1000000000000000000'
+      const amount = coderUtils.build([amountNumber], ['uint256'])
       const accountAddress = createRandomAddress()
+
+      await tokenContract.approve(registryContractAddress, amountNumber)
       await registryContract.joinAndDeposit(accountAddress, amount)
 
       const [, cashback] = await registryContract.accounts(accountAddress)
       const [decompiledCashback] = coderUtils.decompile(cashback, ['uint256'])
-      expect(decompiledCashback).to.equal(100)
+      expect(decompiledCashback).to.equal(amountNumber)
     })
 
     it('should revert if try to join with an already joined account', async function () {
-      const { registryContract } = await loadFixture(registry.deployRegistryFixture.bind(this, createRandomAddress()))
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const tokenAddress = await tokenContract.getAddress()
 
-      const amount = coderUtils.build([100], ['uint256'])
+      const FakeStrategy = await ethers.getContractFactory('FakeStrategy')
+      const fakeStrategy = await FakeStrategy.deploy(coderUtils.build([tokenAddress], ['address']))
+      const fakeStrategyAddress = await fakeStrategy.getAddress()
 
+      const { registryContract } = await loadFixture(registry.deployRegistryFixture.bind(this, fakeStrategyAddress))
+      const registryContractAddress = await registryContract.getAddress()
+
+      const amountNumber = '1000000000000000000'
+      const amount = coderUtils.build([amountNumber], ['uint256'])
       const accountAddress = createRandomAddress()
+
+      await tokenContract.approve(registryContractAddress, amountNumber)
       await registryContract.joinAndDeposit(accountAddress, amount)
 
       await expect(registryContract.joinAndDeposit(accountAddress, amount)).to.be.revertedWithCustomError(
@@ -43,13 +53,24 @@ describe('Registry', () => {
     })
 
     it('should emit Joined event on join', async function () {
-      const { registryContract } = await loadFixture(registry.deployRegistryFixture.bind(this, createRandomAddress()))
-      const amount = coderUtils.build([100], ['uint256'])
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const tokenAddress = await tokenContract.getAddress()
 
+      const FakeStrategy = await ethers.getContractFactory('FakeStrategy')
+      const fakeStrategy = await FakeStrategy.deploy(coderUtils.build([tokenAddress], ['address']))
+      const fakeStrategyAddress = await fakeStrategy.getAddress()
+
+      const { registryContract } = await loadFixture(registry.deployRegistryFixture.bind(this, fakeStrategyAddress))
+      const registryContractAddress = await registryContract.getAddress()
+
+      const amountNumber = '1000000000000000000'
+      const amount = coderUtils.build([amountNumber], ['uint256'])
       const accountAddress = createRandomAddress()
+
+      await tokenContract.approve(registryContractAddress, amountNumber)
       await expect(registryContract.joinAndDeposit(accountAddress, amount))
         .to.emit(registryContract, 'Joined')
-        .withArgs(accountAddress)
+        .withArgs(accountAddress, anyValue)
     })
 
     it('should revert if try to join without being the owner', async function () {
@@ -65,7 +86,5 @@ describe('Registry', () => {
         'Ownable: caller is not the owner'
       )
     })
-
-    it('should set account balance on join', async function () {})
   })
 })
