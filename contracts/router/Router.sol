@@ -2,9 +2,9 @@
 pragma solidity =0.8.19;
 
 import {IRouter} from '../interfaces/router/IRouter.sol';
-import {Node, INode} from '../node/Node.sol';
+import {Node} from '../node/Node.sol';
 import {NodeControl} from '../node/NodeControl.sol';
-import {Registry, RegistryLib, IRegistry} from '../registry/Registry.sol';
+import {Registry} from '../registry/Registry.sol';
 
 contract Router is IRouter, NodeControl {
     function registryAndCreate(
@@ -14,7 +14,7 @@ contract Router is IRouter, NodeControl {
         address _registryAddress = _registry(_strategyAddress);
         address _nodeAddress = _create(_invitedAddresses, _registryAddress);
 
-        IRegistry(_registryAddress).join(_nodeAddress);
+        Registry(_registryAddress).join(_nodeAddress);
 
         return _nodeAddress;
     }
@@ -45,17 +45,17 @@ contract Router is IRouter, NodeControl {
     }
 
     function join(address _parentAddress, address[] memory _invitedAddresses) external returns (address) {
-        INode _parent = INode(_parentAddress);
+        Node _parent = Node(_parentAddress);
         address _parentRegistry = _parent.registry();
         address _nodeAddress = _joinParent(_parent, _invitedAddresses, _parentRegistry);
 
-        IRegistry(_parentRegistry).join(_nodeAddress);
+        Registry(_parentRegistry).join(_nodeAddress);
 
         return _nodeAddress;
     }
 
     function _joinParent(
-        INode _parent,
+        Node _parent,
         address[] memory _invitedAddresses,
         address _registryAddress
     ) private returns (address) {
