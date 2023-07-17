@@ -5,6 +5,7 @@ import {RegistryLib} from '../../libraries/Registry.sol';
 
 interface IRegistry {
     event Joined(address indexed _accountAddress);
+    event Deposited(address indexed _accountAddress, bytes _amount);
 
     error AlreadyJoined();
 

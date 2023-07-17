@@ -19,14 +19,14 @@ describe('Router', () => {
       const amount = coderUtils.build([100], ['uint256'])
       const tx = await routerContract.registryAndCreate(fakeStrategyAddress, [invited.address], amount)
       const receipt = await tx.wait()
-      const [nodeAddress] = getReceiptArgs(receipt)
+      const [nodeAddress] = receipt.logs[6].args
       const rootNodeContract = await ethers.getContractAt('Node', nodeAddress)
       const rootNodeRegistryAddress = await rootNodeContract.registry()
 
       const routerContractInvitedInstance = routerContract.connect(invited) as any
       const tx1 = await routerContractInvitedInstance.join(nodeAddress, [], amount)
       const receipt1 = await tx1.wait()
-      const [nodeAddress1] = getReceiptArgs(receipt1)
+      const [nodeAddress1] = receipt1.logs[2].args
       const nodeContract = await ethers.getContractAt('Node', nodeAddress1)
       const nodeRegistryAddress = await nodeContract.registry()
       expect(nodeRegistryAddress).to.equal(rootNodeRegistryAddress)
@@ -44,7 +44,7 @@ describe('Router', () => {
       const amount = coderUtils.build([100], ['uint256'])
       const tx = await routerContract.registryAndCreate(fakeStrategyAddress, [], amount)
       const receipt = await tx.wait()
-      const [nodeAddress] = getReceiptArgs(receipt)
+      const [nodeAddress] = receipt.logs[4].args
 
       const nodeContract = await ethers.getContractAt('Node', nodeAddress)
       await nodeContract.setInvitedOnly(false) // must be public to join without issue

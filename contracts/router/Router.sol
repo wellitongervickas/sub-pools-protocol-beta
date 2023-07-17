@@ -12,17 +12,19 @@ contract Router is IRouter, NodeControl {
         address[] memory _invitedAddresses,
         bytes memory _amount
     ) external returns (address) {
-        address _registryAddress = _registry(_strategyAddress);
+        address _registryAddress = _createRegistry(_strategyAddress);
         address _nodeAddress = _createRootNode(_invitedAddresses, _registryAddress);
 
-        Registry(_registryAddress).join(_nodeAddress);
-        Registry(_registryAddress).deposit(_nodeAddress, _amount);
+        _joinRegistry(_registryAddress, _nodeAddress, _amount);
 
         return _nodeAddress;
     }
 
-    function _registry(address _strategyAddress) private returns (address) {
+    function _createRegistry(address _strategyAddress) private returns (address) {
         address _registryAddress = address(new Registry(_strategyAddress));
+
+        emit IRouter.RegistryCreated(_registryAddress);
+
         return _registryAddress;
     }
 
@@ -40,7 +42,6 @@ contract Router is IRouter, NodeControl {
         address _registryAddress
     ) private returns (address) {
         Node _node = new Node(_parentAddress, _managerAddress, _invitedAddresses, _registryAddress);
-
         address _nodeAddress = address(_node);
 
         emit IRouter.NodeCreated(_nodeAddress);
@@ -58,10 +59,16 @@ contract Router is IRouter, NodeControl {
         address _nodeAddress = _deployNode(address(_parent), msg.sender, _invitedAddresses, _parentRegistry);
 
         _parent.join(_nodeAddress, msg.sender);
-
-        Registry(_parentRegistry).join(_nodeAddress);
-        Registry(_parentRegistry).deposit(_nodeAddress, _amount);
+        _joinRegistry(_parentRegistry, _nodeAddress, _amount);
 
         return _nodeAddress;
+    }
+
+    function _joinRegistry(address _registryAddress, address _nodeAddress, bytes memory _amount) private {
+        Registry _registry = Registry(_registryAddress);
+
+        _registry.join(_nodeAddress);
+
+        emit IRouter.RegistryJoined(_registryAddress, _nodeAddress, _amount);
     }
 }

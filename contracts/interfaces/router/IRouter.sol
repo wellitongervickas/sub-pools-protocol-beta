@@ -5,6 +5,8 @@ import {RegistryLib} from '../../libraries/Registry.sol';
 
 interface IRouter {
     event NodeCreated(address indexed _nodeAddress);
+    event RegistryCreated(address indexed _registryAddress);
+    event RegistryJoined(address indexed _registryAddress, address indexed _nodeAddress, bytes _amount);
 
     function registryAndCreate(
         address _strategyAddress,
