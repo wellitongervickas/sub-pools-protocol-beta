@@ -8,9 +8,5 @@ interface IRegistry {
 
     error AlreadyJoined();
 
-    function registryType() external view returns (RegistryLib.RegistryType);
-
-    function tokenData() external view returns (bytes memory);
-
     function join(address _accountAddress) external;
 }

@@ -1,18 +1,12 @@
 import { ethers } from 'hardhat'
-import { RegistryType } from './types'
 import { createRandomAddress } from '../helpers/address'
-import { buildBytesSingleToken } from '../helpers/tokens'
 
 const customAddress = createRandomAddress()
-const tokenDataSingleToken = buildBytesSingleToken(customAddress)
 
-export async function deployRegistryFixture(
-  registryType: RegistryType = RegistryType.SingleTokenRegistry,
-  tokenData: string = tokenDataSingleToken
-) {
+export async function deployRegistryFixture(strategy = customAddress) {
   const accounts = await ethers.getSigners()
   const Registry = await ethers.getContractFactory('Registry')
-  const registryContract = await Registry.deploy(registryType, tokenData)
+  const registryContract = await Registry.deploy(strategy)
 
   return { accounts, registryContract }
 }

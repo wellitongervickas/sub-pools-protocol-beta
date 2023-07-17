@@ -9,13 +9,13 @@ pragma solidity =0.8.19;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 
+import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 import {IRegistry} from '../interfaces/registry/IRegistry.sol';
 import {RegistryControl} from './RegistryControl.sol';
 import {RegistryLib} from '../libraries/Registry.sol';
 
 contract Registry is IRegistry, RegistryControl, Ownable {
-    RegistryLib.RegistryType public registryType;
-    bytes public tokenData;
+    IStrategy public strategy;
 
     modifier onlyRouter() {
         _checkOwner();
@@ -27,9 +27,8 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         _;
     }
 
-    constructor(RegistryLib.RegistryType _registryType, bytes memory _tokenData) {
-        registryType = _registryType;
-        tokenData = _tokenData;
+    constructor(address _strategy) {
+        strategy = IStrategy(_strategy);
         join(msg.sender);
     }
 

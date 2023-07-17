@@ -8,11 +8,10 @@ import {Registry, RegistryLib, IRegistry} from '../registry/Registry.sol';
 
 contract Router is IRouter, NodeControl {
     function registryAndCreate(
-        RegistryLib.RegistryType _registryType,
-        bytes memory _tokenData,
+        address _strategyAddress,
         address[] memory _invitedAddresses
     ) external returns (address) {
-        address _registryAddress = _registry(_registryType, _tokenData);
+        address _registryAddress = _registry(_strategyAddress);
         address _nodeAddress = _create(_invitedAddresses, _registryAddress);
 
         IRegistry(_registryAddress).join(_nodeAddress);
@@ -20,8 +19,8 @@ contract Router is IRouter, NodeControl {
         return _nodeAddress;
     }
 
-    function _registry(RegistryLib.RegistryType _registryType, bytes memory _tokenData) private returns (address) {
-        address _registryAddress = address(new Registry(_registryType, _tokenData));
+    function _registry(address _strategyAddress) private returns (address) {
+        address _registryAddress = address(new Registry(_strategyAddress));
         return _registryAddress;
     }
 
