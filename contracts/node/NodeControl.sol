@@ -13,7 +13,6 @@ contract NodeControl is INodeControl {
 
     function _setupNode(address _nodeAddress, address _managerAddress) internal {
         uint256 _id = _createID();
-
         _node[_nodeAddress] = INodeControl.Setup({id: _id, managerAddress: _managerAddress});
     }
 

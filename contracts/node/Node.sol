@@ -35,9 +35,9 @@ contract Node is INode, NodeControl, Manager, Ownable {
 
     function join(
         address _nodeAddress,
-        address _nodeOwnerAddress
-    ) external checkInvitation(_nodeOwnerAddress) whenNotNode(_nodeOwnerAddress) onlyRouter {
-        _setupNode(_nodeAddress, _nodeOwnerAddress);
-        _updateInvitedRole(_nodeOwnerAddress);
+        address _childNodeManagerAddress
+    ) external checkInvitation(_childNodeManagerAddress) whenNotNode(_childNodeManagerAddress) onlyRouter {
+        _setupNode(_nodeAddress, _childNodeManagerAddress);
+        _updateInvitedRole(_childNodeManagerAddress);
     }
 }
