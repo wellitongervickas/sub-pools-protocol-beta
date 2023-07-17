@@ -56,7 +56,7 @@ contract RouterControl is IRouterControl, NodeControl {
     }
 
     function _computeRegistryTransfer(Registry _registry, bytes memory _amount) internal {
-        IStrategy _strategy = _registry.strategy(); // get in registry where will abstract the getter
+        IStrategy _strategy = _registry.strategy();
 
         address _decodedTokenAddress = abi.decode(_strategy.token(), (address));
         uint256 _decodedAmount = abi.decode(_amount, (uint256));
