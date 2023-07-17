@@ -8,5 +8,5 @@ interface IRegistry {
 
     error AlreadyJoined();
 
-    function join(address _accountAddress) external;
+    function joinAndDeposit(address _accountAddress) external;
 }

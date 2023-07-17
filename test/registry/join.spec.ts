@@ -8,7 +8,7 @@ describe('Registry', () => {
       const { registryContract } = await loadFixture(registry.deployRegistryFixture.bind(this, createRandomAddress()))
 
       const accountAddress = createRandomAddress()
-      await registryContract.join(accountAddress)
+      await registryContract.joinAndDeposit(accountAddress)
 
       const [id] = await registryContract.accounts(accountAddress)
       expect(id).to.equal(2)
@@ -18,9 +18,9 @@ describe('Registry', () => {
       const { registryContract } = await loadFixture(registry.deployRegistryFixture.bind(this, createRandomAddress()))
 
       const accountAddress = createRandomAddress()
-      await registryContract.join(accountAddress)
+      await registryContract.joinAndDeposit(accountAddress)
 
-      await expect(registryContract.join(accountAddress)).to.be.revertedWithCustomError(
+      await expect(registryContract.joinAndDeposit(accountAddress)).to.be.revertedWithCustomError(
         registryContract,
         'AlreadyJoined()'
       )
@@ -30,7 +30,9 @@ describe('Registry', () => {
       const { registryContract } = await loadFixture(registry.deployRegistryFixture.bind(this, createRandomAddress()))
 
       const accountAddress = createRandomAddress()
-      await expect(registryContract.join(accountAddress)).to.emit(registryContract, 'Joined').withArgs(accountAddress)
+      await expect(registryContract.joinAndDeposit(accountAddress))
+        .to.emit(registryContract, 'Joined')
+        .withArgs(accountAddress)
     })
 
     it('should revert if try to join without being the owner', async function () {
@@ -41,7 +43,7 @@ describe('Registry', () => {
 
       const accountAddress = createRandomAddress()
       const registryContractAccountInstance = registryContract.connect(account) as any
-      await expect(registryContractAccountInstance.join(accountAddress)).to.be.revertedWith(
+      await expect(registryContractAccountInstance.joinAndDeposit(accountAddress)).to.be.revertedWith(
         'Ownable: caller is not the owner'
       )
     })

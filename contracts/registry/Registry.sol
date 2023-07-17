@@ -22,11 +22,15 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
-        join(msg.sender);
+        _join(msg.sender);
     }
 
-    function join(address _accountAddress) public onlyRouter whenNotAccount(_accountAddress) {
+    function _join(address _accountAddress) internal {
         _setupAccount(_accountAddress);
+    }
+
+    function joinAndDeposit(address _accountAddress) public onlyRouter whenNotAccount(_accountAddress) {
+        _join(_accountAddress);
         emit Joined(_accountAddress);
     }
 }
