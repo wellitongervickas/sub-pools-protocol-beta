@@ -13,9 +13,9 @@ contract RegistryControl is IRegistryControl {
 
     mapping(address => RegistryLib.Account) private _accounts;
 
-    function _setupAccount(address _accountAddress) internal {
+    function _setupAccount(address _accountAddress, bytes memory _amount) internal {
         uint256 _childrenID = _createChildrenID();
-        _accounts[_accountAddress] = RegistryLib.Account({id: _childrenID});
+        _accounts[_accountAddress] = RegistryLib.Account({id: _childrenID, cashback: _amount});
     }
 
     function _createChildrenID() private returns (uint256) {

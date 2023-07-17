@@ -9,12 +9,13 @@ import {Registry} from '../registry/Registry.sol';
 contract Router is IRouter, NodeControl {
     function registryAndCreate(
         address _strategyAddress,
-        address[] memory _invitedAddresses
+        address[] memory _invitedAddresses,
+        bytes memory _amount
     ) external returns (address) {
         address _registryAddress = _registry(_strategyAddress);
-        address _nodeAddress = _create(_invitedAddresses, _registryAddress);
+        address _nodeAddress = _createRootNode(_invitedAddresses, _registryAddress);
 
-        Registry(_registryAddress).joinAndDeposit(_nodeAddress);
+        Registry(_registryAddress).joinAndDeposit(_nodeAddress, _amount);
 
         return _nodeAddress;
     }
@@ -24,7 +25,7 @@ contract Router is IRouter, NodeControl {
         return _registryAddress;
     }
 
-    function _create(address[] memory _invitedAddresses, address _registryAddress) private returns (address) {
+    function _createRootNode(address[] memory _invitedAddresses, address _registryAddress) private returns (address) {
         address _nodeAddress = _deployNode(address(this), msg.sender, _invitedAddresses, _registryAddress);
         _setupNode(_nodeAddress, msg.sender);
 
@@ -44,18 +45,22 @@ contract Router is IRouter, NodeControl {
         return _nodeAddress;
     }
 
-    function join(address _parentAddress, address[] memory _invitedAddresses) external returns (address) {
+    function join(
+        address _parentAddress,
+        address[] memory _invitedAddresses,
+        bytes memory _amount
+    ) external returns (address) {
         Node _parent = Node(_parentAddress);
         address _parentRegistry = _parent.registry();
         address _nodeAddress = _deployNode(address(_parent), msg.sender, _invitedAddresses, _parentRegistry);
-        _joinParent(_parent, _nodeAddress);
 
-        Registry(_parentRegistry).joinAndDeposit(_nodeAddress);
+        _joinParentNode(_parent, _nodeAddress);
+        Registry(_parentRegistry).joinAndDeposit(_nodeAddress, _amount);
 
         return _nodeAddress;
     }
 
-    function _joinParent(Node _parent, address _nodeAddress) private {
+    function _joinParentNode(Node _parent, address _nodeAddress) private {
         _parent.join(_nodeAddress, msg.sender);
     }
 }

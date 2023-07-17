@@ -8,8 +8,8 @@ library RegistryLib {
 
     struct Account {
         uint256 id;
-        /// CASHBACK
-        /// BALANCE
+        bytes cashback;
+        /// BALANCe
         /// JOIN FEES RATIO
         /// REQUIRED INITIAL AMOUNT
         /// LOCK PERIOD
