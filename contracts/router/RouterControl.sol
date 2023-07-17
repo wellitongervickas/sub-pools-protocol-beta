@@ -24,8 +24,6 @@ contract RouterControl is IRouterControl, NodeControl {
         address _nodeAddress = _deployNode(address(this), msg.sender, _invitedAddresses, _registryAddress);
         _setupNode(_nodeAddress, msg.sender);
 
-        emit IRouterControl.RegistryCreated(_registryAddress);
-
         return _nodeAddress;
     }
 

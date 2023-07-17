@@ -28,11 +28,11 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     function setupAccount(address _accountAddress) public onlyRouter whenNotAccount(_accountAddress) {
         _setupAccount(_accountAddress);
-        emit Joined(_accountAddress);
+        emit IRegistry.Joined(_accountAddress);
     }
 
     function deposit(address _accountAddress, bytes memory _amount) external onlyRouter {
         _depositAccount(_accountAddress, _amount);
-        emit Deposited(_accountAddress, _amount);
+        emit IRegistry.Deposited(_accountAddress, _amount);
     }
 }
