@@ -68,6 +68,7 @@ contract Router is IRouter, NodeControl {
         Registry _registry = Registry(_registryAddress);
 
         _registry.join(_nodeAddress);
+        _registry.deposit(_nodeAddress, _amount);
 
         emit IRouter.RegistryJoined(_registryAddress, _nodeAddress, _amount);
     }
