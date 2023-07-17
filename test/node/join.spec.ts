@@ -11,7 +11,7 @@ describe('Node', () => {
       const node2Address = await nodeContract2.getAddress()
       await nodeContract.join(node2Address, otherManager.address)
 
-      const [nodeManager] = await nodeContract.node(node2Address)
+      const [, nodeManager] = await nodeContract.node(node2Address)
       expect(nodeManager).to.equal(otherManager.address)
     })
 

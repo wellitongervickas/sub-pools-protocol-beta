@@ -15,7 +15,8 @@ contract Router is IRouter, NodeControl {
         address _registryAddress = _registry(_strategyAddress);
         address _nodeAddress = _createRootNode(_invitedAddresses, _registryAddress);
 
-        Registry(_registryAddress).joinAndDeposit(_nodeAddress, _amount);
+        Registry(_registryAddress).join(_nodeAddress);
+        Registry(_registryAddress).deposit(_nodeAddress, _amount);
 
         return _nodeAddress;
     }
@@ -34,11 +35,11 @@ contract Router is IRouter, NodeControl {
 
     function _deployNode(
         address _parentAddress,
-        address _nodeOwnerAddress,
+        address _managerAddress,
         address[] memory _invitedAddresses,
         address _registryAddress
     ) private returns (address) {
-        Node _node = new Node(_parentAddress, _nodeOwnerAddress, _invitedAddresses, _registryAddress);
+        Node _node = new Node(_parentAddress, _managerAddress, _invitedAddresses, _registryAddress);
 
         address _nodeAddress = address(_node);
 
@@ -58,7 +59,8 @@ contract Router is IRouter, NodeControl {
 
         _parent.join(_nodeAddress, msg.sender);
 
-        Registry(_parentRegistry).joinAndDeposit(_nodeAddress, _amount);
+        Registry(_parentRegistry).join(_nodeAddress);
+        Registry(_parentRegistry).deposit(_nodeAddress, _amount);
 
         return _nodeAddress;
     }

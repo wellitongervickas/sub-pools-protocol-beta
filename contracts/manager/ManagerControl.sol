@@ -13,13 +13,13 @@ contract ManagerControl is IManagerControl, AccessControl {
     IManagerControl.Manager public manager;
 
     function _setupManager(address _managerAddress, address[] memory _invitedAddresses) internal {
-        manager = IManagerControl.Manager({ownerAddress: _managerAddress});
+        manager = IManagerControl.Manager({managerAddress: _managerAddress});
         _setManagerRole(manager);
         _grantInvites(_invitedAddresses);
     }
 
     function _setManagerRole(IManagerControl.Manager storage _manager) private {
-        _grantRole(MANAGER_ROLE, _manager.ownerAddress);
+        _grantRole(MANAGER_ROLE, _manager.managerAddress);
     }
 
     function _grantInvites(address[] memory _invitedAddresses) private {

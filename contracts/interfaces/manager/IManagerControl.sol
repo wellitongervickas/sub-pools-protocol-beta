@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 interface IManagerControl {
     struct Manager {
-        address ownerAddress;
+        address managerAddress;
     }
 
     event NodeManagerInvited(address indexed _invitedAddress);

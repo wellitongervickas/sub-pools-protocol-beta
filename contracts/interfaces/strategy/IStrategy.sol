@@ -6,6 +6,8 @@ enum StrategyType {
 }
 
 interface IStrategy {
+    function strategyType() external view returns (StrategyType);
+
     function token() external view returns (bytes memory);
 
     function deposit(bytes memory _amount) external;
