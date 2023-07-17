@@ -22,15 +22,19 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         _;
     }
 
+    modifier whenNotAccount(address _address) {
+        if (accounts(_address).id != 0) revert AlreadyJoined();
+        _;
+    }
+
     constructor(RegistryLib.RegistryType _registryType, bytes memory _tokenData) {
         registryType = _registryType;
         tokenData = _tokenData;
         join(msg.sender);
     }
 
-    /// check joined to avoid twice
-    function join(address _accountAddress) public onlyRouter {
+    function join(address _accountAddress) public onlyRouter whenNotAccount(_accountAddress) {
         _setupAccount(_accountAddress);
-        /// ToDo: event
+        emit Joined(_accountAddress);
     }
 }
