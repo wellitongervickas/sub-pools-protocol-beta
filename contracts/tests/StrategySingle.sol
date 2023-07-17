@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import {IStrategy, StrategyType} from '../interfaces/strategy/IStrategy.sol';
 
-contract FakeStrategy is IStrategy {
+contract FakeStrategySingle is IStrategy {
     bytes public token;
     StrategyType public immutable strategyType = StrategyType.Single;
 

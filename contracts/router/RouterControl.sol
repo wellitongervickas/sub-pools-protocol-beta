@@ -5,7 +5,7 @@ import {IRouterControl} from '../interfaces/router/IRouterControl.sol';
 import {Node} from '../node/Node.sol';
 import {NodeControl} from '../node/NodeControl.sol';
 import {Registry} from '../registry/Registry.sol';
-import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
+import {IStrategy, StrategyType} from '../interfaces/strategy/IStrategy.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 
@@ -58,10 +58,22 @@ contract RouterControl is IRouterControl, NodeControl {
     function _computeRegistryTransfer(Registry _registry, bytes memory _amount) internal {
         IStrategy _strategy = _registry.strategy();
 
-        address _decodedTokenAddress = abi.decode(_strategy.token(), (address));
-        uint256 _decodedAmount = abi.decode(_amount, (uint256));
+        if (_strategy.strategyType() == StrategyType.Single) {
+            address _decodedTokenAddress = abi.decode(_strategy.token(), (address));
+            uint256 _decodedAmount = abi.decode(_amount, (uint256));
 
-        IERC20(_decodedTokenAddress).safeTransferFrom(msg.sender, address(_registry), _decodedAmount);
+            IERC20(_decodedTokenAddress).safeTransferFrom(msg.sender, address(_strategy), _decodedAmount);
+        } else {
+            (address _decodedToken1Address, address _decodedToken2Address) = abi.decode(
+                _strategy.token(),
+                (address, address)
+            );
+
+            (uint256 _decodedAmount1, uint256 _decodedAmount2) = abi.decode(_amount, (uint256, uint256));
+
+            IERC20(_decodedToken1Address).safeTransferFrom(msg.sender, address(_strategy), _decodedAmount1);
+            IERC20(_decodedToken2Address).safeTransferFrom(msg.sender, address(_strategy), _decodedAmount2);
+        }
     }
 
     function _computeRegistryDeposit(Registry _registry, address _nodeAddress, bytes memory _amount) internal {

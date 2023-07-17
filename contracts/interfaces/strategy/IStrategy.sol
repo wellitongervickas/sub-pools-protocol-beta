@@ -2,7 +2,8 @@
 pragma solidity =0.8.19;
 
 enum StrategyType {
-    Single
+    Single,
+    Multi
 }
 
 interface IStrategy {

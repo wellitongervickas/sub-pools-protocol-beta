@@ -8,7 +8,7 @@ describe('Router', () => {
       const { tokenContract } = await loadFixture(token.deployTokenFixture)
       const tokenAddress = await tokenContract.getAddress()
 
-      const FakeStrategy = await ethers.getContractFactory('FakeStrategy')
+      const FakeStrategy = await ethers.getContractFactory('FakeStrategySingle')
       const fakeStrategy = await FakeStrategy.deploy(coderUtils.build([tokenAddress], ['address']))
       const fakeStrategyAddress = await fakeStrategy.getAddress()
 
@@ -42,7 +42,7 @@ describe('Router', () => {
       const { tokenContract } = await loadFixture(token.deployTokenFixture)
       const tokenAddress = await tokenContract.getAddress()
 
-      const FakeStrategy = await ethers.getContractFactory('FakeStrategy')
+      const FakeStrategy = await ethers.getContractFactory('FakeStrategySingle')
       const fakeStrategy = await FakeStrategy.deploy(coderUtils.build([tokenAddress], ['address']))
       const fakeStrategyAddress = await fakeStrategy.getAddress()
 
@@ -72,7 +72,7 @@ describe('Router', () => {
       const { tokenContract } = await loadFixture(token.deployTokenFixture)
       const tokenAddress = await tokenContract.getAddress()
 
-      const FakeStrategy = await ethers.getContractFactory('FakeStrategy')
+      const FakeStrategy = await ethers.getContractFactory('FakeStrategySingle')
       const fakeStrategy = await FakeStrategy.deploy(coderUtils.build([tokenAddress], ['address']))
       const fakeStrategyAddress = await fakeStrategy.getAddress()
 
