@@ -60,13 +60,13 @@ contract RouterControl is IRouterControl, NodeControl {
     ) internal {
         Registry _registry = Registry(_registryAddress);
 
-        _computeRegistrySetup(_parentAddress, _registry, _nodeAddress, _fees);
-        _computeRegistryDeposit(_registry, _nodeAddress, _initialAmount);
+        _registrySetupAccount(_parentAddress, _registry, _nodeAddress, _fees);
+        _registryDepositAccount(_registry, _nodeAddress, _initialAmount);
 
         emit IRouterControl.RegistryJoined(_registryAddress, _nodeAddress, _initialAmount);
     }
 
-    function _computeRegistrySetup(
+    function _registrySetupAccount(
         address _parentAddress,
         Registry _registry,
         address _nodeAddress,
@@ -75,7 +75,7 @@ contract RouterControl is IRouterControl, NodeControl {
         _registry.setupAccount(_parentAddress, _nodeAddress, _fees);
     }
 
-    function _computeRegistryDeposit(Registry _registry, address _nodeAddress, bytes memory _initialAmount) private {
+    function _registryDepositAccount(Registry _registry, address _nodeAddress, bytes memory _initialAmount) private {
         _registry.deposit(msg.sender, _nodeAddress, _initialAmount);
     }
 }

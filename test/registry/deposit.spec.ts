@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { loadFixture, fakeStrategySingle, registry, token } from '../fixtures'
+import { loadFixture, fakeStrategySingle, registry, token, ethers } from '../fixtures'
 import coderUtils from '../helpers/coder'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 
@@ -105,5 +105,7 @@ describe('Registry', () => {
         )
       ).to.be.rejectedWith('Ownable: caller is not the owner')
     })
+
+    it.skip('should charge fees from parent account when deposit to account', async function () {})
   })
 })

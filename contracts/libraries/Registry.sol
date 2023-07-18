@@ -10,9 +10,9 @@ library RegistryLib {
         bytes additionalBalance;
         FractionLib.Fraction fees;
         address parent;
-        /// NODE LOCK PERIOD
-        /// CHILD REQUIRED INITIAL AMOUNT
-        /// CHILD MAX DEPOSIT
+        /// LOCK PERIOD
+        /// REQUIRED INITIAL AMOUNT
+        /// MAX DEPOSIT
     }
 
     function _deposit(Account storage _account, bytes memory _amount) internal {

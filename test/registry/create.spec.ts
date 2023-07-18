@@ -11,7 +11,13 @@ describe('Registry', () => {
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
       const [deployer, otherAccount] = accounts
-      await registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
+
+      const accountFees = {
+        value: ethers.toBigInt(1),
+        divider: ethers.toBigInt(200),
+      }
+
+      await registryContract.setupAccount(deployer.address, otherAccount.address, accountFees)
       const [id, initialBalance, additionalBalance, fees, parentAddress] = await registryContract.accounts(
         otherAccount.address
       )
@@ -20,7 +26,7 @@ describe('Registry', () => {
         ethers.toBigInt(2),
         '0x',
         '0x',
-        [DEFAULT_FEES_FRACTION.value, DEFAULT_FEES_FRACTION.divider],
+        [accountFees.value, accountFees.divider],
         deployer.address,
       ])
     })
