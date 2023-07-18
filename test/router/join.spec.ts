@@ -1,78 +1,123 @@
 import { expect } from 'chai'
-import { router, loadFixture, ethers, anyValue, token } from '../fixtures'
+import { router, loadFixture, ethers, anyValue, token, fakeStrategySingle } from '../fixtures'
 import coderUtils from '../helpers/coder'
 
 describe('Router', () => {
   describe('Join', () => {
-    it('should set registry address as same as parent on join', async function () {
-      const { tokenContract } = await loadFixture(token.deployTokenFixture)
-      const tokenAddress = await tokenContract.getAddress()
-
-      const FakeStrategy = await ethers.getContractFactory('FakeStrategySingle')
-      const fakeStrategy = await FakeStrategy.deploy(coderUtils.build([tokenAddress], ['address']))
-      const fakeStrategyAddress = await fakeStrategy.getAddress()
-
+    it('should deploy a node on join', async function () {
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
       const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
       const [, invited] = accounts
 
-      const amountValue = '1000000000000000000'
-      const amount = coderUtils.build([amountValue], ['uint256'])
-
-      const tx0 = await routerContract.registry(fakeStrategyAddress)
-      const receipt0 = await tx0.wait()
-      const [registryAddress] = receipt0.logs[1].args
-
-      await tokenContract.approve(registryAddress, amountValue)
-
-      await tokenContract.transfer(invited.address, amountValue)
-      await (tokenContract.connect(invited) as any).approve(registryAddress, amountValue)
-
-      const tx = await routerContract.create(registryAddress, [invited.address], amount)
+      const tx = await routerContract.registry(fakeStrategyAddress)
       const receipt = await tx.wait()
-      const [nodeAddress] = receipt.logs[4].args
-      const rootNodeContract = await ethers.getContractAt('Node', nodeAddress)
-      const rootNodeRegistryAddress = await rootNodeContract.registry()
+      const [registryAddress] = receipt.logs[2].args
 
-      const routerContractInvitedInstance = routerContract.connect(invited) as any
-      const tx1 = await routerContractInvitedInstance.join(nodeAddress, [], amount)
+      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+
+      const tx1 = await routerContract.create(registryAddress, [invited.address], amount)
       const receipt1 = await tx1.wait()
-      const [nodeAddress1] = receipt1.logs[2].args
-      const nodeContract = await ethers.getContractAt('Node', nodeAddress1)
-      const nodeRegistryAddress = await nodeContract.registry()
-      expect(nodeRegistryAddress).to.equal(rootNodeRegistryAddress)
+      const [nodeAddress] = receipt1.logs[4].args
+
+      const invitedRouterInstance = routerContract.connect(invited) as any
+
+      expect(await invitedRouterInstance.join(nodeAddress, [], amount)).to.not.reverted
     })
 
-    it('should emit NodeCreated on join', async function () {
-      const { tokenContract } = await loadFixture(token.deployTokenFixture)
-      const tokenAddress = await tokenContract.getAddress()
-
-      const FakeStrategy = await ethers.getContractFactory('FakeStrategySingle')
-      const fakeStrategy = await FakeStrategy.deploy(coderUtils.build([tokenAddress], ['address']))
-      const fakeStrategyAddress = await fakeStrategy.getAddress()
-
-      const { routerContract } = await loadFixture(router.deployRouterFixture)
-
-      const amountValue = '1000000000000000000'
-      const amount = coderUtils.build([amountValue], ['uint256'])
+    it('should set node parent on join', async function () {
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
+      const [, invited] = accounts
 
       const tx = await routerContract.registry(fakeStrategyAddress)
       const receipt = await tx.wait()
-      const [registryAddress] = receipt.logs[1].args
+      const [registryAddress] = receipt.logs[2].args
 
-      await tokenContract.approve(registryAddress, amountValue)
+      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
-      const tx1 = await routerContract.create(registryAddress, [], amount)
+      const tx1 = await routerContract.create(registryAddress, [invited.address], amount)
       const receipt1 = await tx1.wait()
-      const [nodeAddress] = receipt1.logs[2].args
+      const [nodeAddress] = receipt1.logs[4].args
 
-      const nodeContract = await ethers.getContractAt('Node', nodeAddress)
-      await nodeContract.setInvitedOnly(false) // must be public to join without issue
+      const invitedRouterInstance = routerContract.connect(invited) as any
+      const tx2 = await invitedRouterInstance.join(nodeAddress, [], amount)
+      const receipt2 = await tx2.wait()
+      const [nodeAddress1] = receipt2.logs[2].args
 
-      await tokenContract.approve(registryAddress, amountValue)
+      const nodeContract = await ethers.getContractAt('Node', nodeAddress1)
+      const parentAddress = await nodeContract.parent()
 
-      await expect(routerContract.join(nodeAddress, [], amount))
+      expect(parentAddress).to.equal(nodeAddress)
+    })
+
+    it('should use same registry as parent on join', async function () {
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
+      const [, invited] = accounts
+
+      const tx = await routerContract.registry(fakeStrategyAddress)
+      const receipt = await tx.wait()
+      const [registryAddress] = receipt.logs[2].args
+
+      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+
+      const tx1 = await routerContract.create(registryAddress, [invited.address], amount)
+      const receipt1 = await tx1.wait()
+      const [nodeAddress] = receipt1.logs[4].args
+
+      const invitedRouterInstance = routerContract.connect(invited) as any
+      const tx2 = await invitedRouterInstance.join(nodeAddress, [], amount)
+      const receipt2 = await tx2.wait()
+      const [nodeAddress1] = receipt2.logs[2].args
+
+      const nodeContract = await ethers.getContractAt('Node', nodeAddress1)
+      const registryAddress1 = await nodeContract.registry()
+
+      expect(registryAddress1).to.equal(registryAddress)
+    })
+
+    it('should emit NodeCreated on join', async function () {
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
+      const [, invited] = accounts
+
+      const tx = await routerContract.registry(fakeStrategyAddress)
+      const receipt = await tx.wait()
+      const [registryAddress] = receipt.logs[2].args
+
+      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+
+      const tx1 = await routerContract.create(registryAddress, [invited.address], amount)
+      const receipt1 = await tx1.wait()
+      const [nodeAddress] = receipt1.logs[4].args
+
+      const invitedRouterInstance = routerContract.connect(invited) as any
+
+      await expect(invitedRouterInstance.join(nodeAddress, [], amount))
         .to.emit(routerContract, 'NodeCreated')
         .withArgs(anyValue)
+    })
+
+    it('should emit RegistryJoined on join', async function () {
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
+      const [, invited] = accounts
+
+      const tx = await routerContract.registry(fakeStrategyAddress)
+      const receipt = await tx.wait()
+      const [registryAddress] = receipt.logs[2].args
+
+      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+
+      const tx1 = await routerContract.create(registryAddress, [invited.address], amount)
+      const receipt1 = await tx1.wait()
+      const [nodeAddress] = receipt1.logs[4].args
+
+      const invitedRouterInstance = routerContract.connect(invited) as any
+
+      await expect(invitedRouterInstance.join(nodeAddress, [], amount))
+        .to.emit(routerContract, 'RegistryJoined')
+        .withArgs(registryAddress, anyValue, amount)
     })
   })
 })

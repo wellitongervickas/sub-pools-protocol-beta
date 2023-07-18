@@ -7,5 +7,5 @@ interface INodeControl {
         address managerAddress;
     }
 
-    function node(address _nodeAddress) external view returns (INodeControl.Setup memory);
+    function nodes(address _nodeAddress) external view returns (INodeControl.Setup memory);
 }

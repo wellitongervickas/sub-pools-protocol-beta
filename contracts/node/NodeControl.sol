@@ -21,7 +21,7 @@ contract NodeControl is INodeControl {
         return currentID.current();
     }
 
-    function node(address _nodeAddress) public view returns (INodeControl.Setup memory) {
+    function nodes(address _nodeAddress) public view returns (INodeControl.Setup memory) {
         return _node[_nodeAddress];
     }
 }

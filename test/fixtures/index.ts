@@ -12,3 +12,4 @@ export { default as registry } from './registry'
 
 /// helper fixtures
 export { default as token } from './token'
+export { default as fakeStrategySingle } from './fakeStrategySingle'

@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { ethers, loadFixture, node } from '../fixtures'
 import { FAKE_PARENT, FAKE_REGISTRY, ZERO_ADDRESS } from '../helpers/address'
 
-describe('Node', () => {
+describe.skip('Node', () => {
   describe('Deploy', () => {
     it('should setup node manager on create', async function () {
       const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)

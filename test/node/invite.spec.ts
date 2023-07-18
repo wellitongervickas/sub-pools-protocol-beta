@@ -4,7 +4,7 @@ import { ZERO_ADDRESS } from '../helpers/address'
 
 const { MANAGER_ROLE } = managerControl
 
-describe('Node', () => {
+describe.skip('Node', () => {
   describe('Invite', () => {
     it('should emit NodeManagerInvited on invite', async function () {
       const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)

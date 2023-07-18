@@ -8,15 +8,28 @@ import {Registry} from '../registry/Registry.sol';
 import {IStrategy, StrategyType} from '../interfaces/strategy/IStrategy.sol';
 
 contract RouterControl is IRouterControl, NodeControl {
+    mapping(address => bool) private _registries;
+
+    modifier onlyValidRegistry(address _registryAddress) {
+        _checkRegistry(_registryAddress);
+        _;
+    }
+
+    function _checkRegistry(address _registryAddress) private view {
+        if (!_registries[_registryAddress]) revert IRouterControl.NonRegistry();
+    }
+
     function _createRegistry(address _strategyAddress) internal returns (address) {
         address _registryAddress = address(new Registry(_strategyAddress));
 
         emit IRouterControl.RegistryCreated(_registryAddress);
 
+        _registries[_registryAddress] = true;
+
         return _registryAddress;
     }
 
-    function _createRootNode(address[] memory _invitedAddresses, address _registryAddress) internal returns (address) {
+    function _createRootNode(address _registryAddress, address[] memory _invitedAddresses) internal returns (address) {
         address _nodeAddress = _deployNode(address(this), msg.sender, _invitedAddresses, _registryAddress);
         _setupNode(_nodeAddress, msg.sender);
 

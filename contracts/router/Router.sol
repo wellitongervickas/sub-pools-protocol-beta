@@ -10,12 +10,13 @@ contract Router is IRouter, RouterControl {
         return _createRegistry(_strategyAddress);
     }
 
+    /// todo: revert if try to use outside registry
     function create(
         address _registryAddress,
         address[] memory _invitedAddresses,
         bytes memory _amount
-    ) external returns (address) {
-        address _nodeAddress = _createRootNode(_invitedAddresses, _registryAddress);
+    ) external onlyValidRegistry(_registryAddress) returns (address) {
+        address _nodeAddress = _createRootNode(_registryAddress, _invitedAddresses);
 
         _setupRegistryAccount(_registryAddress, _nodeAddress, _amount);
         return _nodeAddress;
