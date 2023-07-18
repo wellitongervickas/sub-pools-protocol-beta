@@ -10,11 +10,19 @@ describe('Registry', () => {
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
-      const [, otherAccount] = accounts
-      await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
-      const [id, initialBalance, additionalBalance] = await registryContract.accounts(otherAccount.address)
+      const [deployer, otherAccount] = accounts
+      await registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
+      const [id, initialBalance, additionalBalance, fees, parentAddress] = await registryContract.accounts(
+        otherAccount.address
+      )
 
-      expect([id, initialBalance, additionalBalance]).to.deep.equal([ethers.toBigInt(2), '0x', '0x'])
+      expect([id, initialBalance, additionalBalance, fees, parentAddress]).to.deep.equal([
+        ethers.toBigInt(2),
+        '0x',
+        '0x',
+        [DEFAULT_FEES_FRACTION.value, DEFAULT_FEES_FRACTION.divider],
+        deployer.address,
+      ])
     })
 
     it('should emit Joined when create a new account', async function () {
@@ -22,9 +30,9 @@ describe('Registry', () => {
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
-      const [, otherAccount] = accounts
+      const [deployer, otherAccount] = accounts
 
-      await expect(registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION))
+      await expect(registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION))
         .to.emit(registryContract, 'Joined')
         .withArgs(otherAccount.address)
     })
@@ -34,12 +42,12 @@ describe('Registry', () => {
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
-      const [, otherAccount] = accounts
+      const [deployer, otherAccount] = accounts
 
-      await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
+      await registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
 
       await expect(
-        registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
+        registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
       ).to.be.revertedWithCustomError(registryContract, 'AlreadyJoined()')
     })
 
@@ -48,10 +56,14 @@ describe('Registry', () => {
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
-      const [, otherAccount] = accounts
+      const [deployer, otherAccount] = accounts
 
       await expect(
-        (registryContract.connect(otherAccount) as any).setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
+        (registryContract.connect(otherAccount) as any).setupAccount(
+          deployer.address,
+          otherAccount.address,
+          DEFAULT_FEES_FRACTION
+        )
       ).to.be.rejectedWith('Ownable: caller is not the owner')
     })
   })

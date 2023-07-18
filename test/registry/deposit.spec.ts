@@ -12,13 +12,13 @@ describe('Registry', () => {
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
 
-      const [, otherAccount] = accounts
+      const [deployer, otherAccount] = accounts
       const registryAddress = await registryContract.getAddress()
 
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
+      await registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
@@ -38,13 +38,13 @@ describe('Registry', () => {
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
-      const [, otherAccount] = accounts
+      const [deployer, otherAccount] = accounts
       const registryAddress = await registryContract.getAddress()
 
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
+      await registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
@@ -62,13 +62,13 @@ describe('Registry', () => {
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
 
-      const [, otherAccount] = accounts
+      const [deployer, otherAccount] = accounts
       const registryAddress = await registryContract.getAddress()
 
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
+      await registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
@@ -85,13 +85,13 @@ describe('Registry', () => {
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
 
-      const [, otherAccount] = accounts
+      const [deployer, otherAccount] = accounts
       const registryAddress = await registryContract.getAddress()
 
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
+      await registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any

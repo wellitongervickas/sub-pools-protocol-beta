@@ -19,7 +19,7 @@ contract Router is IRouter, RouterControl {
     ) external onlyValidRegistry(_registryAddress) returns (address) {
         address _nodeAddress = _createRootNode(_registryAddress, _invitedAddresses);
 
-        _setupRegistryAccount(_registryAddress, _nodeAddress, _initialAmount, _fees);
+        _setupRegistryAccount(address(this), _registryAddress, _nodeAddress, _initialAmount, _fees);
         return _nodeAddress;
     }
 
@@ -35,7 +35,7 @@ contract Router is IRouter, RouterControl {
         address _nodeAddress = _deployNode(address(_parent), msg.sender, _invitedAddresses, _parentRegistry);
 
         _parent.join(_nodeAddress, msg.sender);
-        _setupRegistryAccount(_parentRegistry, _nodeAddress, _initialAmount, _fees);
+        _setupRegistryAccount(_parentAddress, _parentRegistry, _nodeAddress, _initialAmount, _fees);
 
         return _nodeAddress;
     }

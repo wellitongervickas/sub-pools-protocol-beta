@@ -52,6 +52,7 @@ contract RouterControl is IRouterControl, NodeControl {
     }
 
     function _setupRegistryAccount(
+        address _parentAddress,
         address _registryAddress,
         address _nodeAddress,
         bytes memory _initialAmount,
@@ -59,18 +60,19 @@ contract RouterControl is IRouterControl, NodeControl {
     ) internal {
         Registry _registry = Registry(_registryAddress);
 
-        _computeRegistrySetup(_registry, _nodeAddress, _fees);
+        _computeRegistrySetup(_parentAddress, _registry, _nodeAddress, _fees);
         _computeRegistryDeposit(_registry, _nodeAddress, _initialAmount);
 
         emit IRouterControl.RegistryJoined(_registryAddress, _nodeAddress, _initialAmount);
     }
 
     function _computeRegistrySetup(
+        address _parentAddress,
         Registry _registry,
         address _nodeAddress,
         FractionLib.Fraction memory _fees
     ) private {
-        _registry.setupAccount(_nodeAddress, _fees);
+        _registry.setupAccount(_parentAddress, _nodeAddress, _fees);
     }
 
     function _computeRegistryDeposit(Registry _registry, address _nodeAddress, bytes memory _initialAmount) private {

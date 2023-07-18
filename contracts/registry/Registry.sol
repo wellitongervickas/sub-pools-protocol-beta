@@ -27,14 +27,15 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
-        setupAccount(_msgSender(), FractionLib.Fraction(0, 0));
+        setupAccount(_msgSender(), _msgSender(), FractionLib.Fraction(0, 0));
     }
 
     function setupAccount(
+        address _parentAddress,
         address _accountAddress,
         FractionLib.Fraction memory _fees
     ) public onlyRouter whenNotAccount(_accountAddress) {
-        _setupAccount(_accountAddress, _fees);
+        _setupAccount(_parentAddress, _accountAddress, _fees);
         emit IRegistry.Joined(_accountAddress);
     }
 
