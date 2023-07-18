@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import '@openzeppelin/contracts/utils/Counters.sol';
 import {IRegistryControl} from '../interfaces/registry/IRegistryControl.sol';
 import {RegistryLib} from '../libraries/Registry.sol';
+import {FractionLib} from '../libraries/Fraction.sol';
 
 contract RegistryControl is IRegistryControl {
     using RegistryLib for RegistryLib.Account;
@@ -13,10 +14,14 @@ contract RegistryControl is IRegistryControl {
 
     mapping(address => RegistryLib.Account) private _accounts;
 
-    function _setupAccount(address _accountAddress) internal {
+    function _setupAccount(address _accountAddress, FractionLib.Fraction memory _fees) internal {
         uint256 _id = _createID();
-        bytes memory _initialBalance = abi.encode(0, ['uint256']);
-        _accounts[_accountAddress] = RegistryLib.Account({id: _id, initialBalance: _initialBalance});
+        _accounts[_accountAddress] = RegistryLib.Account({
+            id: _id,
+            initialBalance: '',
+            additionalBalance: '',
+            fees: _fees
+        });
     }
 
     function _createID() private returns (uint256) {

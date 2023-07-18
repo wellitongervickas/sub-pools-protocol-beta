@@ -6,6 +6,7 @@ import {Node} from '../node/Node.sol';
 import {NodeControl} from '../node/NodeControl.sol';
 import {Registry} from '../registry/Registry.sol';
 import {IStrategy, StrategyType} from '../interfaces/strategy/IStrategy.sol';
+import {FractionLib} from '../libraries/Fraction.sol';
 
 contract RouterControl is IRouterControl, NodeControl {
     mapping(address => bool) private _registries;
@@ -50,20 +51,29 @@ contract RouterControl is IRouterControl, NodeControl {
         return _nodeAddress;
     }
 
-    function _setupRegistryAccount(address _registryAddress, address _nodeAddress, bytes memory _amount) internal {
+    function _setupRegistryAccount(
+        address _registryAddress,
+        address _nodeAddress,
+        bytes memory _initialAmount,
+        FractionLib.Fraction memory _fees
+    ) internal {
         Registry _registry = Registry(_registryAddress);
 
-        _computeRegistrySetup(_registry, _nodeAddress);
-        _computeRegistryDeposit(_registry, _nodeAddress, _amount);
+        _computeRegistrySetup(_registry, _nodeAddress, _fees);
+        _computeRegistryDeposit(_registry, _nodeAddress, _initialAmount);
 
-        emit IRouterControl.RegistryJoined(_registryAddress, _nodeAddress, _amount);
+        emit IRouterControl.RegistryJoined(_registryAddress, _nodeAddress, _initialAmount);
     }
 
-    function _computeRegistrySetup(Registry _registry, address _nodeAddress) private {
-        _registry.setupAccount(_nodeAddress);
+    function _computeRegistrySetup(
+        Registry _registry,
+        address _nodeAddress,
+        FractionLib.Fraction memory _fees
+    ) private {
+        _registry.setupAccount(_nodeAddress, _fees);
     }
 
-    function _computeRegistryDeposit(Registry _registry, address _nodeAddress, bytes memory _amount) private {
-        _registry.deposit(msg.sender, _nodeAddress, _amount);
+    function _computeRegistryDeposit(Registry _registry, address _nodeAddress, bytes memory _initialAmount) private {
+        _registry.deposit(msg.sender, _nodeAddress, _initialAmount);
     }
 }

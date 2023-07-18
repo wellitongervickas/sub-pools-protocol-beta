@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import {IRouter} from '../interfaces/router/IRouter.sol';
 import {RouterControl} from './RouterControl.sol';
 import {Node} from '../node/Node.sol';
+import {FractionLib} from '../libraries/Fraction.sol';
 
 contract Router is IRouter, RouterControl {
     function registry(address _strategyAddress) external returns (address) {
@@ -13,18 +14,20 @@ contract Router is IRouter, RouterControl {
     function create(
         address _registryAddress,
         address[] memory _invitedAddresses,
-        bytes memory _amount
+        bytes memory _initialAmount,
+        FractionLib.Fraction memory _fees
     ) external onlyValidRegistry(_registryAddress) returns (address) {
         address _nodeAddress = _createRootNode(_registryAddress, _invitedAddresses);
 
-        _setupRegistryAccount(_registryAddress, _nodeAddress, _amount);
+        _setupRegistryAccount(_registryAddress, _nodeAddress, _initialAmount, _fees);
         return _nodeAddress;
     }
 
     function join(
         address _parentAddress,
         address[] memory _invitedAddresses,
-        bytes memory _amount
+        bytes memory _initialAmount,
+        FractionLib.Fraction memory _fees
     ) external returns (address) {
         Node _parent = Node(_parentAddress);
 
@@ -32,7 +35,7 @@ contract Router is IRouter, RouterControl {
         address _nodeAddress = _deployNode(address(_parent), msg.sender, _invitedAddresses, _parentRegistry);
 
         _parent.join(_nodeAddress, msg.sender);
-        _setupRegistryAccount(_parentRegistry, _nodeAddress, _amount);
+        _setupRegistryAccount(_parentRegistry, _nodeAddress, _initialAmount, _fees);
 
         return _nodeAddress;
     }

@@ -4,12 +4,11 @@ pragma solidity =0.8.19;
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
-
 import {IStrategy, StrategyType} from '../interfaces/strategy/IStrategy.sol';
 import {IRegistry} from '../interfaces/registry/IRegistry.sol';
-
 import {RegistryLib} from '../libraries/Registry.sol';
 import {RegistryControl} from './RegistryControl.sol';
+import {FractionLib} from '../libraries/Fraction.sol';
 
 contract Registry is IRegistry, RegistryControl, Ownable {
     using SafeERC20 for IERC20;
@@ -28,11 +27,14 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
-        setupAccount(_msgSender());
+        setupAccount(_msgSender(), FractionLib.Fraction(0, 0));
     }
 
-    function setupAccount(address _accountAddress) public onlyRouter whenNotAccount(_accountAddress) {
-        _setupAccount(_accountAddress);
+    function setupAccount(
+        address _accountAddress,
+        FractionLib.Fraction memory _fees
+    ) public onlyRouter whenNotAccount(_accountAddress) {
+        _setupAccount(_accountAddress, _fees);
         emit IRegistry.Joined(_accountAddress);
     }
 

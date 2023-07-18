@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import { router, loadFixture, ethers, anyValue, token, fakeStrategySingle } from '../fixtures'
 import coderUtils from '../helpers/coder'
+import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 
 describe('Router', () => {
   describe('Join', () => {
@@ -13,15 +14,15 @@ describe('Router', () => {
       const receipt = await tx.wait()
       const [registryAddress] = receipt.logs[2].args
 
-      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
-      const tx1 = await routerContract.create(registryAddress, [invited.address], amount)
+      const tx1 = await routerContract.create(registryAddress, [invited.address], initialAmount, DEFAULT_FEES_FRACTION)
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[4].args
 
       const invitedRouterInstance = routerContract.connect(invited) as any
 
-      expect(await invitedRouterInstance.join(nodeAddress, [], amount)).to.not.reverted
+      expect(await invitedRouterInstance.join(nodeAddress, [], initialAmount, DEFAULT_FEES_FRACTION)).to.not.reverted
     })
 
     it('should set node parent on join', async function () {
@@ -33,14 +34,14 @@ describe('Router', () => {
       const receipt = await tx.wait()
       const [registryAddress] = receipt.logs[2].args
 
-      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
-      const tx1 = await routerContract.create(registryAddress, [invited.address], amount)
+      const tx1 = await routerContract.create(registryAddress, [invited.address], initialAmount, DEFAULT_FEES_FRACTION)
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[4].args
 
       const invitedRouterInstance = routerContract.connect(invited) as any
-      const tx2 = await invitedRouterInstance.join(nodeAddress, [], amount)
+      const tx2 = await invitedRouterInstance.join(nodeAddress, [], initialAmount, DEFAULT_FEES_FRACTION)
       const receipt2 = await tx2.wait()
       const [nodeAddress1] = receipt2.logs[2].args
 
@@ -59,14 +60,14 @@ describe('Router', () => {
       const receipt = await tx.wait()
       const [registryAddress] = receipt.logs[2].args
 
-      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
-      const tx1 = await routerContract.create(registryAddress, [invited.address], amount)
+      const tx1 = await routerContract.create(registryAddress, [invited.address], initialAmount, DEFAULT_FEES_FRACTION)
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[4].args
 
       const invitedRouterInstance = routerContract.connect(invited) as any
-      const tx2 = await invitedRouterInstance.join(nodeAddress, [], amount)
+      const tx2 = await invitedRouterInstance.join(nodeAddress, [], initialAmount, DEFAULT_FEES_FRACTION)
       const receipt2 = await tx2.wait()
       const [nodeAddress1] = receipt2.logs[2].args
 
@@ -85,15 +86,15 @@ describe('Router', () => {
       const receipt = await tx.wait()
       const [registryAddress] = receipt.logs[2].args
 
-      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
-      const tx1 = await routerContract.create(registryAddress, [invited.address], amount)
+      const tx1 = await routerContract.create(registryAddress, [invited.address], initialAmount, DEFAULT_FEES_FRACTION)
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[4].args
 
       const invitedRouterInstance = routerContract.connect(invited) as any
 
-      await expect(invitedRouterInstance.join(nodeAddress, [], amount))
+      await expect(invitedRouterInstance.join(nodeAddress, [], initialAmount, DEFAULT_FEES_FRACTION))
         .to.emit(routerContract, 'NodeCreated')
         .withArgs(anyValue)
     })
@@ -107,17 +108,17 @@ describe('Router', () => {
       const receipt = await tx.wait()
       const [registryAddress] = receipt.logs[2].args
 
-      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
-      const tx1 = await routerContract.create(registryAddress, [invited.address], amount)
+      const tx1 = await routerContract.create(registryAddress, [invited.address], initialAmount, DEFAULT_FEES_FRACTION)
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[4].args
 
       const invitedRouterInstance = routerContract.connect(invited) as any
 
-      await expect(invitedRouterInstance.join(nodeAddress, [], amount))
+      await expect(invitedRouterInstance.join(nodeAddress, [], initialAmount, DEFAULT_FEES_FRACTION))
         .to.emit(routerContract, 'RegistryJoined')
-        .withArgs(registryAddress, anyValue, amount)
+        .withArgs(registryAddress, anyValue, initialAmount)
     })
   })
 })

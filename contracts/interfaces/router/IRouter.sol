@@ -2,6 +2,7 @@
 pragma solidity =0.8.19;
 
 import {RegistryLib} from '../../libraries/Registry.sol';
+import {FractionLib} from '../../libraries/Fraction.sol';
 
 interface IRouter {
     function registry(address _strategyAddress) external returns (address);
@@ -9,12 +10,14 @@ interface IRouter {
     function create(
         address _strategyAddress,
         address[] memory _invitedAddresses,
-        bytes memory _amount
+        bytes memory _initialAmount,
+        FractionLib.Fraction memory _fees
     ) external returns (address);
 
     function join(
         address _parentAddress,
         address[] memory _invitedAddresses,
-        bytes memory _amount
+        bytes memory _initialAmount,
+        FractionLib.Fraction memory _fees
     ) external returns (address);
 }

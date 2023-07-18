@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import { loadFixture, fakeStrategySingle, registry, token } from '../fixtures'
 import coderUtils from '../helpers/coder'
+import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 
 describe('Registry', () => {
   describe('Deposit', () => {
@@ -15,22 +16,22 @@ describe('Registry', () => {
 
       const registryAddress = await registryContract.getAddress()
 
-      const amountNumber = '1000000000000000000'
+      const initialAmountNumber = '1000000000000000000'
 
-      const amount = coderUtils.build([amountNumber], ['uint256'])
+      const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(otherAccount.address)
+      await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
 
-      await tokenContract.transfer(otherAccount.address, amountNumber)
+      await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
-      await otherAccountTokenContract.approve(registryAddress, amount)
+      await otherAccountTokenContract.approve(registryAddress, initialAmount)
 
-      await registryContract.deposit(otherAccount.address, otherAccount.address, amount)
+      await registryContract.deposit(otherAccount.address, otherAccount.address, initialAmount)
 
       const [, initialBalance] = await registryContract.accounts(otherAccount.address)
 
-      expect(initialBalance).to.equal(amount)
+      expect(initialBalance).to.equal(initialAmount)
     })
 
     it('should emit Deposited when deposit to account', async function () {
@@ -44,20 +45,20 @@ describe('Registry', () => {
 
       const registryAddress = await registryContract.getAddress()
 
-      const amountNumber = '1000000000000000000'
+      const initialAmountNumber = '1000000000000000000'
 
-      const amount = coderUtils.build([amountNumber], ['uint256'])
+      const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(otherAccount.address)
+      await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
 
-      await tokenContract.transfer(otherAccount.address, amountNumber)
+      await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
-      await otherAccountTokenContract.approve(registryAddress, amount)
+      await otherAccountTokenContract.approve(registryAddress, initialAmount)
 
-      await expect(registryContract.deposit(otherAccount.address, otherAccount.address, amount))
+      await expect(registryContract.deposit(otherAccount.address, otherAccount.address, initialAmount))
         .to.emit(registryContract, 'Deposited')
-        .withArgs(otherAccount.address, amount)
+        .withArgs(otherAccount.address, initialAmount)
     })
 
     it('should transfer funds to strategy when deposit to account', async function () {
@@ -71,20 +72,20 @@ describe('Registry', () => {
 
       const registryAddress = await registryContract.getAddress()
 
-      const amountNumber = '1000000000000000000'
+      const initialAmountNumber = '1000000000000000000'
 
-      const amount = coderUtils.build([amountNumber], ['uint256'])
+      const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(otherAccount.address)
+      await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
 
-      await tokenContract.transfer(otherAccount.address, amountNumber)
+      await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
-      await otherAccountTokenContract.approve(registryAddress, amount)
+      await otherAccountTokenContract.approve(registryAddress, initialAmount)
 
-      await registryContract.deposit(otherAccount.address, otherAccount.address, amount)
+      await registryContract.deposit(otherAccount.address, otherAccount.address, initialAmount)
 
-      expect(await tokenContract.balanceOf(fakeStrategyAddress)).to.equal(amountNumber)
+      expect(await tokenContract.balanceOf(fakeStrategyAddress)).to.equal(initialAmountNumber)
     })
 
     it('should revert if try to deposit to account without being the owner', async function () {
@@ -98,19 +99,23 @@ describe('Registry', () => {
 
       const registryAddress = await registryContract.getAddress()
 
-      const amountNumber = '1000000000000000000'
+      const initialAmountNumber = '1000000000000000000'
 
-      const amount = coderUtils.build([amountNumber], ['uint256'])
+      const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(otherAccount.address)
+      await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
 
-      await tokenContract.transfer(otherAccount.address, amountNumber)
+      await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
-      await otherAccountTokenContract.approve(registryAddress, amount)
+      await otherAccountTokenContract.approve(registryAddress, initialAmount)
 
       await expect(
-        (registryContract.connect(otherAccount) as any).deposit(otherAccount.address, otherAccount.address, amount)
+        (registryContract.connect(otherAccount) as any).deposit(
+          otherAccount.address,
+          otherAccount.address,
+          initialAmount
+        )
       ).to.be.rejectedWith('Ownable: caller is not the owner')
     })
   })

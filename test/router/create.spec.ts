@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import { router, fakeStrategySingle, loadFixture, ethers, anyValue } from '../fixtures'
 import coderUtils from '../helpers/coder'
 import { createRandomAddress } from '../helpers/address'
+import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 
 describe('Router', () => {
   describe('Create', () => {
@@ -13,9 +14,9 @@ describe('Router', () => {
       const receipt = await tx.wait()
       const [registryAddress] = receipt.logs[2].args
 
-      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
-      expect(await routerContract.create(registryAddress, [], amount)).to.not.reverted
+      expect(await routerContract.create(registryAddress, [], initialAmount, DEFAULT_FEES_FRACTION)).to.not.reverted
     })
 
     it('should set root node parent as router itself on create', async function () {
@@ -26,9 +27,9 @@ describe('Router', () => {
       const receipt = await tx.wait()
       const [registryAddress] = receipt.logs[2].args
 
-      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
-      const tx1 = await routerContract.create(registryAddress, [], amount)
+      const tx1 = await routerContract.create(registryAddress, [], initialAmount, DEFAULT_FEES_FRACTION)
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[2].args
 
@@ -47,9 +48,9 @@ describe('Router', () => {
       const receipt = await tx.wait()
       const [registryAddress] = receipt.logs[2].args
 
-      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
-      await expect(routerContract.create(registryAddress, [], amount))
+      await expect(routerContract.create(registryAddress, [], initialAmount, DEFAULT_FEES_FRACTION))
         .to.emit(routerContract, 'NodeCreated')
         .withArgs(anyValue)
     })
@@ -62,9 +63,9 @@ describe('Router', () => {
       const receipt = await tx.wait()
       const [registryAddress] = receipt.logs[2].args
 
-      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
-      const tx1 = await routerContract.create(registryAddress, [], amount)
+      const tx1 = await routerContract.create(registryAddress, [], initialAmount, DEFAULT_FEES_FRACTION)
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[2].args
 
@@ -81,22 +82,21 @@ describe('Router', () => {
       const receipt = await tx.wait()
       const [registryAddress] = receipt.logs[2].args
 
-      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
-      await expect(routerContract.create(registryAddress, [], amount))
+      await expect(routerContract.create(registryAddress, [], initialAmount, DEFAULT_FEES_FRACTION))
         .to.emit(routerContract, 'RegistryJoined')
-        .withArgs(registryAddress, anyValue, amount)
+        .withArgs(registryAddress, anyValue, initialAmount)
     })
 
     it('should revert if try to create using a non-registry address', async function () {
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-      const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
-      await expect(routerContract.create(createRandomAddress(), [], amount)).to.be.revertedWithCustomError(
-        routerContract,
-        'NonRegistry()'
-      )
+      await expect(
+        routerContract.create(createRandomAddress(), [], initialAmount, DEFAULT_FEES_FRACTION)
+      ).to.be.revertedWithCustomError(routerContract, 'NonRegistry()')
     })
   })
 })
