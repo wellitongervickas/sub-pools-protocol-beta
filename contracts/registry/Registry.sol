@@ -32,13 +32,13 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function deposit(address _accountAddress, bytes memory _amount) external onlyRouter {
-        _depositStrategy(_amount);
+        // _depositStrategy(_amount);
         _depositAccount(_accountAddress, _amount);
 
         emit IRegistry.Deposited(_accountAddress, _amount);
     }
 
-    function _depositStrategy(bytes memory _amount) internal {
-        strategy.deposit(_amount);
-    }
+    // function _depositStrategy(bytes memory _amount) internal {
+    //     strategy.deposit(_amount);
+    // }
 }
