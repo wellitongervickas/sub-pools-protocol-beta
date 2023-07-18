@@ -9,9 +9,8 @@ library RegistryLib {
         bytes initialBalance;
         bytes additionalBalance;
         FractionLib.Fraction fees;
-        /// JOIN FEES RATIO
-        /// CHILD REQUIRED INITIAL AMOUNT
         /// NODE LOCK PERIOD
+        /// CHILD REQUIRED INITIAL AMOUNT
         /// CHILD MAX DEPOSIT
     }
 
