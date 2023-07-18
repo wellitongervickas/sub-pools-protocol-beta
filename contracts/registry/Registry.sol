@@ -28,7 +28,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
-        _setupAccount(_msgSender());
+        setupAccount(_msgSender());
     }
 
     function setupAccount(address _accountAddress) public onlyRouter whenNotAccount(_accountAddress) {
