@@ -6,12 +6,15 @@ import {RouterControl} from './RouterControl.sol';
 import {Node} from '../node/Node.sol';
 
 contract Router is IRouter, RouterControl {
-    function registryAndCreate(
-        address _strategyAddress,
+    function registry(address _strategyAddress) external returns (address) {
+        return _createRegistry(_strategyAddress);
+    }
+
+    function create(
+        address _registryAddress,
         address[] memory _invitedAddresses,
         bytes memory _amount
     ) external returns (address) {
-        address _registryAddress = _createRegistry(_strategyAddress);
         address _nodeAddress = _createRootNode(_invitedAddresses, _registryAddress);
 
         _setupRegistryAccount(_registryAddress, _nodeAddress, _amount);

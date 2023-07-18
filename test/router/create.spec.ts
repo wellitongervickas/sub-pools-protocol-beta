@@ -13,16 +13,19 @@ describe('Router', () => {
       const fakeStrategyAddress = await fakeStrategy.getAddress()
 
       const { routerContract } = await loadFixture(router.deployRouterFixture)
-      const routerContractAddress = await routerContract.getAddress()
 
       const amountValue = '1000000000000000000'
       const amount = coderUtils.build([amountValue], ['uint256'])
 
-      await tokenContract.approve(routerContractAddress, amountValue)
+      const tx = await routerContract.registry(fakeStrategyAddress)
+      const receipt = await tx.wait()
+      const [registryAddress] = receipt.logs[1].args
 
-      const tx1 = await routerContract.registryAndCreate(fakeStrategyAddress, [], amount)
+      await tokenContract.approve(registryAddress, amountValue)
+
+      const tx1 = await routerContract.create(registryAddress, [], amount)
       const receipt1 = await tx1.wait()
-      const [nodeAddress] = receipt1.logs[4].args
+      const [nodeAddress] = receipt1.logs[2].args
 
       const nodeContract = await ethers.getContractAt('Node', nodeAddress)
       const routerAddress = await routerContract.getAddress()
@@ -40,13 +43,17 @@ describe('Router', () => {
       const fakeStrategyAddress = await fakeStrategy.getAddress()
 
       const { routerContract } = await loadFixture(router.deployRouterFixture)
-      const routerContractAddress = await routerContract.getAddress()
 
       const amountValue = '1000000000000000000'
       const amount = coderUtils.build([amountValue], ['uint256'])
 
-      await tokenContract.approve(routerContractAddress, amountValue)
-      await expect(routerContract.registryAndCreate(fakeStrategyAddress, [], amount))
+      const tx = await routerContract.registry(fakeStrategyAddress)
+      const receipt = await tx.wait()
+      const [registryAddress] = receipt.logs[1].args
+
+      await tokenContract.approve(registryAddress, amountValue)
+
+      await expect(routerContract.create(registryAddress, [], amount))
         .to.emit(routerContract, 'NodeCreated')
         .withArgs(anyValue)
     })
