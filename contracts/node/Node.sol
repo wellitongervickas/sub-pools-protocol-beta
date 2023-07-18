@@ -18,18 +18,12 @@ contract Node is INode, NodeControl, Manager, Ownable {
         address _registryAddress
     ) {
         parent = _parentAddress;
-        _setupManager(_managerAddress, _invitedAddresses);
         registry = _registryAddress;
+        _setupManager(_managerAddress, _invitedAddresses);
     }
 
     modifier onlyRouter() {
         _checkOwner();
-        _;
-    }
-
-    modifier checkInvitation(address _invitedAddress) {
-        bool _isInvited = hasInvitedRole(_invitedAddress);
-        if (invitedOnly && !_isInvited) revert NotInvited();
         _;
     }
 

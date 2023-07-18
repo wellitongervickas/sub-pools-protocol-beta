@@ -7,6 +7,12 @@ import {ManagerControl, IManagerControl} from '../manager/ManagerControl.sol';
 contract Manager is IManager, ManagerControl {
     bool public invitedOnly = true;
 
+    modifier checkInvitation(address _invitedAddress) {
+        bool _isInvited = hasInvitedRole(_invitedAddress);
+        if (invitedOnly && !_isInvited) revert NotInvited();
+        _;
+    }
+
     modifier whenNotManager(address _address) {
         if (hasRoleManager(_address)) revert IManagerControl.ManagerNotAllowed();
         _;

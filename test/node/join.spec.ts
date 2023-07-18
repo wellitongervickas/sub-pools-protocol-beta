@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { node, loadFixture } from '../fixtures'
 
-describe.skip('Node', () => {
+describe('Node', () => {
   describe('Join', () => {
     it('should set node manager on join', async function () {
       const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)
@@ -16,12 +16,12 @@ describe.skip('Node', () => {
     })
 
     it('should revert if try to join invited only node', async function () {
-      const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture.bind(this, [], true))
+      const invitedOnly = true
 
-      const { nodeContract: nodeContract2 } = await loadFixture(node.deployNodeFixture.bind(this, [], true))
+      const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture.bind(this, [], invitedOnly))
+      const { nodeContract: nodeContract2 } = await loadFixture(node.deployNodeFixture.bind(this, [], invitedOnly))
 
       const [, otherManager] = accounts
-
       const node2Address = await nodeContract2.getAddress()
 
       await expect(nodeContract.join(node2Address, otherManager.address)).to.be.revertedWithCustomError(

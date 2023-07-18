@@ -4,8 +4,16 @@ import { ZERO_ADDRESS } from '../helpers/address'
 
 const { MANAGER_ROLE } = managerControl
 
-describe.skip('Node', () => {
+describe('Node', () => {
   describe('Invite', () => {
+    it('should invite node manager', async function () {
+      const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)
+      const [, invited] = accounts
+
+      await nodeContract.invite(invited.address)
+      expect(await nodeContract.hasInvitedRole(invited.address)).to.equal(true)
+    })
+
     it('should emit NodeManagerInvited on invite', async function () {
       const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)
       const [, invited] = accounts
@@ -13,14 +21,6 @@ describe.skip('Node', () => {
       await expect(nodeContract.invite(invited.address))
         .to.emit(nodeContract, 'NodeManagerInvited')
         .withArgs(invited.address)
-    })
-
-    it('should invite children manager', async function () {
-      const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)
-      const [, invited] = accounts
-
-      await nodeContract.invite(invited.address)
-      expect(await nodeContract.hasInvitedRole(invited.address)).to.equal(true)
     })
 
     it('should update invited only to false', async function () {
@@ -40,7 +40,7 @@ describe.skip('Node', () => {
       )
     })
 
-    it('should revert if not manager try to invite children manager', async function () {
+    it('should revert if not manager try to invite node manager', async function () {
       const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture)
       const [, notManager] = accounts
 
