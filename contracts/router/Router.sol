@@ -10,7 +10,6 @@ contract Router is IRouter, RouterControl {
         return _createRegistry(_strategyAddress);
     }
 
-    /// todo: revert if try to use outside registry
     function create(
         address _registryAddress,
         address[] memory _invitedAddresses,
