@@ -8,25 +8,22 @@ describe('Registry', () => {
     it('should deposit to account', async function () {
       const { tokenContract } = await loadFixture(token.deployTokenFixture)
       const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
-
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
-      const [, otherAccount] = accounts
 
+      const [, otherAccount] = accounts
       const registryAddress = await registryContract.getAddress()
 
       const initialAmountNumber = '1000000000000000000'
-
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
       await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
-
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
-      await otherAccountTokenContract.approve(registryAddress, initialAmount)
 
+      await otherAccountTokenContract.approve(registryAddress, initialAmount)
       await registryContract.deposit(otherAccount.address, otherAccount.address, initialAmount)
 
       const [, initialBalance] = await registryContract.accounts(otherAccount.address)
@@ -42,15 +39,12 @@ describe('Registry', () => {
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
       const [, otherAccount] = accounts
-
       const registryAddress = await registryContract.getAddress()
 
       const initialAmountNumber = '1000000000000000000'
-
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
       await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
-
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
@@ -64,47 +58,40 @@ describe('Registry', () => {
     it('should transfer funds to strategy when deposit to account', async function () {
       const { tokenContract } = await loadFixture(token.deployTokenFixture)
       const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
-
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
-      const [, otherAccount] = accounts
 
+      const [, otherAccount] = accounts
       const registryAddress = await registryContract.getAddress()
 
       const initialAmountNumber = '1000000000000000000'
-
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
       await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
-
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
       await otherAccountTokenContract.approve(registryAddress, initialAmount)
 
       await registryContract.deposit(otherAccount.address, otherAccount.address, initialAmount)
-
       expect(await tokenContract.balanceOf(fakeStrategyAddress)).to.equal(initialAmountNumber)
     })
 
     it('should revert if try to deposit to account without being the owner', async function () {
       const { tokenContract } = await loadFixture(token.deployTokenFixture)
       const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
-
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
-      const [, otherAccount] = accounts
 
+      const [, otherAccount] = accounts
       const registryAddress = await registryContract.getAddress()
 
       const initialAmountNumber = '1000000000000000000'
-
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
       await registryContract.setupAccount(otherAccount.address, DEFAULT_FEES_FRACTION)
-
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any

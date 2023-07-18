@@ -38,21 +38,21 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         emit IRegistry.Joined(_accountAddress);
     }
 
-    function deposit(address _from, address _accountAddress, bytes memory _amount) external onlyRouter {
-        _depositStrategy(_from, _amount);
-        _depositAccount(_accountAddress, _amount);
+    function deposit(address _from, address _accountAddress, bytes memory _initialAmount) external onlyRouter {
+        _depositStrategy(_from, _initialAmount);
+        _depositAccount(_accountAddress, _initialAmount);
 
-        emit IRegistry.Deposited(_accountAddress, _amount);
+        emit IRegistry.Deposited(_accountAddress, _initialAmount);
     }
 
-    function _depositStrategy(address _from, bytes memory _amount) private {
-        _transferSingleTokenStrategy(_from, _amount);
-        strategy.deposit(_amount);
+    function _depositStrategy(address _from, bytes memory _initialAmount) private {
+        _transferSingleTokenStrategy(_from, _initialAmount);
+        strategy.deposit(_initialAmount);
     }
 
-    function _transferSingleTokenStrategy(address _from, bytes memory _amount) private {
+    function _transferSingleTokenStrategy(address _from, bytes memory _initialAmount) private {
         address _decodedTokenAddress = abi.decode(strategy.token(), (address));
-        uint256 _decodedAmount = abi.decode(_amount, (uint256));
+        uint256 _decodedAmount = abi.decode(_initialAmount, (uint256));
         IERC20(_decodedTokenAddress).safeTransferFrom(_from, address(strategy), _decodedAmount);
     }
 }
