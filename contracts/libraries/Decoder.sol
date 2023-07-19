@@ -28,3 +28,19 @@ function defaultAdditionalBalance(Mode _mode) pure returns (bytes memory) {
 
     return abi.encode(0, 0);
 }
+
+function decodeSingleAddress(bytes memory _data) pure returns (address) {
+    return abi.decode(_data, (address));
+}
+
+function decodeMultiAddress(bytes memory _data) pure returns (address, address) {
+    return abi.decode(_data, (address, address));
+}
+
+function decodeSingleAssetAmount(bytes memory _data) pure returns (uint256) {
+    return abi.decode(_data, (uint256));
+}
+
+function decodeMultiAssetAmount(bytes memory _data) pure returns (uint256, uint256) {
+    return abi.decode(_data, (uint256, uint256));
+}
