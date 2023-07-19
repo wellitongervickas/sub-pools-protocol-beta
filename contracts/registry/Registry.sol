@@ -36,11 +36,12 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
 
-        join(address(0), _msgSender(), _defaultFractionFees(), Decoder.defaultRequiredInitialDeposit(strategyMode()));
-    }
-
-    function _defaultFractionFees() private pure returns (FractionLib.Fraction memory) {
-        return FractionLib.Fraction(0, 100);
+        join(
+            address(0),
+            _msgSender(),
+            FractionLib.Fraction(0, 100),
+            Decoder.defaultRequiredInitialDeposit(strategyMode())
+        );
     }
 
     function join(
