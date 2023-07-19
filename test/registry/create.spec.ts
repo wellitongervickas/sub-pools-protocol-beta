@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { ethers, loadFixture, registry } from '../fixtures'
+import { ethers, loadFixture, registry, fakeStrategySingle } from '../fixtures'
 import { createRandomAddress } from '../helpers/address'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 import { DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
@@ -7,7 +7,7 @@ import { DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
 describe('Registry', () => {
   describe('Create', () => {
     it('should create a new account', async function () {
-      const fakeStrategyAddress = createRandomAddress()
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
@@ -33,7 +33,7 @@ describe('Registry', () => {
     })
 
     it('should emit Joined when create a new account', async function () {
-      const fakeStrategyAddress = createRandomAddress()
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
@@ -52,7 +52,7 @@ describe('Registry', () => {
     })
 
     it('should revert if try to create account twice', async function () {
-      const fakeStrategyAddress = createRandomAddress()
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
@@ -76,7 +76,7 @@ describe('Registry', () => {
     })
 
     it('should revert if try to create account without being the owner', async function () {
-      const fakeStrategyAddress = createRandomAddress()
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )

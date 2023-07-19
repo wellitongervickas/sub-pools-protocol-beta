@@ -5,7 +5,7 @@ import {IRouterControl} from '../interfaces/router/IRouterControl.sol';
 import {Node} from '../node/Node.sol';
 import {NodeControl} from '../node/NodeControl.sol';
 import {Registry} from '../registry/Registry.sol';
-import {IStrategy, StrategyType} from '../interfaces/strategy/IStrategy.sol';
+import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 
 contract RouterControl is IRouterControl, NodeControl {

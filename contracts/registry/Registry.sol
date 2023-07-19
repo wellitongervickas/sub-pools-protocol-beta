@@ -4,13 +4,13 @@ pragma solidity =0.8.19;
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
-import {IStrategy, StrategyType} from '../interfaces/strategy/IStrategy.sol';
+import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 import {IRegistry} from '../interfaces/registry/IRegistry.sol';
 import {RegistryLib} from '../libraries/Registry.sol';
 import {RegistryControl} from './RegistryControl.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 
-import 'hardhat/console.sol';
+import '../libraries/Decoder.sol' as Decoder;
 
 contract Registry is IRegistry, RegistryControl, Ownable {
     using SafeERC20 for IERC20;
@@ -35,15 +35,12 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
-        join(address(0), _msgSender(), _defaultFractionFees(), _defaultEncodedRequiredInitialDeposit());
+
+        join(address(0), _msgSender(), _defaultFractionFees(), Decoder.defaultRequiredInitialDeposit(strategyMode()));
     }
 
     function _defaultFractionFees() private pure returns (FractionLib.Fraction memory) {
         return FractionLib.Fraction(0, 100);
-    }
-
-    function _defaultEncodedRequiredInitialDeposit() private pure returns (bytes memory) {
-        return abi.encode(0);
     }
 
     function join(
@@ -54,22 +51,14 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     ) public onlyRouter whenNotAccount(_accountAddress) {
         _setupAccount(
             _accountAddress,
-            _defaultEncodedInitialBalance(),
-            _defaultEncodedAdditionalBalance(),
+            Decoder.defaultInitialBalance(strategyMode()),
+            Decoder.defaultAdditionalBalance(strategyMode()),
             _fees,
             _parentAddress,
             _requiredInitialDeposit
         );
 
         emit IRegistry.Joined(_accountAddress);
-    }
-
-    function _defaultEncodedInitialBalance() private pure returns (bytes memory) {
-        return abi.encode(0);
-    }
-
-    function _defaultEncodedAdditionalBalance() private pure returns (bytes memory) {
-        return abi.encode(0);
     }
 
     function deposit(
@@ -129,7 +118,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         return _account.id == 2;
     }
 
-    function _checkParentRequiredInitialDeposit(address _accountAddress, bytes memory _amount) internal view {
+    function _checkParentRequiredInitialDeposit(address _accountAddress, bytes memory _amount) private view {
         uint256 _decodedAmount = _decodeAssetAmount(_amount);
         RegistryLib.Account storage _account = _account(_accountAddress);
 
@@ -139,5 +128,9 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             uint256 _requiredAmount = _decodeAssetAmount(_parent.requiredInitialDeposit);
             if (_requiredAmount > 0 && _decodedAmount != _requiredAmount) revert IRegistry.InvalidInitialAmount();
         }
+    }
+
+    function strategyMode() public view returns (Decoder.Mode) {
+        return strategy.strategyType();
     }
 }

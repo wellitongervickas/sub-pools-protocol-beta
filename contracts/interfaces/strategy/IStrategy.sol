@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-enum StrategyType {
-    Single
-}
+import {Mode} from '../../libraries/Decoder.sol';
 
 interface IStrategy {
-    function strategyType() external view returns (StrategyType);
+    function strategyType() external view returns (Mode);
 
     function token() external view returns (bytes memory);
 
