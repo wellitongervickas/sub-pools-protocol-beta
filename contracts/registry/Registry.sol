@@ -70,7 +70,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         _transferStrategyAssets(_depositor, _amount);
         _depositStrategyAssets(_amount);
 
-        bytes memory _remainingAmount = _chargeParentFees(_accountAddress, _amount);
+        bytes memory _remainingAmount = _chargeParentAssetsFees(_accountAddress, _amount);
         _depositAccount(_accountAddress, _remainingAmount);
 
         emit IRegistry.Deposited(_accountAddress, _amount);
@@ -78,22 +78,22 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     function _transferStrategyAssets(address _depositor, bytes memory _amount) private {
         if (_strategyMode() == Coder.Mode.Single) {
-            address _tokenAddress = Coder.decodeSingleAddress(strategy.token());
-            IERC20(_tokenAddress).safeTransferFrom(
-                _depositor,
-                address(strategy),
-                Coder.decodeSingleAssetAmount(_amount)
-            );
+            _transferStrategySingleAssets(_depositor, _amount);
         } else {
             /// TODO
         }
+    }
+
+    function _transferStrategySingleAssets(address _depositor, bytes memory _amount) private {
+        address _tokenAddress = Coder.decodeSingleAddress(strategy.token());
+        IERC20(_tokenAddress).safeTransferFrom(_depositor, address(strategy), Coder.decodeSingleAssetAmount(_amount));
     }
 
     function _depositStrategyAssets(bytes memory _amount) private {
         strategy.deposit(_amount);
     }
 
-    function _chargeParentFees(address _accountAddress, bytes memory _amount) private returns (bytes memory) {
+    function _chargeParentAssetsFees(address _accountAddress, bytes memory _amount) private returns (bytes memory) {
         RegistryLib.Account storage _account = _account(_accountAddress);
 
         if (_strategyMode() == Coder.Mode.Single) {
