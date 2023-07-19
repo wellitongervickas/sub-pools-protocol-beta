@@ -15,11 +15,19 @@ contract Router is IRouter, RouterControl {
         address _registryAddress,
         address[] memory _invitedAddresses,
         bytes memory _initialAmount,
-        FractionLib.Fraction memory _fees
+        FractionLib.Fraction memory _fees,
+        bytes memory _requiredInitialDeposit
     ) external onlyValidRegistry(_registryAddress) returns (address) {
         address _nodeAddress = _createRootNode(_registryAddress, _invitedAddresses);
 
-        _setupRegistryAccount(address(this), _registryAddress, _nodeAddress, _initialAmount, _fees);
+        _setupRegistryAccount(
+            address(this),
+            _registryAddress,
+            _nodeAddress,
+            _initialAmount,
+            _fees,
+            _requiredInitialDeposit
+        );
         return _nodeAddress;
     }
 
@@ -27,7 +35,8 @@ contract Router is IRouter, RouterControl {
         address _parentAddress,
         address[] memory _invitedAddresses,
         bytes memory _initialAmount,
-        FractionLib.Fraction memory _fees
+        FractionLib.Fraction memory _fees,
+        bytes memory _requiredInitialDeposit
     ) external returns (address) {
         Node _parent = Node(_parentAddress);
 
@@ -35,7 +44,14 @@ contract Router is IRouter, RouterControl {
         address _nodeAddress = _deployNode(address(_parent), msg.sender, _invitedAddresses, _parentRegistry);
 
         _parent.join(_nodeAddress, msg.sender);
-        _setupRegistryAccount(_parentAddress, _parentRegistry, _nodeAddress, _initialAmount, _fees);
+        _setupRegistryAccount(
+            _parentAddress,
+            _parentRegistry,
+            _nodeAddress,
+            _initialAmount,
+            _fees,
+            _requiredInitialDeposit
+        );
 
         return _nodeAddress;
     }

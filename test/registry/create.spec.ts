@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import { ethers, loadFixture, registry } from '../fixtures'
 import { createRandomAddress } from '../helpers/address'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
+import { DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
 
 describe('Registry', () => {
   describe('Create', () => {
@@ -17,7 +18,12 @@ describe('Registry', () => {
         divider: ethers.toBigInt(200),
       }
 
-      await registryContract.setupAccount(deployer.address, otherAccount.address, accountFees)
+      await registryContract.setupAccount(
+        deployer.address,
+        otherAccount.address,
+        accountFees,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT
+      )
       const [id, initialBalance, additionalBalance, fees, parentAddress] = await registryContract.accounts(
         otherAccount.address
       )
@@ -38,7 +44,14 @@ describe('Registry', () => {
       )
       const [deployer, otherAccount] = accounts
 
-      await expect(registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION))
+      await expect(
+        registryContract.setupAccount(
+          deployer.address,
+          otherAccount.address,
+          DEFAULT_FEES_FRACTION,
+          DEFAULT_REQUIRED_INITIAL_AMOUNT
+        )
+      )
         .to.emit(registryContract, 'Joined')
         .withArgs(otherAccount.address)
     })
@@ -50,10 +63,20 @@ describe('Registry', () => {
       )
       const [deployer, otherAccount] = accounts
 
-      await registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
+      await registryContract.setupAccount(
+        deployer.address,
+        otherAccount.address,
+        DEFAULT_FEES_FRACTION,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT
+      )
 
       await expect(
-        registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
+        registryContract.setupAccount(
+          deployer.address,
+          otherAccount.address,
+          DEFAULT_FEES_FRACTION,
+          DEFAULT_REQUIRED_INITIAL_AMOUNT
+        )
       ).to.be.revertedWithCustomError(registryContract, 'AlreadyJoined()')
     })
 
@@ -68,7 +91,8 @@ describe('Registry', () => {
         (registryContract.connect(otherAccount) as any).setupAccount(
           deployer.address,
           otherAccount.address,
-          DEFAULT_FEES_FRACTION
+          DEFAULT_FEES_FRACTION,
+          DEFAULT_REQUIRED_INITIAL_AMOUNT
         )
       ).to.be.rejectedWith('Ownable: caller is not the owner')
     })

@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import { loadFixture, fakeStrategySingle, registry, token, ethers } from '../fixtures'
 import coderUtils from '../helpers/coder'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
+import { DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
 
 describe('Registry', () => {
   describe('Deposit', () => {
@@ -18,7 +19,12 @@ describe('Registry', () => {
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
+      await registryContract.setupAccount(
+        deployer.address,
+        otherAccount.address,
+        DEFAULT_FEES_FRACTION,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT
+      )
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
@@ -44,7 +50,12 @@ describe('Registry', () => {
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
+      await registryContract.setupAccount(
+        deployer.address,
+        otherAccount.address,
+        DEFAULT_FEES_FRACTION,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT
+      )
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
@@ -68,7 +79,12 @@ describe('Registry', () => {
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
+      await registryContract.setupAccount(
+        deployer.address,
+        otherAccount.address,
+        DEFAULT_FEES_FRACTION,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT
+      )
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
@@ -91,7 +107,12 @@ describe('Registry', () => {
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(deployer.address, otherAccount.address, DEFAULT_FEES_FRACTION)
+      await registryContract.setupAccount(
+        deployer.address,
+        otherAccount.address,
+        DEFAULT_FEES_FRACTION,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT
+      )
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
@@ -124,8 +145,18 @@ describe('Registry', () => {
         divider: ethers.toBigInt(200),
       }
 
-      await registryContract.setupAccount(deployer.address, managerAccount.address, accountFees)
-      await registryContract.setupAccount(managerAccount.address, invitedAccount.address, accountFees)
+      await registryContract.setupAccount(
+        deployer.address,
+        managerAccount.address,
+        accountFees,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT
+      )
+      await registryContract.setupAccount(
+        managerAccount.address,
+        invitedAccount.address,
+        accountFees,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT
+      )
 
       await tokenContract.transfer(managerAccount.address, initialAmountNumber)
       await tokenContract.transfer(invitedAccount.address, initialAmountNumber)

@@ -10,10 +10,10 @@ library RegistryLib {
         bytes additionalBalance;
         FractionLib.Fraction fees;
         address parent;
+        bytes requiredInitialDeposit;
 
         /// ToDo:
         /// LOCK PERIOD
-        /// REQUIRED INITIAL AMOUNT
         /// MAX DEPOSIT
     }
 

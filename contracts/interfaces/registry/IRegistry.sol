@@ -10,7 +10,12 @@ interface IRegistry {
 
     error AlreadyJoined();
 
-    function setupAccount(address _parentAddress, address _accountAddress, FractionLib.Fraction memory _fees) external;
+    function setupAccount(
+        address _parentAddress,
+        address _accountAddress,
+        FractionLib.Fraction memory _fees,
+        bytes memory _requiredInitialDeposit
+    ) external;
 
     function deposit(address _from, address _accountAddress, bytes memory _amount) external;
 }

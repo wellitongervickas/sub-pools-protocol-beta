@@ -11,13 +11,15 @@ interface IRouter {
         address _strategyAddress,
         address[] memory _invitedAddresses,
         bytes memory _initialAmount,
-        FractionLib.Fraction memory _fees
+        FractionLib.Fraction memory _fees,
+        bytes memory _requiredInitialDeposit
     ) external returns (address);
 
     function join(
         address _parentAddress,
         address[] memory _invitedAddresses,
         bytes memory _initialAmount,
-        FractionLib.Fraction memory _fees
+        FractionLib.Fraction memory _fees,
+        bytes memory _requiredInitialDeposit
     ) external returns (address);
 }

@@ -9,7 +9,6 @@ import {IRegistry} from '../interfaces/registry/IRegistry.sol';
 import {RegistryLib} from '../libraries/Registry.sol';
 import {RegistryControl} from './RegistryControl.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
-import 'hardhat/console.sol';
 
 contract Registry is IRegistry, RegistryControl, Ownable {
     using SafeERC20 for IERC20;
@@ -29,20 +28,45 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
-        setupAccount(address(0), _msgSender(), FractionLib.Fraction(0, 100));
+        setupAccount(address(0), _msgSender(), _defaultFractionFees(), _defaultRequiredInitialDeposit());
+    }
+
+    function _defaultFractionFees() private pure returns (FractionLib.Fraction memory) {
+        return FractionLib.Fraction(0, 100);
+    }
+
+    function _defaultRequiredInitialDeposit() private pure returns (bytes memory) {
+        return abi.encode(0);
     }
 
     function setupAccount(
         address _parentAddress,
         address _accountAddress,
-        FractionLib.Fraction memory _fees
+        FractionLib.Fraction memory _fees,
+        bytes memory _requiredInitialDeposit
     ) public onlyRouter whenNotAccount(_accountAddress) {
-        _setupAccount(_parentAddress, _accountAddress, _fees);
+        _setupAccount(
+            _accountAddress,
+            _defaultInitialBalance(),
+            _defaultAdditionalBalance(),
+            _fees,
+            _parentAddress,
+            _requiredInitialDeposit
+        );
+
         emit IRegistry.Joined(_accountAddress);
     }
 
-    function deposit(address _from, address _accountAddress, bytes memory _initialAmount) external onlyRouter {
-        _transferStrategyAssets(_from, _initialAmount);
+    function _defaultInitialBalance() private pure returns (bytes memory) {
+        return abi.encode(0);
+    }
+
+    function _defaultAdditionalBalance() private pure returns (bytes memory) {
+        return abi.encode(0);
+    }
+
+    function deposit(address _depositor, address _accountAddress, bytes memory _initialAmount) external onlyRouter {
+        _transferStrategyAssets(_depositor, _initialAmount);
         _depositStrategyAssets(_initialAmount);
 
         bytes memory _remainingAmount = _chargeParentFees(_accountAddress, _initialAmount);
@@ -51,10 +75,10 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         emit IRegistry.Deposited(_accountAddress, _initialAmount);
     }
 
-    function _transferStrategyAssets(address _from, bytes memory _amount) private {
+    function _transferStrategyAssets(address _depositor, bytes memory _amount) private {
         uint256 _decodedAmount = _decodeAssetAmount(_amount);
         address _decodedTokenAddress = _decodeTokenAddress();
-        IERC20(_decodedTokenAddress).safeTransferFrom(_from, address(strategy), _decodedAmount);
+        IERC20(_decodedTokenAddress).safeTransferFrom(_depositor, address(strategy), _decodedAmount);
     }
 
     function _depositStrategyAssets(bytes memory _amount) private {
@@ -74,7 +98,6 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
             bytes memory _parentAdditionalBalance = _parent.additionalBalance;
             uint256 _decodedAdditionalBalance = _decodeAssetAmount(_parentAdditionalBalance);
-
             uint256 _feesAmount = _parent._calculateFees(_decodedAmount);
             uint256 _updatedAdditionalBalance = _feesAmount + _decodedAdditionalBalance;
 

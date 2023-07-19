@@ -15,18 +15,22 @@ contract RegistryControl is IRegistryControl {
     mapping(address => RegistryLib.Account) public accounts;
 
     function _setupAccount(
-        address _parentAddress,
         address _accountAddress,
-        FractionLib.Fraction memory _fees
+        bytes memory _initialBalance,
+        bytes memory _additionalBalance,
+        FractionLib.Fraction memory _fees,
+        address _parentAddress,
+        bytes memory _requiredInitialAmount
     ) internal {
         uint256 _id = _createID();
 
         accounts[_accountAddress] = RegistryLib.Account({
             id: _id,
-            initialBalance: abi.encode(0),
-            additionalBalance: abi.encode(0),
+            initialBalance: _initialBalance,
+            additionalBalance: _additionalBalance,
             fees: _fees,
-            parent: _parentAddress
+            parent: _parentAddress,
+            requiredInitialDeposit: _requiredInitialAmount
         });
     }
 
