@@ -5,8 +5,9 @@ import {IRouter} from '../interfaces/router/IRouter.sol';
 import {RouterControl} from './RouterControl.sol';
 import {Node} from '../node/Node.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
+import {RouterPivot} from './RouterPivot.sol';
 
-contract Router is IRouter, RouterControl {
+contract Router is IRouter, RouterPivot, RouterControl {
     function registry(address _strategyAddress) external returns (address) {
         return _createRegistry(_strategyAddress);
     }
