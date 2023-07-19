@@ -40,7 +40,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             address(0),
             _msgSender(),
             FractionLib.Fraction(0, 100),
-            Decoder.defaultRequiredInitialDeposit(strategyMode())
+            Decoder.defaultRequiredInitialDeposit(_strategyMode())
         );
     }
 
@@ -52,8 +52,8 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     ) public onlyRouter whenNotAccount(_accountAddress) {
         _setupAccount(
             _accountAddress,
-            Decoder.defaultInitialBalance(strategyMode()),
-            Decoder.defaultAdditionalBalance(strategyMode()),
+            Decoder.defaultInitialBalance(_strategyMode()),
+            Decoder.defaultAdditionalBalance(_strategyMode()),
             _fees,
             _parentAddress,
             _requiredInitialDeposit
@@ -77,7 +77,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function _transferStrategyAssets(address _depositor, bytes memory _amount) private {
-        if (strategyMode() == Decoder.Mode.Single) {
+        if (_strategyMode() == Decoder.Mode.Single) {
             address _tokenAddress = Decoder.decodeSingleAddress(strategy.token());
             IERC20(_tokenAddress).safeTransferFrom(
                 _depositor,
@@ -85,7 +85,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
                 Decoder.decodeSingleAssetAmount(_amount)
             );
         } else {
-            ///
+            /// TODO
         }
     }
 
@@ -94,10 +94,13 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function _chargeParentFees(address _accountAddress, bytes memory _amount) private returns (bytes memory) {
-        uint256 _decodedAmount = Decoder.decodeSingleAssetAmount(_amount);
         RegistryLib.Account storage _account = _account(_accountAddress);
 
-        if (!_checkIsRootAccount(_account)) {
+        if (_strategyMode() == Decoder.Mode.Single) {
+            uint256 _decodedAmount = Decoder.decodeSingleAssetAmount(_amount);
+
+            if (_checkIsRootAccount(_account)) return abi.encode(_decodedAmount);
+
             RegistryLib.Account storage _parent = _parentAccount(_accountAddress);
 
             bytes memory _parentAdditionalBalance = _parent.additionalBalance;
@@ -109,9 +112,11 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             _additionalDepositAccount(_account.parent, abi.encode(_updatedAdditionalBalance));
 
             return abi.encode(_decodedAmount - _feesAmount);
+        } else {
+            (uint256 _decodedAmount1, uint256 _decodedAmount2) = Decoder.decodeMultiAssetAmount(_amount);
+            /// ToDo
+            return abi.encode(_decodedAmount1, _decodedAmount2);
         }
-
-        return abi.encode(_decodedAmount);
     }
 
     function _checkIsRootAccount(RegistryLib.Account storage _account) private view returns (bool) {
@@ -119,7 +124,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function _checkParentRequiredInitialDeposit(address _accountAddress, bytes memory _amount) private view {
-        if (strategyMode() == Decoder.Mode.Single) {
+        if (_strategyMode() == Decoder.Mode.Single) {
             uint256 _decodedAmount = Decoder.decodeSingleAssetAmount(_amount);
             RegistryLib.Account storage _account = _account(_accountAddress);
 
@@ -130,11 +135,11 @@ contract Registry is IRegistry, RegistryControl, Ownable {
                 if (_requiredAmount > 0 && _decodedAmount != _requiredAmount) revert IRegistry.InvalidInitialAmount();
             }
         } else {
-            ///
+            /// ToDo
         }
     }
 
-    function strategyMode() public view returns (Decoder.Mode) {
-        return strategy.strategyType();
+    function _strategyMode() private view returns (Decoder.Mode) {
+        return strategy.strategyMode();
     }
 }
