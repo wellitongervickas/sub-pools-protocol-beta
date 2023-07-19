@@ -10,6 +10,8 @@ import {RegistryLib} from '../libraries/Registry.sol';
 import {RegistryControl} from './RegistryControl.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 
+import 'hardhat/console.sol';
+
 contract Registry is IRegistry, RegistryControl, Ownable {
     using SafeERC20 for IERC20;
     using RegistryLib for RegistryLib.Account;
@@ -22,20 +24,20 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     modifier whenNotAccount(address _address) {
-        if (accounts[_address].id != 0) revert AlreadyJoined();
+        if (_account(_address).id != 0) revert IRegistry.AlreadyJoined();
         _;
     }
 
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
-        setupAccount(address(0), _msgSender(), _defaultFractionFees(), _defaultRequiredInitialDeposit());
+        setupAccount(address(0), _msgSender(), _defaultFractionFees(), _defaultEncodedRequiredInitialDeposit());
     }
 
     function _defaultFractionFees() private pure returns (FractionLib.Fraction memory) {
         return FractionLib.Fraction(0, 100);
     }
 
-    function _defaultRequiredInitialDeposit() private pure returns (bytes memory) {
+    function _defaultEncodedRequiredInitialDeposit() private pure returns (bytes memory) {
         return abi.encode(0);
     }
 
@@ -47,8 +49,8 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     ) public onlyRouter whenNotAccount(_accountAddress) {
         _setupAccount(
             _accountAddress,
-            _defaultInitialBalance(),
-            _defaultAdditionalBalance(),
+            _defaultEncodedInitialBalance(),
+            _defaultEncodedAdditionalBalance(),
             _fees,
             _parentAddress,
             _requiredInitialDeposit
@@ -57,15 +59,17 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         emit IRegistry.Joined(_accountAddress);
     }
 
-    function _defaultInitialBalance() private pure returns (bytes memory) {
+    function _defaultEncodedInitialBalance() private pure returns (bytes memory) {
         return abi.encode(0);
     }
 
-    function _defaultAdditionalBalance() private pure returns (bytes memory) {
+    function _defaultEncodedAdditionalBalance() private pure returns (bytes memory) {
         return abi.encode(0);
     }
 
     function deposit(address _depositor, address _accountAddress, bytes memory _initialAmount) external onlyRouter {
+        _checkParentRequiredInitialDeposit(_accountAddress, _initialAmount);
+
         _transferStrategyAssets(_depositor, _initialAmount);
         _depositStrategyAssets(_initialAmount);
 
@@ -89,15 +93,16 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         return abi.decode(_amount, (uint256));
     }
 
-    function _chargeParentFees(address _accountAddress, bytes memory _initialAmount) private returns (bytes memory) {
-        uint256 _decodedAmount = _decodeAssetAmount(_initialAmount);
+    function _chargeParentFees(address _accountAddress, bytes memory _amount) private returns (bytes memory) {
+        uint256 _decodedAmount = _decodeAssetAmount(_amount);
+        RegistryLib.Account storage _account = _account(_accountAddress);
 
-        RegistryLib.Account storage _account = accounts[_accountAddress];
-        if (_account.parent != owner()) {
-            RegistryLib.Account storage _parent = accounts[_account.parent];
+        if (!_checkIsRootAccount(_account)) {
+            RegistryLib.Account storage _parent = _parentAccount(_accountAddress);
 
             bytes memory _parentAdditionalBalance = _parent.additionalBalance;
             uint256 _decodedAdditionalBalance = _decodeAssetAmount(_parentAdditionalBalance);
+
             uint256 _feesAmount = _parent._calculateFees(_decodedAmount);
             uint256 _updatedAdditionalBalance = _feesAmount + _decodedAdditionalBalance;
 
@@ -111,5 +116,21 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     function _decodeTokenAddress() private view returns (address) {
         return abi.decode(strategy.token(), (address));
+    }
+
+    function _checkIsRootAccount(RegistryLib.Account storage _account) private view returns (bool) {
+        return _account.id == 2;
+    }
+
+    function _checkParentRequiredInitialDeposit(address _accountAddress, bytes memory _amount) internal view {
+        uint256 _decodedAmount = _decodeAssetAmount(_amount);
+        RegistryLib.Account storage _account = _account(_accountAddress);
+
+        if (!_checkIsRootAccount(_account)) {
+            RegistryLib.Account storage _parent = _parentAccount(_accountAddress);
+
+            uint256 _requiredAmount = _decodeAssetAmount(_parent.requiredInitialDeposit);
+            if (_requiredAmount > 0 && _decodedAmount != _requiredAmount) revert IRegistry.InvalidInitialAmount();
+        }
     }
 }

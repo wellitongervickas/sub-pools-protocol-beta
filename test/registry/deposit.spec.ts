@@ -151,6 +151,7 @@ describe('Registry', () => {
         accountFees,
         DEFAULT_REQUIRED_INITIAL_AMOUNT
       )
+
       await registryContract.setupAccount(
         managerAccount.address,
         invitedAccount.address,
@@ -174,6 +175,52 @@ describe('Registry', () => {
       const [decodedAdditionalBalance] = coderUtils.decompile(additionalBalance, ['uint256'])
 
       expect(decodedAdditionalBalance).to.equal('5000000000000000')
+    })
+
+    it('should revert if try to deposit amount not equal as required inital amount', async function () {
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+
+      const { registryContract, accounts } = await loadFixture(
+        registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
+      )
+      const [deployer, managerAccount, invitedAccount] = accounts
+      const registryAddress = await registryContract.getAddress()
+
+      const invalidInitialAmountNumber = '1'
+      const requiredAmountNumber = '1000000000000000000'
+
+      const invalidInitialAmount = coderUtils.build([invalidInitialAmountNumber], ['uint256'])
+      const requiredInitialAmount = coderUtils.build([requiredAmountNumber], ['uint256'])
+
+      const accountFees = {
+        value: ethers.toBigInt(1),
+        divider: ethers.toBigInt(200),
+      }
+
+      await registryContract.setupAccount(deployer.address, managerAccount.address, accountFees, requiredInitialAmount)
+
+      await registryContract.setupAccount(
+        managerAccount.address,
+        invitedAccount.address,
+        accountFees,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT
+      )
+
+      await tokenContract.transfer(managerAccount.address, requiredAmountNumber)
+      await tokenContract.transfer(invitedAccount.address, requiredAmountNumber)
+
+      const managerAccountTokenContract = tokenContract.connect(managerAccount) as any
+      await managerAccountTokenContract.approve(registryAddress, requiredAmountNumber)
+
+      const invitedAccountTokenContract = tokenContract.connect(invitedAccount) as any
+      await invitedAccountTokenContract.approve(registryAddress, requiredAmountNumber)
+
+      await registryContract.deposit(managerAccount.address, managerAccount.address, requiredInitialAmount)
+
+      await expect(
+        registryContract.deposit(invitedAccount.address, invitedAccount.address, invalidInitialAmount)
+      ).to.be.revertedWithCustomError(registryContract, 'InvalidInitialAmount()')
     })
   })
 })

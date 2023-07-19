@@ -46,4 +46,12 @@ contract RegistryControl is IRegistryControl {
     function _additionalDepositAccount(address _accountAddress, bytes memory _amount) internal {
         accounts[_accountAddress]._additionalDeposit(_amount);
     }
+
+    function _parentAccount(address _accountAddress) internal view returns (RegistryLib.Account storage) {
+        return accounts[accounts[_accountAddress].parent];
+    }
+
+    function _account(address _accountAddress) internal view returns (RegistryLib.Account storage) {
+        return accounts[_accountAddress];
+    }
 }
