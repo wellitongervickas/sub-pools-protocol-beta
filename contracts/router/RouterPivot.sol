@@ -59,13 +59,11 @@ contract RouterPivot is IRouterPivot {
         _registry.deposit(msg.sender, _nodeAddress, _initialAmount);
     }
 
-    function _additionalDeposit(
-        address _registryAddress,
-        address _nodeAddress,
-        bytes memory _initialAmount
-    ) internal onlyValidRegistry(_registryAddress) {
+    function _additionalDeposit(address _registryAddress, address _nodeAddress, bytes memory _initialAmount) internal {
         Registry _registry = Registry(_registryAddress);
         _additionalDepositRegistryAccount(_registry, _nodeAddress, _initialAmount);
+
+        emit RegistryDeposited(_registryAddress, _nodeAddress, _initialAmount);
     }
 
     function _additionalDepositRegistryAccount(
