@@ -42,4 +42,11 @@ contract Router is IRouter, RouterPivot, RouterControl {
 
         return _nodeAddress;
     }
+
+    function additionalDeposit(address _nodeAddress, bytes memory _additionalAmount) external {
+        Node _node = Node(_nodeAddress);
+        address _registryAddress = _node.registry();
+
+        _additionalDeposit(_registryAddress, _nodeAddress, _additionalAmount);
+    }
 }

@@ -18,4 +18,6 @@ interface IRegistry {
     ) external;
 
     function deposit(address _from, address _accountAddress, bytes memory _amount) external;
+
+    function additionalDeposit(address _from, address _accountAddress, bytes memory _amount) external;
 }

@@ -7,15 +7,14 @@ library RegistryLib {
     struct Account {
         uint256 id;
         bytes initialBalance;
-        /// ToDo:
         bytes additionalBalance;
         FractionLib.Fraction fees;
         address parent;
         bytes requiredInitialDeposit;
 
         /// ToDo:
-        /// LOCK PERIOD
         /// MAX DEPOSIT
+        /// LOCK PERIOD
     }
 
     function _deposit(Account storage _account, bytes memory _amount) internal {
