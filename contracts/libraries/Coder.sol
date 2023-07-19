@@ -44,3 +44,11 @@ function decodeSingleAssetAmount(bytes memory _data) pure returns (uint256) {
 function decodeMultiAssetAmount(bytes memory _data) pure returns (uint256, uint256) {
     return abi.decode(_data, (uint256, uint256));
 }
+
+function encodeSingleAssetAmount(uint256 _amount) pure returns (bytes memory) {
+    return abi.encode(_amount);
+}
+
+function encodeMultiAssetAmount(uint256 _amount1, uint256 _amount2) pure returns (bytes memory) {
+    return abi.encode(_amount1, _amount2);
+}

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
-import {Mode} from '../libraries/Decoder.sol';
+import {Mode} from '../libraries/Coder.sol';
 
 contract FakeStrategySingle is IStrategy {
     bytes public token;
