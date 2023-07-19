@@ -9,7 +9,7 @@ import {IStrategy, StrategyType} from '../interfaces/strategy/IStrategy.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 
 contract RouterControl is IRouterControl, NodeControl {
-    mapping(address => bool) private _registries;
+    mapping(address => bool) public registries;
 
     modifier onlyValidRegistry(address _registryAddress) {
         _checkRegistry(_registryAddress);
@@ -17,7 +17,7 @@ contract RouterControl is IRouterControl, NodeControl {
     }
 
     function _checkRegistry(address _registryAddress) private view {
-        if (!_registries[_registryAddress]) revert IRouterControl.NonRegistry();
+        if (!registries[_registryAddress]) revert IRouterControl.NonRegistry();
     }
 
     function _createRegistry(address _strategyAddress) internal returns (address) {
@@ -25,7 +25,7 @@ contract RouterControl is IRouterControl, NodeControl {
 
         emit IRouterControl.RegistryCreated(_registryAddress);
 
-        _registries[_registryAddress] = true;
+        registries[_registryAddress] = true;
 
         return _registryAddress;
     }
@@ -64,6 +64,8 @@ contract RouterControl is IRouterControl, NodeControl {
         _registryDepositAccount(_registry, _nodeAddress, _initialAmount);
 
         emit IRouterControl.RegistryJoined(_registryAddress, _nodeAddress, _initialAmount);
+
+        registries[_registryAddress] = false;
     }
 
     function _registrySetupAccount(

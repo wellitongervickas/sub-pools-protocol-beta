@@ -98,5 +98,22 @@ describe('Router', () => {
         routerContract.create(createRandomAddress(), [], initialAmount, DEFAULT_FEES_FRACTION)
       ).to.be.revertedWithCustomError(routerContract, 'NonRegistry()')
     })
+
+    it('should indalited registry after it used on a node', async function () {
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+      const { routerContract } = await loadFixture(router.deployRouterFixture)
+
+      const tx = await routerContract.registry(fakeStrategyAddress)
+      const receipt = await tx.wait()
+      const [registryAddress] = receipt.logs[2].args
+
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+
+      await routerContract.create(registryAddress, [], initialAmount, DEFAULT_FEES_FRACTION)
+
+      await expect(
+        routerContract.create(registryAddress, [], initialAmount, DEFAULT_FEES_FRACTION)
+      ).to.be.revertedWithCustomError(routerContract, 'NonRegistry()')
+    })
   })
 })
