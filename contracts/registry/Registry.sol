@@ -95,8 +95,9 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function _chargeParentDepositFees(address _accountAddress, bytes memory _amount) private returns (bytes memory) {
+        if (_checkIsRootAccount(_accountAddress)) return _amount;
+
         RegistryLib.Account storage _account = _account(_accountAddress);
-        if (_checkIsRootAccount(_account)) return _amount;
 
         if (_strategyMode() == Coder.Mode.Single) {
             uint256 _decodedAmount = Coder.decodeSingleAssetAmount(_amount);
@@ -116,13 +117,12 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         }
     }
 
-    function _checkIsRootAccount(RegistryLib.Account storage _account) private view returns (bool) {
-        return _account.id == 2;
+    function _checkIsRootAccount(address _accountAddress) private view returns (bool) {
+        return _account(_accountAddress).id == 2;
     }
 
     function _checkParentRequiredInitialDeposit(address _accountAddress, bytes memory _amount) private view {
-        RegistryLib.Account storage _account = _account(_accountAddress);
-        if (_checkIsRootAccount(_account)) return;
+        if (_checkIsRootAccount(_accountAddress)) return;
 
         RegistryLib.Account storage _parent = _parentAccount(_accountAddress);
 
