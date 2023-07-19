@@ -30,4 +30,5 @@ library RegistryLib {
         uint256 _feesAmount = (_amount * _account.fees.value) / _account.fees.divider;
         return _feesAmount;
     }
+    /// ToDo: withdraw
 }

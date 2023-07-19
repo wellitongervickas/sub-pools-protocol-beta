@@ -98,11 +98,9 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
         if (_strategyMode() == Coder.Mode.Single) {
             uint256 _decodedAmount = Coder.decodeSingleAssetAmount(_amount);
-
             if (_checkIsRootAccount(_account)) return Coder.encodeSingleAssetAmount(_decodedAmount);
 
             RegistryLib.Account storage _parent = _parentAccount(_accountAddress);
-
             bytes memory _parentAdditionalBalance = _parent.additionalBalance;
             uint256 _decodedAdditionalBalance = Coder.decodeSingleAssetAmount(_parentAdditionalBalance);
 
@@ -120,20 +118,21 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function _checkIsRootAccount(RegistryLib.Account storage _account) private view returns (bool) {
+        /// @dev Root account has no parent and id == 1
         return _account.id == 2;
     }
 
     function _checkParentRequiredInitialDeposit(address _accountAddress, bytes memory _amount) private view {
+        RegistryLib.Account storage _account = _account(_accountAddress);
+        RegistryLib.Account storage _parent = _parentAccount(_accountAddress);
+
+        if (_checkIsRootAccount(_account)) return;
+
         if (_strategyMode() == Coder.Mode.Single) {
             uint256 _decodedAmount = Coder.decodeSingleAssetAmount(_amount);
-            RegistryLib.Account storage _account = _account(_accountAddress);
+            uint256 _requiredAmount = Coder.decodeSingleAssetAmount(_parent.requiredInitialDeposit);
 
-            if (!_checkIsRootAccount(_account)) {
-                RegistryLib.Account storage _parent = _parentAccount(_accountAddress);
-
-                uint256 _requiredAmount = Coder.decodeSingleAssetAmount(_parent.requiredInitialDeposit);
-                if (_requiredAmount > 0 && _decodedAmount != _requiredAmount) revert IRegistry.InvalidInitialAmount();
-            }
+            if (_requiredAmount > 0 && _decodedAmount != _requiredAmount) revert IRegistry.InvalidInitialAmount();
         } else {
             /// ToDo
         }
