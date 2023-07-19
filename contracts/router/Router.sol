@@ -21,14 +21,7 @@ contract Router is IRouter, RouterPivot, RouterControl {
     ) external onlyValidRegistry(_registryAddress) returns (address) {
         address _nodeAddress = _createRootNode(_registryAddress, _invitedAddresses);
 
-        _setupRegistryAccount(
-            address(this),
-            _registryAddress,
-            _nodeAddress,
-            _initialAmount,
-            _fees,
-            _requiredInitialDeposit
-        );
+        _setupAccount(address(this), _registryAddress, _nodeAddress, _initialAmount, _fees, _requiredInitialDeposit);
         return _nodeAddress;
     }
 
@@ -45,14 +38,7 @@ contract Router is IRouter, RouterPivot, RouterControl {
         address _nodeAddress = _deployNode(address(_parent), msg.sender, _invitedAddresses, _parentRegistry);
 
         _parent.join(_nodeAddress, msg.sender);
-        _setupRegistryAccount(
-            _parentAddress,
-            _parentRegistry,
-            _nodeAddress,
-            _initialAmount,
-            _fees,
-            _requiredInitialDeposit
-        );
+        _setupAccount(_parentAddress, _parentRegistry, _nodeAddress, _initialAmount, _fees, _requiredInitialDeposit);
 
         return _nodeAddress;
     }

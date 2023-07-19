@@ -28,9 +28,14 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         _;
     }
 
+    modifier checkParentRequiredInitialDeposit(address _accountAddress, bytes memory _amount) {
+        _checkParentRequiredInitialDeposit(_accountAddress, _amount);
+        _;
+    }
+
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
-        setupAccount(address(0), _msgSender(), _defaultFractionFees(), _defaultEncodedRequiredInitialDeposit());
+        join(address(0), _msgSender(), _defaultFractionFees(), _defaultEncodedRequiredInitialDeposit());
     }
 
     function _defaultFractionFees() private pure returns (FractionLib.Fraction memory) {
@@ -41,7 +46,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         return abi.encode(0);
     }
 
-    function setupAccount(
+    function join(
         address _parentAddress,
         address _accountAddress,
         FractionLib.Fraction memory _fees,
@@ -67,16 +72,18 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         return abi.encode(0);
     }
 
-    function deposit(address _depositor, address _accountAddress, bytes memory _initialAmount) external onlyRouter {
-        _checkParentRequiredInitialDeposit(_accountAddress, _initialAmount);
+    function deposit(
+        address _depositor,
+        address _accountAddress,
+        bytes memory _amount
+    ) external onlyRouter checkParentRequiredInitialDeposit(_accountAddress, _amount) {
+        _transferStrategyAssets(_depositor, _amount);
+        _depositStrategyAssets(_amount);
 
-        _transferStrategyAssets(_depositor, _initialAmount);
-        _depositStrategyAssets(_initialAmount);
-
-        bytes memory _remainingAmount = _chargeParentFees(_accountAddress, _initialAmount);
+        bytes memory _remainingAmount = _chargeParentFees(_accountAddress, _amount);
         _depositAccount(_accountAddress, _remainingAmount);
 
-        emit IRegistry.Deposited(_accountAddress, _initialAmount);
+        emit IRegistry.Deposited(_accountAddress, _amount);
     }
 
     function _transferStrategyAssets(address _depositor, bytes memory _amount) private {

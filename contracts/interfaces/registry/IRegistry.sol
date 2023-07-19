@@ -10,7 +10,7 @@ interface IRegistry {
     error AlreadyJoined();
     error InvalidInitialAmount();
 
-    function setupAccount(
+    function join(
         address _parentAddress,
         address _accountAddress,
         FractionLib.Fraction memory _fees,

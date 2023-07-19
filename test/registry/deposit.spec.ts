@@ -19,7 +19,7 @@ describe('Registry', () => {
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(
+      await registryContract.join(
         deployer.address,
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
@@ -50,7 +50,7 @@ describe('Registry', () => {
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(
+      await registryContract.join(
         deployer.address,
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
@@ -79,7 +79,7 @@ describe('Registry', () => {
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(
+      await registryContract.join(
         deployer.address,
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
@@ -107,7 +107,7 @@ describe('Registry', () => {
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
 
-      await registryContract.setupAccount(
+      await registryContract.join(
         deployer.address,
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
@@ -145,14 +145,14 @@ describe('Registry', () => {
         divider: ethers.toBigInt(200),
       }
 
-      await registryContract.setupAccount(
+      await registryContract.join(
         deployer.address,
         managerAccount.address,
         accountFees,
         DEFAULT_REQUIRED_INITIAL_AMOUNT
       )
 
-      await registryContract.setupAccount(
+      await registryContract.join(
         managerAccount.address,
         invitedAccount.address,
         accountFees,
@@ -198,9 +198,9 @@ describe('Registry', () => {
         divider: ethers.toBigInt(200),
       }
 
-      await registryContract.setupAccount(deployer.address, managerAccount.address, accountFees, requiredInitialAmount)
+      await registryContract.join(deployer.address, managerAccount.address, accountFees, requiredInitialAmount)
 
-      await registryContract.setupAccount(
+      await registryContract.join(
         managerAccount.address,
         invitedAccount.address,
         accountFees,

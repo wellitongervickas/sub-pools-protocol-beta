@@ -18,12 +18,7 @@ describe('Registry', () => {
         divider: ethers.toBigInt(200),
       }
 
-      await registryContract.setupAccount(
-        deployer.address,
-        otherAccount.address,
-        accountFees,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
-      )
+      await registryContract.join(deployer.address, otherAccount.address, accountFees, DEFAULT_REQUIRED_INITIAL_AMOUNT)
       const [id, initialBalance, additionalBalance, fees, parentAddress] = await registryContract.accounts(
         otherAccount.address
       )
@@ -45,7 +40,7 @@ describe('Registry', () => {
       const [deployer, otherAccount] = accounts
 
       await expect(
-        registryContract.setupAccount(
+        registryContract.join(
           deployer.address,
           otherAccount.address,
           DEFAULT_FEES_FRACTION,
@@ -63,7 +58,7 @@ describe('Registry', () => {
       )
       const [deployer, otherAccount] = accounts
 
-      await registryContract.setupAccount(
+      await registryContract.join(
         deployer.address,
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
@@ -71,7 +66,7 @@ describe('Registry', () => {
       )
 
       await expect(
-        registryContract.setupAccount(
+        registryContract.join(
           deployer.address,
           otherAccount.address,
           DEFAULT_FEES_FRACTION,
@@ -88,7 +83,7 @@ describe('Registry', () => {
       const [deployer, otherAccount] = accounts
 
       await expect(
-        (registryContract.connect(otherAccount) as any).setupAccount(
+        (registryContract.connect(otherAccount) as any).join(
           deployer.address,
           otherAccount.address,
           DEFAULT_FEES_FRACTION,

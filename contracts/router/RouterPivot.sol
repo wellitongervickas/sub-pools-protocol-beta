@@ -27,7 +27,7 @@ contract RouterPivot is IRouterPivot {
         return _registryAddress;
     }
 
-    function _setupRegistryAccount(
+    function _setupAccount(
         address _parentAddress,
         address _registryAddress,
         address _nodeAddress,
@@ -37,25 +37,25 @@ contract RouterPivot is IRouterPivot {
     ) internal {
         Registry _registry = Registry(_registryAddress);
 
-        _registrySetupAccount(_parentAddress, _registry, _nodeAddress, _fees, _requiredInitialDeposit);
-        _registryDepositAccount(_registry, _nodeAddress, _initialAmount);
+        _setupRegistryAccount(_parentAddress, _registry, _nodeAddress, _fees, _requiredInitialDeposit);
+        _depositRegistryAccount(_registry, _nodeAddress, _initialAmount);
 
         emit IRouterPivot.RegistryJoined(_registryAddress, _nodeAddress, _initialAmount);
 
         registries[_registryAddress] = false;
     }
 
-    function _registrySetupAccount(
+    function _setupRegistryAccount(
         address _parentAddress,
         Registry _registry,
         address _nodeAddress,
         FractionLib.Fraction memory _fees,
         bytes memory _requiredInitialDeposit
     ) private {
-        _registry.setupAccount(_parentAddress, _nodeAddress, _fees, _requiredInitialDeposit);
+        _registry.join(_parentAddress, _nodeAddress, _fees, _requiredInitialDeposit);
     }
 
-    function _registryDepositAccount(Registry _registry, address _nodeAddress, bytes memory _initialAmount) private {
+    function _depositRegistryAccount(Registry _registry, address _nodeAddress, bytes memory _initialAmount) private {
         _registry.deposit(msg.sender, _nodeAddress, _initialAmount);
     }
 }
