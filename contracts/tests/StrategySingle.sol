@@ -6,7 +6,7 @@ import {Mode} from '../libraries/Decoder.sol';
 
 contract FakeStrategySingle is IStrategy {
     bytes public token;
-    Mode public immutable strategyMode = Mode.Single;
+    Mode public immutable mode = Mode.Single;
 
     constructor(bytes memory _token) {
         token = _token;

@@ -140,6 +140,6 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function _strategyMode() private view returns (Decoder.Mode) {
-        return strategy.strategyMode();
+        return strategy.mode();
     }
 }
