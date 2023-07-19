@@ -12,7 +12,7 @@ contract RegistryControl is IRegistryControl {
 
     Counters.Counter private currentID;
 
-    mapping(address => RegistryLib.Account) private _accounts;
+    mapping(address => RegistryLib.Account) public accounts;
 
     function _setupAccount(
         address _parentAddress,
@@ -20,10 +20,11 @@ contract RegistryControl is IRegistryControl {
         FractionLib.Fraction memory _fees
     ) internal {
         uint256 _id = _createID();
-        _accounts[_accountAddress] = RegistryLib.Account({
+
+        accounts[_accountAddress] = RegistryLib.Account({
             id: _id,
-            initialBalance: '',
-            additionalBalance: '',
+            initialBalance: abi.encode(0),
+            additionalBalance: abi.encode(0),
             fees: _fees,
             parent: _parentAddress
         });
@@ -34,11 +35,11 @@ contract RegistryControl is IRegistryControl {
         return currentID.current();
     }
 
-    function accounts(address _accountAddress) public view returns (RegistryLib.Account memory) {
-        return _accounts[_accountAddress];
+    function _depositAccount(address _accountAddress, bytes memory _amount) internal {
+        accounts[_accountAddress]._deposit(_amount);
     }
 
-    function _depositAccount(address _accountAddress, bytes memory _amount) internal {
-        _accounts[_accountAddress]._deposit(_amount);
+    function _additionalDepositAccount(address _accountAddress, bytes memory _amount) internal {
+        accounts[_accountAddress]._additionalDeposit(_amount);
     }
 }

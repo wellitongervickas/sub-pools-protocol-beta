@@ -106,6 +106,43 @@ describe('Registry', () => {
       ).to.be.rejectedWith('Ownable: caller is not the owner')
     })
 
-    it.skip('should charge fees from parent account when deposit to account', async function () {})
+    it('should charge fees from parent account when deposit to account', async function () {
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+
+      const { registryContract, accounts } = await loadFixture(
+        registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
+      )
+      const [deployer, managerAccount, invitedAccount] = accounts
+      const registryAddress = await registryContract.getAddress()
+
+      const initialAmountNumber = '1000000000000000000'
+      const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
+
+      const accountFees = {
+        value: ethers.toBigInt(1),
+        divider: ethers.toBigInt(200),
+      }
+
+      await registryContract.setupAccount(deployer.address, managerAccount.address, accountFees)
+      await registryContract.setupAccount(managerAccount.address, invitedAccount.address, accountFees)
+
+      await tokenContract.transfer(managerAccount.address, initialAmountNumber)
+      await tokenContract.transfer(invitedAccount.address, initialAmountNumber)
+
+      const managerAccountTokenContract = tokenContract.connect(managerAccount) as any
+      await managerAccountTokenContract.approve(registryAddress, initialAmount)
+
+      const invitedAccountTokenContract = tokenContract.connect(invitedAccount) as any
+      await invitedAccountTokenContract.approve(registryAddress, initialAmount)
+
+      await registryContract.deposit(managerAccount.address, managerAccount.address, initialAmount)
+      await registryContract.deposit(invitedAccount.address, invitedAccount.address, initialAmount)
+
+      const [, , additionalBalance] = await registryContract.accounts(managerAccount.address)
+      const [decodedAdditionalBalance] = coderUtils.decompile(additionalBalance, ['uint256'])
+
+      expect(decodedAdditionalBalance).to.equal('5000000000000000')
+    })
   })
 })

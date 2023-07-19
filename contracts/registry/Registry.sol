@@ -9,9 +9,11 @@ import {IRegistry} from '../interfaces/registry/IRegistry.sol';
 import {RegistryLib} from '../libraries/Registry.sol';
 import {RegistryControl} from './RegistryControl.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
+import 'hardhat/console.sol';
 
 contract Registry is IRegistry, RegistryControl, Ownable {
     using SafeERC20 for IERC20;
+    using RegistryLib for RegistryLib.Account;
 
     IStrategy public immutable strategy;
 
@@ -21,13 +23,13 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     modifier whenNotAccount(address _address) {
-        if (accounts(_address).id != 0) revert AlreadyJoined();
+        if (accounts[_address].id != 0) revert AlreadyJoined();
         _;
     }
 
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
-        setupAccount(_msgSender(), _msgSender(), FractionLib.Fraction(0, 0));
+        setupAccount(address(0), _msgSender(), FractionLib.Fraction(0, 100));
     }
 
     function setupAccount(
@@ -40,20 +42,51 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function deposit(address _from, address _accountAddress, bytes memory _initialAmount) external onlyRouter {
-        _depositStrategy(_from, _initialAmount);
-        _depositAccount(_accountAddress, _initialAmount);
+        _transferStrategyAssets(_from, _initialAmount);
+        _depositStrategyAssets(_initialAmount);
+
+        bytes memory _remainingAmount = _chargeParentFees(_accountAddress, _initialAmount);
+        _depositAccount(_accountAddress, _remainingAmount);
 
         emit IRegistry.Deposited(_accountAddress, _initialAmount);
     }
 
-    function _depositStrategy(address _from, bytes memory _initialAmount) private {
-        _transferSingleTokenStrategy(_from, _initialAmount);
-        strategy.deposit(_initialAmount);
+    function _chargeParentFees(address _accountAddress, bytes memory _initialAmount) private returns (bytes memory) {
+        uint256 _decodedAmount = _decodeAssetAmount(_initialAmount);
+
+        RegistryLib.Account storage _account = accounts[_accountAddress];
+        if (_account.parent != owner()) {
+            RegistryLib.Account storage _parent = accounts[_account.parent];
+
+            bytes memory _parentAdditionalBalance = _parent.additionalBalance;
+            uint256 _decodedAdditionalBalance = _decodeAssetAmount(_parentAdditionalBalance);
+
+            uint256 _feesAmount = _parent._calculateFees(_decodedAmount);
+            uint256 _updatedAdditionalBalance = _feesAmount + _decodedAdditionalBalance;
+
+            _additionalDepositAccount(_account.parent, abi.encode(_updatedAdditionalBalance));
+
+            return abi.encode(_decodedAmount - _feesAmount);
+        }
+
+        return abi.encode(_decodedAmount);
     }
 
-    function _transferSingleTokenStrategy(address _from, bytes memory _initialAmount) private {
-        address _decodedTokenAddress = abi.decode(strategy.token(), (address));
-        uint256 _decodedAmount = abi.decode(_initialAmount, (uint256));
+    function _depositStrategyAssets(bytes memory _amount) private {
+        strategy.deposit(_amount);
+    }
+
+    function _transferStrategyAssets(address _from, bytes memory _amount) private {
+        uint256 _decodedAmount = _decodeAssetAmount(_amount);
+        address _decodedTokenAddress = _decodeTokenAddress();
         IERC20(_decodedTokenAddress).safeTransferFrom(_from, address(strategy), _decodedAmount);
+    }
+
+    function _decodeAssetAmount(bytes memory _amount) private pure returns (uint256) {
+        return abi.decode(_amount, (uint256));
+    }
+
+    function _decodeTokenAddress() private view returns (address) {
+        return abi.decode(strategy.token(), (address));
     }
 }
