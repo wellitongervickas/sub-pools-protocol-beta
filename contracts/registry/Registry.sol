@@ -56,7 +56,8 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             Coder.defaultAdditionalBalance(_strategyMode()),
             _fees,
             _parentAddress,
-            _requiredInitialDeposit
+            _requiredInitialDeposit,
+            Coder.defaultCashbackBalance(_strategyMode())
         );
 
         emit IRegistry.Joined(_accountAddress);
@@ -70,7 +71,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         _transferStrategyAssets(_depositor, _amount);
         _depositStrategyAssets(_amount);
 
-        bytes memory _remainingAmount = _chargeParentAssetsFees(_accountAddress, _amount);
+        bytes memory _remainingAmount = _chargeParentDepositFees(_accountAddress, _amount);
         _depositAccount(_accountAddress, _remainingAmount);
 
         emit IRegistry.Deposited(_accountAddress, _amount);
@@ -78,44 +79,44 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     function _transferStrategyAssets(address _depositor, bytes memory _amount) private {
         if (_strategyMode() == Coder.Mode.Single) {
-            _transferStrategySingleAssets(_depositor, _amount);
+            address _tokenAddress = Coder.decodeSingleAddress(strategy.token());
+            IERC20(_tokenAddress).safeTransferFrom(
+                _depositor,
+                address(strategy),
+                Coder.decodeSingleAssetAmount(_amount)
+            );
         } else {
             /// TODO
         }
-    }
-
-    function _transferStrategySingleAssets(address _depositor, bytes memory _amount) private {
-        address _tokenAddress = Coder.decodeSingleAddress(strategy.token());
-        IERC20(_tokenAddress).safeTransferFrom(_depositor, address(strategy), Coder.decodeSingleAssetAmount(_amount));
     }
 
     function _depositStrategyAssets(bytes memory _amount) private {
         strategy.deposit(_amount);
     }
 
-    function _chargeParentAssetsFees(address _accountAddress, bytes memory _amount) private returns (bytes memory) {
+    function _chargeParentDepositFees(address _accountAddress, bytes memory _amount) private returns (bytes memory) {
         RegistryLib.Account storage _account = _account(_accountAddress);
+        if (_checkIsRootAccount(_account)) return _amount;
 
         if (_strategyMode() == Coder.Mode.Single) {
             uint256 _decodedAmount = Coder.decodeSingleAssetAmount(_amount);
-
-            if (_checkIsRootAccount(_account)) return Coder.encodeSingleAssetAmount(_decodedAmount);
-
             RegistryLib.Account storage _parent = _parentAccount(_accountAddress);
 
             uint256 _feesAmount = _parent._calculateFees(_decodedAmount);
             _updateAdditionalBalanceAccount(_account.parent, _feesAmount);
 
-            return Coder.encodeSingleAssetAmount(_decodedAmount - _feesAmount);
+            uint256 _remainingAmount = _decodedAmount - _feesAmount;
+            _updateCashbackBalanceAccount(_account.parent, _remainingAmount);
+
+            return Coder.encodeSingleAssetAmount(_remainingAmount);
         } else {
-            (uint256 _decodedAmount1, uint256 _decodedAmount2) = Coder.decodeMultiAssetAmount(_amount);
             /// ToDo
+            (uint256 _decodedAmount1, uint256 _decodedAmount2) = Coder.decodeMultiAssetAmount(_amount);
             return Coder.encodeMultiAssetAmount(_decodedAmount1, _decodedAmount2);
         }
     }
 
     function _checkIsRootAccount(RegistryLib.Account storage _account) private view returns (bool) {
-        /// @dev Root account has no parent and id == 1
         return _account.id == 2;
     }
 
@@ -157,6 +158,20 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             uint256 _updatedAdditionalBalance = _amount + _decodedAdditionalBalance;
 
             _additionalDepositAccount(_accountAddress, Coder.encodeSingleAssetAmount(_updatedAdditionalBalance));
+        } else {
+            /// TODO
+        }
+    }
+
+    function _updateCashbackBalanceAccount(address _accountAddress, uint256 _amount) private {
+        if (_strategyMode() == Coder.Mode.Single) {
+            RegistryLib.Account storage _account = _account(_accountAddress);
+
+            bytes memory _accountCashbackBalance = _account.cashbackBalance;
+            uint256 _decodedCashbackBalance = Coder.decodeSingleAssetAmount(_accountCashbackBalance);
+            uint256 _updatedCashbackBalance = _amount + _decodedCashbackBalance;
+
+            _setCashbackBalanceAccount(_accountAddress, Coder.encodeSingleAssetAmount(_updatedCashbackBalance));
         } else {
             /// TODO
         }

@@ -177,6 +177,56 @@ describe('Registry', () => {
       expect(decodedAdditionalBalance).to.equal('5000000000000000')
     })
 
+    it('should update parent cashback balance when join to account', async function () {
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+
+      const { registryContract, accounts } = await loadFixture(
+        registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
+      )
+      const [deployer, managerAccount, invitedAccount] = accounts
+      const registryAddress = await registryContract.getAddress()
+
+      const initialAmountNumber = '1000000000000000000'
+      const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
+
+      const accountFees = {
+        value: ethers.toBigInt(1),
+        divider: ethers.toBigInt(200),
+      }
+
+      await registryContract.join(
+        deployer.address,
+        managerAccount.address,
+        accountFees,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT
+      )
+
+      await registryContract.join(
+        managerAccount.address,
+        invitedAccount.address,
+        accountFees,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT
+      )
+
+      await tokenContract.transfer(managerAccount.address, initialAmountNumber)
+      await tokenContract.transfer(invitedAccount.address, initialAmountNumber)
+
+      const managerAccountTokenContract = tokenContract.connect(managerAccount) as any
+      await managerAccountTokenContract.approve(registryAddress, initialAmount)
+
+      const invitedAccountTokenContract = tokenContract.connect(invitedAccount) as any
+      await invitedAccountTokenContract.approve(registryAddress, initialAmount)
+
+      await registryContract.deposit(managerAccount.address, managerAccount.address, initialAmount)
+      await registryContract.deposit(invitedAccount.address, invitedAccount.address, initialAmount)
+
+      const [, , , , , , cashbackBalance] = await registryContract.accounts(managerAccount.address)
+      const [decodedCashbackBalance] = coderUtils.decompile(cashbackBalance, ['uint256'])
+
+      expect(decodedCashbackBalance).to.equal('995000000000000000')
+    })
+
     it('should revert if try to deposit amount not equal as required inital amount', async function () {
       const { tokenContract } = await loadFixture(token.deployTokenFixture)
       const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)

@@ -20,7 +20,8 @@ contract RegistryControl is IRegistryControl {
         bytes memory _additionalBalance,
         FractionLib.Fraction memory _fees,
         address _parentAddress,
-        bytes memory _requiredInitialAmount
+        bytes memory _requiredInitialAmount,
+        bytes memory _initialCashbackBalance
     ) internal {
         uint256 _id = _createID();
 
@@ -30,7 +31,8 @@ contract RegistryControl is IRegistryControl {
             additionalBalance: _additionalBalance,
             fees: _fees,
             parent: _parentAddress,
-            requiredInitialDeposit: _requiredInitialAmount
+            requiredInitialDeposit: _requiredInitialAmount,
+            cashbackBalance: _initialCashbackBalance
         });
     }
 
@@ -45,6 +47,10 @@ contract RegistryControl is IRegistryControl {
 
     function _additionalDepositAccount(address _accountAddress, bytes memory _amount) internal {
         accounts[_accountAddress]._additionalDeposit(_amount);
+    }
+
+    function _setCashbackBalanceAccount(address _accountAddress, bytes memory _amount) internal {
+        accounts[_accountAddress]._setCashbackBalance(_amount);
     }
 
     function _parentAccount(address _accountAddress) internal view returns (RegistryLib.Account storage) {

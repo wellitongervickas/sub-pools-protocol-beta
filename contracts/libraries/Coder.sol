@@ -29,6 +29,14 @@ function defaultAdditionalBalance(Mode _mode) pure returns (bytes memory) {
     return abi.encode(0, 0);
 }
 
+function defaultCashbackBalance(Mode _mode) pure returns (bytes memory) {
+    if (_mode == Mode.Single) {
+        return abi.encode(0);
+    }
+
+    return abi.encode(0, 0);
+}
+
 function decodeSingleAddress(bytes memory _data) pure returns (address) {
     return abi.decode(_data, (address));
 }
