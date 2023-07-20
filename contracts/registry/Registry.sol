@@ -10,6 +10,8 @@ import {RegistryLib} from '../libraries/Registry.sol';
 import {RegistryControl} from './RegistryControl.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 
+import 'hardhat/console.sol';
+
 import '../libraries/Coder.sol' as Coder;
 
 contract Registry is IRegistry, RegistryControl, Ownable {
@@ -198,6 +200,20 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         }
     }
 
+    function _decreaseCashbackBalanceAccount(address _accountAddress, uint256 _amount) private {
+        if (_strategyMode() == Coder.Mode.Single) {
+            RegistryLib.Account storage _account = _account(_accountAddress);
+
+            bytes memory _accountCashbackBalance = _account.cashbackBalance;
+            uint256 _decodedCashbackBalance = Coder.decodeSingleAssetAmount(_accountCashbackBalance);
+            uint256 _updatedCashbackBalance = _amount - _decodedCashbackBalance;
+
+            _setCashbackBalanceAccount(_accountAddress, Coder.encodeSingleAssetAmount(_updatedCashbackBalance));
+        } else {
+            /// TODO
+        }
+    }
+
     function withdraw(
         address _requisitor,
         address _accountAddress,
@@ -230,7 +246,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             uint256 _decodedAdditionalBalance = Coder.decodeSingleAssetAmount(_account.additionalBalance);
             uint256 _decodedAmount = Coder.decodeSingleAssetAmount(_amount);
 
-            if (_decodedAdditionalBalance < _decodedAmount) revert IRegistry.InsufficientAdditionalBalance();
+            if (_decodedAmount > _decodedAdditionalBalance) revert IRegistry.InsufficientAdditionalBalance();
         } else {
             /// TODO
         }
@@ -242,6 +258,11 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         bytes memory _amount
     ) external onlyRouter checkAccountInitialBalance(_accountAddress, _amount) {
         _decreaseInitialBalanceAccount(_accountAddress, Coder.decodeSingleAssetAmount(_amount));
+
+        RegistryLib.Account storage _account = _account(_accountAddress);
+        if (!_checkIsRootAccount(_accountAddress)) {
+            _decreaseCashbackBalanceAccount(_account.parent, Coder.decodeSingleAssetAmount(_amount));
+        }
 
         strategy.withdraw(_requisitor, _amount);
 
@@ -255,7 +276,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             uint256 _decodedInitialBalance = Coder.decodeSingleAssetAmount(_account.initialBalance);
             uint256 _decodedAmount = Coder.decodeSingleAssetAmount(_amount);
 
-            if (_decodedInitialBalance < _decodedAmount) revert IRegistry.InsufficientInitialBalance();
+            if (_decodedAmount > _decodedInitialBalance) revert IRegistry.InsufficientInitialBalance();
         } else {
             /// TODO
         }
@@ -268,7 +289,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             uint256 _decodedInitialBalance = Coder.decodeSingleAssetAmount(_account.initialBalance);
             uint256 _updatedInitialBalance = _decodedInitialBalance - _amount;
 
-            _withdrawAccount(_accountAddress, Coder.encodeSingleAssetAmount(_updatedInitialBalance));
+            _withdrawInitialBalanceAccount(_accountAddress, Coder.encodeSingleAssetAmount(_updatedInitialBalance));
         } else {
             /// TODO
         }
