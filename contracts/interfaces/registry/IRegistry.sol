@@ -13,6 +13,7 @@ interface IRegistry {
     error ExceedsMaxDeposit();
     error InsufficientAdditionalBalance();
     error InsufficientInitialBalance();
+    error LockPeriod();
 
     function join(
         address _parentAddress,

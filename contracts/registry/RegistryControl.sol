@@ -14,11 +14,6 @@ contract RegistryControl is IRegistryControl {
 
     mapping(address => RegistryLib.Account) public accounts;
 
-    modifier onlyParentUnlockedPeriod(address _accountAddress) {
-        if (_parentAccount(_accountAddress)._isLocked()) revert IRegistryControl.LockPeriod();
-        _;
-    }
-
     function _setupAccount(
         address _accountAddress,
         bytes memory _initialBalance,

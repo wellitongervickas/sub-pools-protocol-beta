@@ -212,5 +212,42 @@ describe('Registry', () => {
         registryContract.withdrawInitialBalance(invitedAccount.address, invitedAccount.address, withdrewAmount)
       ).to.be.revertedWithCustomError(registryContract, 'LockPeriod()')
     })
+
+    it('should revert if try to withdraw initial balance to account without being the owner', async function () {
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+      const { registryContract, accounts } = await loadFixture(
+        registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
+      )
+
+      const [deployer, otherAccount] = accounts
+
+      const initialAmountNumber = '1000000000000000000'
+      const amountToWithdrawNumber = '5000000000000000'
+
+      const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
+      const amountToWithdraw = coderUtils.build([amountToWithdrawNumber], ['uint256'])
+
+      await registryContract.join(
+        deployer.address,
+        otherAccount.address,
+        DEFAULT_FEES_FRACTION,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
+      )
+
+      await tokenContract.transfer(otherAccount.address, initialAmountNumber)
+      const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
+      await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmountNumber)
+
+      await registryContract.deposit(otherAccount.address, otherAccount.address, initialAmount)
+
+      const otherAccountRegistryContract = registryContract.connect(otherAccount) as any
+
+      await expect(
+        otherAccountRegistryContract.withdrawInitialBalance(otherAccount.address, otherAccount.address, initialAmount)
+      ).to.be.rejectedWith('Ownable: caller is not the owner')
+    })
   })
 })

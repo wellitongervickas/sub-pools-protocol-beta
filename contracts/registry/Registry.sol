@@ -50,6 +50,11 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         _;
     }
 
+    modifier onlyParentUnlockedPeriod(address _accountAddress) {
+        if (_parentAccount(_accountAddress)._isLocked()) revert IRegistry.LockPeriod();
+        _;
+    }
+
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
 
