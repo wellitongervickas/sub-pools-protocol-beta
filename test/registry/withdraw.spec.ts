@@ -14,7 +14,6 @@ describe('Registry', () => {
       )
 
       const [deployer, otherAccount] = accounts
-      const registryAddress = await registryContract.getAddress()
 
       const initialAmountNumber = '1000000000000000000'
       const amountToWithdrawNumber = '5000000000000000'
@@ -33,7 +32,7 @@ describe('Registry', () => {
 
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
-      await otherAccountTokenContract.approve(registryAddress, initialAmountNumber)
+      await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmountNumber)
 
       await registryContract.additionalDeposit(otherAccount.address, otherAccount.address, initialAmount)
       await registryContract.withdraw(otherAccount.address, otherAccount.address, amountToWithdraw)
@@ -50,7 +49,6 @@ describe('Registry', () => {
       )
 
       const [deployer, otherAccount] = accounts
-      const registryAddress = await registryContract.getAddress()
 
       const initialAmountNumber = '1000000000000000000'
       const amountToWithdrawNumber = '5000000000000000000'
@@ -68,7 +66,7 @@ describe('Registry', () => {
 
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
-      await otherAccountTokenContract.approve(registryAddress, initialAmountNumber)
+      await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmountNumber)
 
       await registryContract.additionalDeposit(otherAccount.address, otherAccount.address, initialAmount)
       await expect(
@@ -84,7 +82,6 @@ describe('Registry', () => {
       )
 
       const [deployer, otherAccount] = accounts
-      const registryAddress = await registryContract.getAddress()
 
       const initialAmountNumber = '1000000000000000000'
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
@@ -99,7 +96,7 @@ describe('Registry', () => {
 
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
-      await otherAccountTokenContract.approve(registryAddress, initialAmountNumber)
+      await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmountNumber)
 
       await registryContract.additionalDeposit(otherAccount.address, otherAccount.address, initialAmount)
 
@@ -116,7 +113,7 @@ describe('Registry', () => {
     //   )
 
     //   const [deployer, otherAccount] = accounts
-    //   const registryAddress = await registryContract.getAddress()
+    //
 
     //   const initialAmountNumber = '1000000000000000000'
     //   const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
@@ -131,7 +128,7 @@ describe('Registry', () => {
     //   await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
     //   const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
-    //   await otherAccountTokenContract.approve(registryAddress, initialAmount)
+    //   await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmount)
 
     //   await registryContract.additionalDeposit(otherAccount.address, otherAccount.address, initialAmount)
     //   expect(await tokenContract.balanceOf(fakeStrategyAddress)).to.equal(initialAmountNumber)

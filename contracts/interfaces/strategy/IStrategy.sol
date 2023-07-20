@@ -8,7 +8,7 @@ interface IStrategy {
 
     function token() external view returns (bytes memory);
 
-    function deposit(bytes memory _amount) external;
+    function deposit(address _depositor, bytes memory _amount) external;
 
     function withdraw(address _requisitor, bytes memory _amount) external;
 }
