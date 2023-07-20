@@ -18,6 +18,7 @@ contract RouterPivot is IRouterPivot {
     }
 
     function _createRegistry(address _strategyAddress) internal returns (address) {
+        /// @dev maybe factory?
         address _registryAddress = address(new Registry(_strategyAddress));
         emit IRouterPivot.RegistryCreated(_registryAddress);
 
