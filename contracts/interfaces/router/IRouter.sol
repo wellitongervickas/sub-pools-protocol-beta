@@ -12,7 +12,8 @@ interface IRouter {
         address[] memory _invitedAddresses,
         bytes memory _initialAmount,
         FractionLib.Fraction memory _fees,
-        bytes memory _requiredInitialDeposit
+        bytes memory _requiredInitialDeposit,
+        bytes memory _maxDeposit
     ) external returns (address);
 
     function join(
@@ -20,6 +21,7 @@ interface IRouter {
         address[] memory _invitedAddresses,
         bytes memory _initialAmount,
         FractionLib.Fraction memory _fees,
-        bytes memory _requiredInitialDeposit
+        bytes memory _requiredInitialDeposit,
+        bytes memory _maxDeposit
     ) external returns (address);
 }

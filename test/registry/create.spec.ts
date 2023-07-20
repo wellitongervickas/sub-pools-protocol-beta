@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { ethers, loadFixture, registry, fakeStrategySingle } from '../fixtures'
 import { createRandomAddress } from '../helpers/address'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
-import { DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
+import { DEFAULT_REQUIRED_INITIAL_AMOUNT, DEFAULT_MAX_DEPOSIT } from '../helpers/tokens'
 
 describe('Registry', () => {
   describe('Create', () => {
@@ -18,7 +18,13 @@ describe('Registry', () => {
         divider: ethers.toBigInt(200),
       }
 
-      await registryContract.join(deployer.address, otherAccount.address, accountFees, DEFAULT_REQUIRED_INITIAL_AMOUNT)
+      await registryContract.join(
+        deployer.address,
+        otherAccount.address,
+        accountFees,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
+      )
       const [id, initialBalance, additionalBalance, fees, parentAddress] = await registryContract.accounts(
         otherAccount.address
       )
@@ -44,7 +50,8 @@ describe('Registry', () => {
           deployer.address,
           otherAccount.address,
           DEFAULT_FEES_FRACTION,
-          DEFAULT_REQUIRED_INITIAL_AMOUNT
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_DEPOSIT
         )
       )
         .to.emit(registryContract, 'Joined')
@@ -62,7 +69,8 @@ describe('Registry', () => {
         deployer.address,
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
 
       await expect(
@@ -70,7 +78,8 @@ describe('Registry', () => {
           deployer.address,
           otherAccount.address,
           DEFAULT_FEES_FRACTION,
-          DEFAULT_REQUIRED_INITIAL_AMOUNT
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_DEPOSIT
         )
       ).to.be.revertedWithCustomError(registryContract, 'AlreadyJoined()')
     })
@@ -87,7 +96,8 @@ describe('Registry', () => {
           deployer.address,
           otherAccount.address,
           DEFAULT_FEES_FRACTION,
-          DEFAULT_REQUIRED_INITIAL_AMOUNT
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_DEPOSIT
         )
       ).to.be.rejectedWith('Ownable: caller is not the owner')
     })

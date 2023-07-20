@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { loadFixture, fakeStrategySingle, registry, token, ethers } from '../fixtures'
 import coderUtils from '../helpers/coder'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
-import { DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
+import { DEFAULT_REQUIRED_INITIAL_AMOUNT, DEFAULT_MAX_DEPOSIT } from '../helpers/tokens'
 
 describe('Registry', () => {
   describe('Additional Deposit', () => {
@@ -23,7 +23,8 @@ describe('Registry', () => {
         deployer.address,
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
 
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
@@ -57,7 +58,8 @@ describe('Registry', () => {
         deployer.address,
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
 
       await tokenContract.transfer(otherAccount.address, totalAmountNumber)
@@ -88,7 +90,8 @@ describe('Registry', () => {
         deployer.address,
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
 
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
@@ -119,7 +122,8 @@ describe('Registry', () => {
         deployer.address,
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
@@ -147,7 +151,8 @@ describe('Registry', () => {
         deployer.address,
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
@@ -161,6 +166,96 @@ describe('Registry', () => {
           initialAmount
         )
       ).to.be.rejectedWith('Ownable: caller is not the owner')
+    })
+
+    it('should revert if try to send additional deposit greater than max deposit', async function () {
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+
+      const { registryContract, accounts } = await loadFixture(
+        registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
+      )
+      const [deployer, managerAccount, invitedAccount] = accounts
+      const registryAddress = await registryContract.getAddress()
+
+      const amountNumber = '1000000000000000000'
+      const amount = coderUtils.build([amountNumber], ['uint256'])
+      const maxDepositAmount = coderUtils.build(['1'], ['uint256'])
+
+      await registryContract.join(
+        deployer.address,
+        managerAccount.address,
+        DEFAULT_FEES_FRACTION,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        maxDepositAmount
+      )
+
+      await registryContract.join(
+        managerAccount.address,
+        invitedAccount.address,
+        DEFAULT_FEES_FRACTION,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
+      )
+
+      await tokenContract.transfer(managerAccount.address, amountNumber)
+      await tokenContract.transfer(invitedAccount.address, amountNumber)
+
+      const managerAccountTokenContract = tokenContract.connect(managerAccount) as any
+      await managerAccountTokenContract.approve(registryAddress, amountNumber)
+
+      const invitedAccountTokenContract = tokenContract.connect(invitedAccount) as any
+      await invitedAccountTokenContract.approve(registryAddress, amountNumber)
+
+      await expect(
+        registryContract.additionalDeposit(invitedAccount.address, invitedAccount.address, amount)
+      ).to.be.revertedWithCustomError(registryContract, 'ExceedsMaxDeposit()')
+    })
+
+    it('should revert if try to send additional deposit greater than max deposit other small additional deposit', async function () {
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+
+      const { registryContract, accounts } = await loadFixture(
+        registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
+      )
+      const [deployer, managerAccount, invitedAccount] = accounts
+      const registryAddress = await registryContract.getAddress()
+
+      const amountNumber = '1000000000000000000'
+      const amount = coderUtils.build([amountNumber], ['uint256'])
+      const maxDepositAmount = coderUtils.build([amountNumber], ['uint256'])
+
+      await registryContract.join(
+        deployer.address,
+        managerAccount.address,
+        DEFAULT_FEES_FRACTION,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        maxDepositAmount
+      )
+
+      await registryContract.join(
+        managerAccount.address,
+        invitedAccount.address,
+        DEFAULT_FEES_FRACTION,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
+      )
+
+      await tokenContract.transfer(managerAccount.address, amountNumber)
+      await tokenContract.transfer(invitedAccount.address, amountNumber)
+
+      const managerAccountTokenContract = tokenContract.connect(managerAccount) as any
+      await managerAccountTokenContract.approve(registryAddress, amountNumber)
+
+      const invitedAccountTokenContract = tokenContract.connect(invitedAccount) as any
+      await invitedAccountTokenContract.approve(registryAddress, amountNumber)
+
+      await registryContract.additionalDeposit(invitedAccount.address, invitedAccount.address, amount)
+
+      await expect(
+        registryContract.additionalDeposit(invitedAccount.address, invitedAccount.address, amount)
+      ).to.be.revertedWithCustomError(registryContract, 'ExceedsMaxDeposit()')
     })
   })
 })

@@ -9,12 +9,14 @@ interface IRegistry {
 
     error AlreadyJoined();
     error InvalidInitialAmount();
+    error ExceedsMaxDeposit();
 
     function join(
         address _parentAddress,
         address _accountAddress,
         FractionLib.Fraction memory _fees,
-        bytes memory _requiredInitialDeposit
+        bytes memory _requiredInitialDeposit,
+        bytes memory _maxDeposit
     ) external;
 
     function deposit(address _from, address _accountAddress, bytes memory _amount) external;

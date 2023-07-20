@@ -12,8 +12,8 @@ library RegistryLib {
         address parent;
         bytes requiredInitialDeposit;
         bytes cashbackBalance; /// CHILD CASHBACK TVL
+        bytes maxDeposit;
         /// ToDo:
-        /// MAX DEPOSIT
         /// LOCK PERIOD
         /// WITHDRAWS
     }

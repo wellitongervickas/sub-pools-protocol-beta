@@ -33,6 +33,11 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         _;
     }
 
+    modifier checkParentMaxDeposit(address _accountAddress, bytes memory _amount) {
+        _checkParentMaxDeposit(_accountAddress, _amount);
+        _;
+    }
+
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
 
@@ -40,7 +45,8 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             address(0),
             _msgSender(),
             FractionLib.Fraction(0, 100),
-            Coder.defaultRequiredInitialDeposit(_strategyMode())
+            Coder.defaultRequiredInitialDeposit(_strategyMode()),
+            Coder.defaultMaxDeposit(_strategyMode())
         );
     }
 
@@ -48,7 +54,8 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         address _parentAddress,
         address _accountAddress,
         FractionLib.Fraction memory _fees,
-        bytes memory _requiredInitialDeposit
+        bytes memory _requiredInitialDeposit,
+        bytes memory _maxDeposit
     ) public onlyRouter whenNotAccount(_accountAddress) {
         _setupAccount(
             _accountAddress,
@@ -57,7 +64,8 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             _fees,
             _parentAddress,
             _requiredInitialDeposit,
-            Coder.defaultCashbackBalance(_strategyMode())
+            Coder.defaultCashbackBalance(_strategyMode()),
+            _maxDeposit
         );
 
         emit IRegistry.Joined(_accountAddress);
@@ -140,7 +148,11 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         return strategy.mode();
     }
 
-    function additionalDeposit(address _depositor, address _accountAddress, bytes memory _amount) external onlyRouter {
+    function additionalDeposit(
+        address _depositor,
+        address _accountAddress,
+        bytes memory _amount
+    ) external onlyRouter checkParentMaxDeposit(_accountAddress, _amount) {
         _transferStrategyAssets(_depositor, _amount);
         _depositStrategyAssets(_amount);
 
@@ -153,8 +165,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         if (_strategyMode() == Coder.Mode.Single) {
             RegistryLib.Account storage _account = _account(_accountAddress);
 
-            bytes memory _accountAdditionalBalance = _account.additionalBalance;
-            uint256 _decodedAdditionalBalance = Coder.decodeSingleAssetAmount(_accountAdditionalBalance);
+            uint256 _decodedAdditionalBalance = Coder.decodeSingleAssetAmount(_account.additionalBalance);
             uint256 _updatedAdditionalBalance = _amount + _decodedAdditionalBalance;
 
             _additionalDepositAccount(_accountAddress, Coder.encodeSingleAssetAmount(_updatedAdditionalBalance));
@@ -174,6 +185,24 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             _setCashbackBalanceAccount(_accountAddress, Coder.encodeSingleAssetAmount(_updatedCashbackBalance));
         } else {
             /// TODO
+        }
+    }
+
+    function _checkParentMaxDeposit(address _accountAddress, bytes memory _amount) private view {
+        if (_checkIsRootAccount(_accountAddress)) return;
+        RegistryLib.Account storage _account = _account(_accountAddress);
+        RegistryLib.Account storage _parent = _parentAccount(_accountAddress);
+
+        if (_strategyMode() == Coder.Mode.Single) {
+            uint256 _decodedAmount = Coder.decodeSingleAssetAmount(_amount);
+            uint256 _decodedAdditionalBalance = Coder.decodeSingleAssetAmount(_account.additionalBalance);
+            uint256 _maxAmount = Coder.decodeSingleAssetAmount(_parent.maxDeposit);
+
+            uint256 _subTotal = _decodedAmount + _decodedAdditionalBalance;
+
+            if (_maxAmount > 0 && _subTotal > _maxAmount) revert IRegistry.ExceedsMaxDeposit();
+        } else {
+            /// ToDo
         }
     }
 }

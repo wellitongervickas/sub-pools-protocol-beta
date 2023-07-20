@@ -3,7 +3,7 @@ import { router, fakeStrategySingle, loadFixture, ethers, anyValue } from '../fi
 import coderUtils from '../helpers/coder'
 import { createRandomAddress } from '../helpers/address'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
-import { DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
+import { DEFAULT_MAX_DEPOSIT, DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
 
 describe('Router', () => {
   describe('Additional Deposit', () => {
@@ -21,7 +21,8 @@ describe('Router', () => {
         [],
         amount,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
 
       const receipt1 = await tx1.wait()

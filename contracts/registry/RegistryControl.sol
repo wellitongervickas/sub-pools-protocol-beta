@@ -21,7 +21,8 @@ contract RegistryControl is IRegistryControl {
         FractionLib.Fraction memory _fees,
         address _parentAddress,
         bytes memory _requiredInitialAmount,
-        bytes memory _initialCashbackBalance
+        bytes memory _initialCashbackBalance,
+        bytes memory _maxDeposit
     ) internal {
         uint256 _id = _createID();
 
@@ -32,7 +33,8 @@ contract RegistryControl is IRegistryControl {
             fees: _fees,
             parent: _parentAddress,
             requiredInitialDeposit: _requiredInitialAmount,
-            cashbackBalance: _initialCashbackBalance
+            cashbackBalance: _initialCashbackBalance,
+            maxDeposit: _maxDeposit
         });
     }
 

@@ -3,7 +3,7 @@ import { router, fakeStrategySingle, loadFixture, ethers, anyValue } from '../fi
 import coderUtils from '../helpers/coder'
 import { createRandomAddress } from '../helpers/address'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
-import { DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
+import { DEFAULT_REQUIRED_INITIAL_AMOUNT, DEFAULT_MAX_DEPOSIT } from '../helpers/tokens'
 
 describe('Router', () => {
   describe('Create', () => {
@@ -23,7 +23,8 @@ describe('Router', () => {
           [],
           initialAmount,
           DEFAULT_FEES_FRACTION,
-          DEFAULT_REQUIRED_INITIAL_AMOUNT
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_DEPOSIT
         )
       ).to.not.reverted
     })
@@ -43,7 +44,8 @@ describe('Router', () => {
         [],
         initialAmount,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[2].args
@@ -71,7 +73,8 @@ describe('Router', () => {
           [],
           initialAmount,
           DEFAULT_FEES_FRACTION,
-          DEFAULT_REQUIRED_INITIAL_AMOUNT
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_DEPOSIT
         )
       )
         .to.emit(routerContract, 'NodeCreated')
@@ -93,7 +96,8 @@ describe('Router', () => {
         [],
         initialAmount,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[2].args
@@ -119,7 +123,8 @@ describe('Router', () => {
           [],
           initialAmount,
           DEFAULT_FEES_FRACTION,
-          DEFAULT_REQUIRED_INITIAL_AMOUNT
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_DEPOSIT
         )
       )
         .to.emit(routerContract, 'RegistryJoined')
@@ -137,7 +142,8 @@ describe('Router', () => {
           [],
           initialAmount,
           DEFAULT_FEES_FRACTION,
-          DEFAULT_REQUIRED_INITIAL_AMOUNT
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_DEPOSIT
         )
       ).to.be.revertedWithCustomError(routerContract, 'NonRegistry()')
     })
@@ -157,7 +163,8 @@ describe('Router', () => {
         [],
         initialAmount,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
 
       await expect(
@@ -166,7 +173,8 @@ describe('Router', () => {
           [],
           initialAmount,
           DEFAULT_FEES_FRACTION,
-          DEFAULT_REQUIRED_INITIAL_AMOUNT
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_DEPOSIT
         )
       ).to.be.revertedWithCustomError(routerContract, 'NonRegistry()')
     })

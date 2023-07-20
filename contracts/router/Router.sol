@@ -17,11 +17,20 @@ contract Router is IRouter, RouterPivot, RouterControl {
         address[] memory _invitedAddresses,
         bytes memory _initialAmount,
         FractionLib.Fraction memory _fees,
-        bytes memory _requiredInitialDeposit
+        bytes memory _requiredInitialDeposit,
+        bytes memory _maxDeposit
     ) external onlyValidRegistry(_registryAddress) returns (address) {
         address _nodeAddress = _createRootNode(_registryAddress, _invitedAddresses);
 
-        _setupAccount(address(this), _registryAddress, _nodeAddress, _initialAmount, _fees, _requiredInitialDeposit);
+        _setupAccount(
+            address(this),
+            _registryAddress,
+            _nodeAddress,
+            _initialAmount,
+            _fees,
+            _requiredInitialDeposit,
+            _maxDeposit
+        );
         return _nodeAddress;
     }
 
@@ -30,7 +39,8 @@ contract Router is IRouter, RouterPivot, RouterControl {
         address[] memory _invitedAddresses,
         bytes memory _initialAmount,
         FractionLib.Fraction memory _fees,
-        bytes memory _requiredInitialDeposit
+        bytes memory _requiredInitialDeposit,
+        bytes memory _maxDeposit
     ) external returns (address) {
         Node _parent = Node(_parentAddress);
 
@@ -38,7 +48,15 @@ contract Router is IRouter, RouterPivot, RouterControl {
         address _nodeAddress = _deployNode(address(_parent), msg.sender, _invitedAddresses, _parentRegistry);
 
         _parent.join(_nodeAddress, msg.sender);
-        _setupAccount(_parentAddress, _parentRegistry, _nodeAddress, _initialAmount, _fees, _requiredInitialDeposit);
+        _setupAccount(
+            _parentAddress,
+            _parentRegistry,
+            _nodeAddress,
+            _initialAmount,
+            _fees,
+            _requiredInitialDeposit,
+            _maxDeposit
+        );
 
         return _nodeAddress;
     }

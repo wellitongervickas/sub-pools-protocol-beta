@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { router, loadFixture, ethers, anyValue, token, fakeStrategySingle } from '../fixtures'
 import coderUtils from '../helpers/coder'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
-import { DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
+import { DEFAULT_REQUIRED_INITIAL_AMOUNT, DEFAULT_MAX_DEPOSIT } from '../helpers/tokens'
 
 describe('Router', () => {
   describe('Join', () => {
@@ -22,7 +22,8 @@ describe('Router', () => {
         [invited.address],
         initialAmount,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[4].args
@@ -35,7 +36,8 @@ describe('Router', () => {
           [],
           initialAmount,
           DEFAULT_FEES_FRACTION,
-          DEFAULT_REQUIRED_INITIAL_AMOUNT
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_DEPOSIT
         )
       ).to.not.reverted
     })
@@ -56,7 +58,8 @@ describe('Router', () => {
         [invited.address],
         initialAmount,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[4].args
@@ -67,7 +70,8 @@ describe('Router', () => {
         [],
         initialAmount,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
       const receipt2 = await tx2.wait()
       const [nodeAddress1] = receipt2.logs[2].args
@@ -94,7 +98,8 @@ describe('Router', () => {
         [invited.address],
         initialAmount,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[4].args
@@ -105,7 +110,8 @@ describe('Router', () => {
         [],
         initialAmount,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
       const receipt2 = await tx2.wait()
       const [nodeAddress1] = receipt2.logs[2].args
@@ -132,7 +138,8 @@ describe('Router', () => {
         [invited.address],
         initialAmount,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[4].args
@@ -145,7 +152,8 @@ describe('Router', () => {
           [],
           initialAmount,
           DEFAULT_FEES_FRACTION,
-          DEFAULT_REQUIRED_INITIAL_AMOUNT
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_DEPOSIT
         )
       )
         .to.emit(routerContract, 'NodeCreated')
@@ -168,7 +176,8 @@ describe('Router', () => {
         [invited.address],
         initialAmount,
         DEFAULT_FEES_FRACTION,
-        DEFAULT_REQUIRED_INITIAL_AMOUNT
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT
       )
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[4].args
@@ -181,7 +190,8 @@ describe('Router', () => {
           [],
           initialAmount,
           DEFAULT_FEES_FRACTION,
-          DEFAULT_REQUIRED_INITIAL_AMOUNT
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_DEPOSIT
         )
       )
         .to.emit(routerContract, 'RegistryJoined')
