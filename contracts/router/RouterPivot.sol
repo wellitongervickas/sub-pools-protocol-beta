@@ -99,7 +99,7 @@ contract RouterPivot is IRouterPivot {
 
     function _withdrawInitialBalance(address _registryAddress, address _nodeAddress, bytes memory _amount) internal {
         Registry _registry = Registry(_registryAddress);
-        _withdrawBalanceRegistryAccount(_registry, _nodeAddress, _amount);
+        _withdrawInitialBalanceRegistryAccount(_registry, _nodeAddress, _amount);
 
         emit RegistryWithdrew(_registryAddress, _nodeAddress, _amount);
     }

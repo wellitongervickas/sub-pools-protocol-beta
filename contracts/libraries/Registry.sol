@@ -11,7 +11,7 @@ library RegistryLib {
         FractionLib.Fraction fees;
         address parent;
         bytes requiredInitialDeposit;
-        bytes cashbackBalance; /// CHILD CASHBACK TVL
+        bytes cashbackBalance;
         bytes maxDeposit;
         uint256 lockPeriod;
     }
@@ -32,7 +32,6 @@ library RegistryLib {
         _account.initialBalance = _amount;
     }
 
-    /// todo: when child withdrawn update here
     function _setCashbackBalance(Account storage _account, bytes memory _amount) internal {
         _account.cashbackBalance = _amount;
     }
