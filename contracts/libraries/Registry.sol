@@ -15,7 +15,6 @@ library RegistryLib {
         bytes maxDeposit;
         /// ToDo:
         /// LOCK PERIOD
-        /// WITHDRAWS
     }
 
     function _deposit(Account storage _account, bytes memory _amount) internal {
@@ -30,6 +29,11 @@ library RegistryLib {
         _account.additionalBalance = _amount;
     }
 
+    function _withdrawInitialBalance(Account storage _account, bytes memory _amount) internal {
+        _account.initialBalance = _amount;
+    }
+
+    /// todo: when child withdrawn update here
     function _setCashbackBalance(Account storage _account, bytes memory _amount) internal {
         _account.cashbackBalance = _amount;
     }

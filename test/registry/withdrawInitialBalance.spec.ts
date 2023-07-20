@@ -5,8 +5,8 @@ import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 import { DEFAULT_REQUIRED_INITIAL_AMOUNT, DEFAULT_MAX_DEPOSIT } from '../helpers/tokens'
 
 describe('Registry', () => {
-  describe('Withdraw Additional Deposit', () => {
-    it('should decrease additional balance on withdraw of account', async function () {
+  describe('Withdraw Initial Deposit', () => {
+    it('should decrease initial balance on withdraw of account', async function () {
       const { tokenContract } = await loadFixture(token.deployTokenFixture)
       const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
       const { registryContract, accounts } = await loadFixture(
@@ -34,14 +34,14 @@ describe('Registry', () => {
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
       await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmountNumber)
 
-      await registryContract.additionalDeposit(otherAccount.address, otherAccount.address, initialAmount)
-      await registryContract.withdraw(otherAccount.address, otherAccount.address, amountToWithdraw)
+      await registryContract.deposit(otherAccount.address, otherAccount.address, initialAmount)
+      await registryContract.withdrawInitialBalance(otherAccount.address, otherAccount.address, amountToWithdraw)
 
       const [, , additionalBalance] = await registryContract.accounts(otherAccount.address)
       expect(additionalBalance).to.equal(expectedAmount)
     })
 
-    it('should revert if try to withdraw more than available on additional balance', async function () {
+    it('should revert if try to withdraw more than available on initial balance', async function () {
       const { tokenContract } = await loadFixture(token.deployTokenFixture)
       const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
       const { registryContract, accounts } = await loadFixture(
@@ -68,10 +68,10 @@ describe('Registry', () => {
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
       await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmountNumber)
 
-      await registryContract.additionalDeposit(otherAccount.address, otherAccount.address, initialAmount)
+      await registryContract.deposit(otherAccount.address, otherAccount.address, initialAmount)
       await expect(
-        registryContract.withdraw(otherAccount.address, otherAccount.address, amountToWithdraw)
-      ).to.be.revertedWithCustomError(registryContract, 'InsufficientAdditionalBalance()')
+        registryContract.withdrawInitialBalance(otherAccount.address, otherAccount.address, amountToWithdraw)
+      ).to.be.revertedWithCustomError(registryContract, 'InsufficientInitialBalance()')
     })
 
     it('should emit Withdrew when withdraw balance of account', async function () {
@@ -98,9 +98,9 @@ describe('Registry', () => {
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
       await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmountNumber)
 
-      await registryContract.additionalDeposit(otherAccount.address, otherAccount.address, initialAmount)
+      await registryContract.deposit(otherAccount.address, otherAccount.address, initialAmount)
 
-      await expect(registryContract.withdraw(otherAccount.address, otherAccount.address, initialAmount))
+      await expect(registryContract.withdrawInitialBalance(otherAccount.address, otherAccount.address, initialAmount))
         .to.emit(registryContract, 'Withdrew')
         .withArgs(otherAccount.address, initialAmount)
     })

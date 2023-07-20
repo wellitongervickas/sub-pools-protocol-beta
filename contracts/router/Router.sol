@@ -85,4 +85,14 @@ contract Router is IRouter, RouterPivot, RouterControl {
 
         _withdraw(_registryAddress, _nodeAddress, _additionalAmount);
     }
+
+    function withdrawInitialBalance(
+        address _nodeAddress,
+        bytes memory _additionalAmount
+    ) external onlyNodeManager(_nodeAddress) {
+        Node _node = Node(_nodeAddress);
+        address _registryAddress = _node.registry();
+
+        _withdrawInitialBalance(_registryAddress, _nodeAddress, _additionalAmount);
+    }
 }

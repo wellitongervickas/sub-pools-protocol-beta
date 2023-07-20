@@ -12,6 +12,7 @@ interface IRegistry {
     error InvalidInitialAmount();
     error ExceedsMaxDeposit();
     error InsufficientAdditionalBalance();
+    error InsufficientInitialBalance();
 
     function join(
         address _parentAddress,

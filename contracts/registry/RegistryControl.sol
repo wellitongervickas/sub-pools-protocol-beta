@@ -59,6 +59,11 @@ contract RegistryControl is IRegistryControl {
         accounts[_accountAddress]._withdraw(_amount);
     }
 
+    function _withdrawInitialBalanceAccount(address _accountAddress, bytes memory _amount) internal {
+        /// todo: update parent cashback balance
+        accounts[_accountAddress]._withdrawInitialBalance(_amount);
+    }
+
     function _parentAccount(address _accountAddress) internal view returns (RegistryLib.Account storage) {
         return accounts[accounts[_accountAddress].parent];
     }

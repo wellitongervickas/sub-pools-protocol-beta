@@ -76,18 +76,20 @@ contract RouterPivot is IRouterPivot {
         _registry.additionalDeposit(msg.sender, _nodeAddress, _initialAmount);
     }
 
-    function _withdraw(address _registryAddress, address _nodeAddress, bytes memory _initialAmount) internal {
+    function _withdraw(address _registryAddress, address _nodeAddress, bytes memory _amount) internal {
         Registry _registry = Registry(_registryAddress);
-        _withdrawBalanceRegistryAccount(_registry, _nodeAddress, _initialAmount);
+        _withdrawBalanceRegistryAccount(_registry, _nodeAddress, _amount);
 
-        emit RegistryWithdrew(_registryAddress, _nodeAddress, _initialAmount);
+        emit RegistryWithdrew(_registryAddress, _nodeAddress, _amount);
     }
 
-    function _withdrawBalanceRegistryAccount(
-        Registry _registry,
-        address _nodeAddress,
-        bytes memory _initialAmount
-    ) private {
-        _registry.withdraw(msg.sender, _nodeAddress, _initialAmount);
+    function _withdrawInitialBalance(address _registryAddress, address _nodeAddress, bytes memory _amount) internal {
+        // Registry _registry = Registry(_registryAddress);
+
+        emit RegistryWithdrew(_registryAddress, _nodeAddress, _amount);
+    }
+
+    function _withdrawBalanceRegistryAccount(Registry _registry, address _nodeAddress, bytes memory _amount) private {
+        _registry.withdraw(msg.sender, _nodeAddress, _amount);
     }
 }

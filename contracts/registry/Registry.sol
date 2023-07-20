@@ -38,8 +38,13 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         _;
     }
 
-    modifier checkAccountAdditionalDeposit(address _accountAddress, bytes memory _amount) {
-        _checkAccountAdditionalDeposit(_accountAddress, _amount);
+    modifier checkAccountAdditionalBalance(address _accountAddress, bytes memory _amount) {
+        _checkAccountAdditionalBalance(_accountAddress, _amount);
+        _;
+    }
+
+    modifier checkAccountInitialBalance(address _accountAddress, bytes memory _amount) {
+        _checkAccountInitialBalance(_accountAddress, _amount);
         _;
     }
 
@@ -197,7 +202,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         address _requisitor,
         address _accountAddress,
         bytes memory _amount
-    ) external onlyRouter checkAccountAdditionalDeposit(_accountAddress, _amount) {
+    ) external onlyRouter checkAccountAdditionalBalance(_accountAddress, _amount) {
         _decreaseAdditionalBalanceAccount(_accountAddress, Coder.decodeSingleAssetAmount(_amount));
 
         strategy.withdraw(_requisitor, _amount);
@@ -218,7 +223,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         }
     }
 
-    function _checkAccountAdditionalDeposit(address _accountAddress, bytes memory _amount) private view {
+    function _checkAccountAdditionalBalance(address _accountAddress, bytes memory _amount) private view {
         if (_strategyMode() == Coder.Mode.Single) {
             RegistryLib.Account storage _account = _account(_accountAddress);
 
@@ -226,6 +231,44 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             uint256 _decodedAmount = Coder.decodeSingleAssetAmount(_amount);
 
             if (_decodedAdditionalBalance < _decodedAmount) revert IRegistry.InsufficientAdditionalBalance();
+        } else {
+            /// TODO
+        }
+    }
+
+    function withdrawInitialBalance(
+        address _requisitor,
+        address _accountAddress,
+        bytes memory _amount
+    ) external onlyRouter checkAccountInitialBalance(_accountAddress, _amount) {
+        _decreaseInitialBalanceAccount(_accountAddress, Coder.decodeSingleAssetAmount(_amount));
+
+        strategy.withdraw(_requisitor, _amount);
+
+        emit IRegistry.Withdrew(_accountAddress, _amount);
+    }
+
+    function _checkAccountInitialBalance(address _accountAddress, bytes memory _amount) private view {
+        if (_strategyMode() == Coder.Mode.Single) {
+            RegistryLib.Account storage _account = _account(_accountAddress);
+
+            uint256 _decodedInitialBalance = Coder.decodeSingleAssetAmount(_account.initialBalance);
+            uint256 _decodedAmount = Coder.decodeSingleAssetAmount(_amount);
+
+            if (_decodedInitialBalance < _decodedAmount) revert IRegistry.InsufficientInitialBalance();
+        } else {
+            /// TODO
+        }
+    }
+
+    function _decreaseInitialBalanceAccount(address _accountAddress, uint256 _amount) private {
+        if (_strategyMode() == Coder.Mode.Single) {
+            RegistryLib.Account storage _account = _account(_accountAddress);
+
+            uint256 _decodedInitialBalance = Coder.decodeSingleAssetAmount(_account.initialBalance);
+            uint256 _updatedInitialBalance = _decodedInitialBalance - _amount;
+
+            _withdrawAccount(_accountAddress, Coder.encodeSingleAssetAmount(_updatedInitialBalance));
         } else {
             /// TODO
         }
