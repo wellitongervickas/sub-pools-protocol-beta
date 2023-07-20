@@ -14,6 +14,11 @@ contract RegistryControl is IRegistryControl {
 
     mapping(address => RegistryLib.Account) public accounts;
 
+    modifier onlyParentUnlockedPeriod(address _accountAddress) {
+        if (_parentAccount(_accountAddress)._isLocked()) revert IRegistryControl.LockPeriod();
+        _;
+    }
+
     function _setupAccount(
         address _accountAddress,
         bytes memory _initialBalance,
@@ -62,7 +67,6 @@ contract RegistryControl is IRegistryControl {
     }
 
     function _withdrawInitialBalanceAccount(address _accountAddress, bytes memory _amount) internal {
-        /// todo: update parent cashback balance
         accounts[_accountAddress]._withdrawInitialBalance(_amount);
     }
 

@@ -259,7 +259,12 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         address _requisitor,
         address _accountAddress,
         bytes memory _amount
-    ) external onlyRouter checkAccountInitialBalance(_accountAddress, _amount) {
+    )
+        external
+        onlyRouter
+        onlyParentUnlockedPeriod(_accountAddress)
+        checkAccountInitialBalance(_accountAddress, _amount)
+    {
         _decreaseInitialBalanceAccount(_accountAddress, Coder.decodeSingleAssetAmount(_amount));
 
         RegistryLib.Account storage _account = _account(_accountAddress);
