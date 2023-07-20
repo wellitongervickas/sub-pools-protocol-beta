@@ -174,7 +174,6 @@ describe('Registry', () => {
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
       const withdrewAmountNumber = '995000000000000000'
       const withdrewAmount = coderUtils.build([withdrewAmountNumber], ['uint256'])
-      const expectedAmount = coderUtils.build(['0'], ['uint256'])
 
       const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60
       const unlockTime = (await time.latest()) + ONE_YEAR_IN_SECS
@@ -226,7 +225,6 @@ describe('Registry', () => {
       const amountToWithdrawNumber = '5000000000000000'
 
       const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
-      const amountToWithdraw = coderUtils.build([amountToWithdrawNumber], ['uint256'])
 
       await registryContract.join(
         deployer.address,
