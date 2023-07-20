@@ -25,10 +25,8 @@ contract RegistryControl is IRegistryControl {
         bytes memory _maxDeposit,
         uint256 _lockPeriod
     ) internal {
-        uint256 _id = _createID();
-
         accounts[_accountAddress] = RegistryLib.Account({
-            id: _id,
+            id: _createID(),
             initialBalance: _initialBalance,
             additionalBalance: _additionalBalance,
             fees: _fees,
@@ -43,26 +41,6 @@ contract RegistryControl is IRegistryControl {
     function _createID() private returns (uint256) {
         currentID.increment();
         return currentID.current();
-    }
-
-    function _depositAccount(address _accountAddress, bytes memory _amount) internal {
-        accounts[_accountAddress]._deposit(_amount);
-    }
-
-    function _additionalDepositAccount(address _accountAddress, bytes memory _amount) internal {
-        accounts[_accountAddress]._additionalDeposit(_amount);
-    }
-
-    function _setCashbackBalanceAccount(address _accountAddress, bytes memory _amount) internal {
-        accounts[_accountAddress]._setCashbackBalance(_amount);
-    }
-
-    function _withdrawAccount(address _accountAddress, bytes memory _amount) internal {
-        accounts[_accountAddress]._withdraw(_amount);
-    }
-
-    function _withdrawInitialBalanceAccount(address _accountAddress, bytes memory _amount) internal {
-        accounts[_accountAddress]._withdrawInitialBalance(_amount);
     }
 
     function _parentAccount(address _accountAddress) internal view returns (RegistryLib.Account storage) {

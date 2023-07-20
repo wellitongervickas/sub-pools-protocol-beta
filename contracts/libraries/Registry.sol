@@ -16,20 +16,12 @@ library RegistryLib {
         uint256 lockPeriod;
     }
 
-    function _deposit(Account storage _account, bytes memory _amount) internal {
+    function _setAccountBalance(Account storage _account, bytes memory _amount) internal {
         _account.initialBalance = _amount;
     }
 
-    function _additionalDeposit(Account storage _account, bytes memory _amount) internal {
+    function _setAdditionalBalance(Account storage _account, bytes memory _amount) internal {
         _account.additionalBalance = _amount;
-    }
-
-    function _withdraw(Account storage _account, bytes memory _amount) internal {
-        _account.additionalBalance = _amount;
-    }
-
-    function _withdrawInitialBalance(Account storage _account, bytes memory _amount) internal {
-        _account.initialBalance = _amount;
     }
 
     function _setCashbackBalance(Account storage _account, bytes memory _amount) internal {
