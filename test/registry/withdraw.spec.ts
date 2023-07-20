@@ -104,34 +104,5 @@ describe('Registry', () => {
         .to.emit(registryContract, 'Withdrew')
         .withArgs(otherAccount.address, initialAmount)
     })
-
-    // it('should transfer funds to strategy when additional deposit to account', async function () {
-    //   const { tokenContract } = await loadFixture(token.deployTokenFixture)
-    //   const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
-    //   const { registryContract, accounts } = await loadFixture(
-    //     registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
-    //   )
-
-    //   const [deployer, otherAccount] = accounts
-    //
-
-    //   const initialAmountNumber = '1000000000000000000'
-    //   const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
-
-    //   await registryContract.join(
-    //     deployer.address,
-    //     otherAccount.address,
-    //     DEFAULT_FEES_FRACTION,
-    //     DEFAULT_REQUIRED_INITIAL_AMOUNT,
-    //     DEFAULT_MAX_DEPOSIT
-    //   )
-    //   await tokenContract.transfer(otherAccount.address, initialAmountNumber)
-
-    //   const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
-    //   await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmount)
-
-    //   await registryContract.additionalDeposit(otherAccount.address, otherAccount.address, initialAmount)
-    //   expect(await tokenContract.balanceOf(fakeStrategyAddress)).to.equal(initialAmountNumber)
-    // })
   })
 })
