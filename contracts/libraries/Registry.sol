@@ -28,11 +28,6 @@ library RegistryLib {
         _account.cashbackBalance = _amount;
     }
 
-    function _calculateFees(Account storage _account, uint256 _amount) internal view returns (uint256) {
-        uint256 _feesAmount = (_amount * _account.fees.value) / _account.fees.divider;
-        return _feesAmount;
-    }
-
     function _isLocked(Account storage _account) internal view returns (bool) {
         return _account.lockPeriod > block.timestamp;
     }

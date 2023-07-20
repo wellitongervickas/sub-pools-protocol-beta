@@ -43,10 +43,6 @@ contract RegistryControl is IRegistryControl {
         return currentID.current();
     }
 
-    function _parentAccount(address _accountAddress) internal view returns (RegistryLib.Account storage) {
-        return accounts[accounts[_accountAddress].parent];
-    }
-
     function _account(address _accountAddress) internal view returns (RegistryLib.Account storage) {
         return accounts[_accountAddress];
     }
