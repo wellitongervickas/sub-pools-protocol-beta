@@ -68,3 +68,24 @@ function encodeSingleAssetAmount(uint256 _amount) pure returns (bytes memory) {
 function encodeMultiAssetAmount(uint256 _amount1, uint256 _amount2) pure returns (bytes memory) {
     return abi.encode(_amount1, _amount2);
 }
+
+function decodeSingleAssetIncrement(bytes memory _amount, bytes memory _increment) pure returns (uint256) {
+    uint256 _decodedAmount = decodeSingleAssetAmount(_amount);
+    uint256 _decodedIncrementAmount = decodeSingleAssetAmount(_increment);
+
+    return _decodedAmount + _decodedIncrementAmount;
+}
+
+function encodeSingleAssetIncrement(bytes memory _amount, bytes memory _increment) pure returns (bytes memory) {
+    uint256 _decodedAmount = decodeSingleAssetAmount(_amount);
+    uint256 _decodedIncrementAmount = decodeSingleAssetAmount(_increment);
+
+    return abi.encode(_decodedAmount + _decodedIncrementAmount);
+}
+
+function encodeSingleAssetDecrement(bytes memory _amount, bytes memory _decrement) pure returns (bytes memory) {
+    uint256 _decodedAmount = decodeSingleAssetAmount(_amount);
+    uint256 _decodedDecrement = decodeSingleAssetAmount(_decrement);
+
+    return abi.encode(_decodedAmount - _decodedDecrement);
+}
