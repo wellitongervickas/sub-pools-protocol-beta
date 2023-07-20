@@ -126,7 +126,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function _checkIsRootAccount(address _accountAddress) private view returns (bool) {
-        return _account(_accountAddress).id == 2;
+        return accounts[_accountAddress].id == 2;
     }
 
     function _checkParentRequiredInitialDeposit(address _accountAddress, bytes memory _amount) private view {
