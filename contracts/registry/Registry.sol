@@ -116,8 +116,8 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
         if (_strategyMode() == Coder.Mode.Single) {
             uint256 _decodedAmount = Coder.decodeSingleAssetAmount(_amount);
-
             bytes memory _feesAmount = Coder.encodeSingleAssetAmount(_parent._calculateFees(_decodedAmount));
+
             _increaseAdditionalBalanceAccount(_account.parent, _feesAmount);
 
             bytes memory _remainingAmount = Coder.encodeSingleAssetDecrement(_amount, _feesAmount);
