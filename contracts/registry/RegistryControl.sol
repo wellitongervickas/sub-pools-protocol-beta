@@ -22,7 +22,8 @@ contract RegistryControl is IRegistryControl {
         address _parentAddress,
         bytes memory _requiredInitialAmount,
         bytes memory _initialCashbackBalance,
-        bytes memory _maxDeposit
+        bytes memory _maxDeposit,
+        uint256 _lockPeriod
     ) internal {
         uint256 _id = _createID();
 
@@ -34,7 +35,8 @@ contract RegistryControl is IRegistryControl {
             parent: _parentAddress,
             requiredInitialDeposit: _requiredInitialAmount,
             cashbackBalance: _initialCashbackBalance,
-            maxDeposit: _maxDeposit
+            maxDeposit: _maxDeposit,
+            lockPeriod: _lockPeriod
         });
     }
 

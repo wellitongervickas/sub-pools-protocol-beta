@@ -3,6 +3,7 @@ import { loadFixture, fakeStrategySingle, registry, token, ethers } from '../fix
 import coderUtils from '../helpers/coder'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 import { DEFAULT_MAX_DEPOSIT, DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
+import { DEFAULT_PERIOD_LOCK } from '../helpers/time'
 
 describe('Registry', () => {
   describe('Deposit', () => {
@@ -23,7 +24,8 @@ describe('Registry', () => {
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
@@ -54,7 +56,8 @@ describe('Registry', () => {
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
@@ -83,7 +86,8 @@ describe('Registry', () => {
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
@@ -111,7 +115,8 @@ describe('Registry', () => {
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
 
@@ -149,7 +154,8 @@ describe('Registry', () => {
         managerAccount.address,
         accountFees,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
 
       await registryContract.join(
@@ -157,7 +163,8 @@ describe('Registry', () => {
         invitedAccount.address,
         accountFees,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
 
       await tokenContract.transfer(managerAccount.address, initialAmountNumber)
@@ -200,7 +207,8 @@ describe('Registry', () => {
         managerAccount.address,
         accountFees,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
 
       await registryContract.join(
@@ -208,7 +216,8 @@ describe('Registry', () => {
         invitedAccount.address,
         accountFees,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
 
       await tokenContract.transfer(managerAccount.address, initialAmountNumber)
@@ -254,7 +263,8 @@ describe('Registry', () => {
         managerAccount.address,
         accountFees,
         requiredInitialAmount,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
 
       await registryContract.join(
@@ -262,7 +272,8 @@ describe('Registry', () => {
         invitedAccount.address,
         accountFees,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
 
       await tokenContract.transfer(managerAccount.address, requiredAmountNumber)

@@ -24,7 +24,8 @@ contract Router is IRouter, RouterPivot, RouterControl {
         bytes memory _initialAmount,
         FractionLib.Fraction memory _fees,
         bytes memory _requiredInitialDeposit,
-        bytes memory _maxDeposit
+        bytes memory _maxDeposit,
+        uint256 _lockPeriod
     ) external onlyValidRegistry(_registryAddress) returns (address) {
         address _nodeAddress = _createRootNode(_registryAddress, _invitedAddresses);
 
@@ -35,7 +36,8 @@ contract Router is IRouter, RouterPivot, RouterControl {
             _initialAmount,
             _fees,
             _requiredInitialDeposit,
-            _maxDeposit
+            _maxDeposit,
+            _lockPeriod
         );
 
         return _nodeAddress;
@@ -47,7 +49,8 @@ contract Router is IRouter, RouterPivot, RouterControl {
         bytes memory _initialAmount,
         FractionLib.Fraction memory _fees,
         bytes memory _requiredInitialDeposit,
-        bytes memory _maxDeposit
+        bytes memory _maxDeposit,
+        uint256 _lockPeriod
     ) external returns (address) {
         Node _parent = Node(_parentAddress);
 
@@ -63,7 +66,8 @@ contract Router is IRouter, RouterPivot, RouterControl {
             _initialAmount,
             _fees,
             _requiredInitialDeposit,
-            _maxDeposit
+            _maxDeposit,
+            _lockPeriod
         );
 
         return _nodeAddress;

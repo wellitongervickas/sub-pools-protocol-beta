@@ -19,7 +19,8 @@ interface IRegistry {
         address _accountAddress,
         FractionLib.Fraction memory _fees,
         bytes memory _requiredInitialDeposit,
-        bytes memory _maxDeposit
+        bytes memory _maxDeposit,
+        uint256 _lockPeriod
     ) external;
 
     function deposit(address _from, address _accountAddress, bytes memory _amount) external;

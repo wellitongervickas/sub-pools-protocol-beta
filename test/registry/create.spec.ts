@@ -3,6 +3,7 @@ import { ethers, loadFixture, registry, fakeStrategySingle } from '../fixtures'
 import { createRandomAddress } from '../helpers/address'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 import { DEFAULT_REQUIRED_INITIAL_AMOUNT, DEFAULT_MAX_DEPOSIT } from '../helpers/tokens'
+import { DEFAULT_PERIOD_LOCK } from '../helpers/time'
 
 describe('Registry', () => {
   describe('Create', () => {
@@ -23,7 +24,8 @@ describe('Registry', () => {
         otherAccount.address,
         accountFees,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
       const [id, initialBalance, additionalBalance, fees, parentAddress] = await registryContract.accounts(
         otherAccount.address
@@ -51,7 +53,8 @@ describe('Registry', () => {
           otherAccount.address,
           DEFAULT_FEES_FRACTION,
           DEFAULT_REQUIRED_INITIAL_AMOUNT,
-          DEFAULT_MAX_DEPOSIT
+          DEFAULT_MAX_DEPOSIT,
+          DEFAULT_PERIOD_LOCK
         )
       )
         .to.emit(registryContract, 'Joined')
@@ -70,7 +73,8 @@ describe('Registry', () => {
         otherAccount.address,
         DEFAULT_FEES_FRACTION,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
 
       await expect(
@@ -79,7 +83,8 @@ describe('Registry', () => {
           otherAccount.address,
           DEFAULT_FEES_FRACTION,
           DEFAULT_REQUIRED_INITIAL_AMOUNT,
-          DEFAULT_MAX_DEPOSIT
+          DEFAULT_MAX_DEPOSIT,
+          DEFAULT_PERIOD_LOCK
         )
       ).to.be.revertedWithCustomError(registryContract, 'AlreadyJoined()')
     })
@@ -97,7 +102,8 @@ describe('Registry', () => {
           otherAccount.address,
           DEFAULT_FEES_FRACTION,
           DEFAULT_REQUIRED_INITIAL_AMOUNT,
-          DEFAULT_MAX_DEPOSIT
+          DEFAULT_MAX_DEPOSIT,
+          DEFAULT_PERIOD_LOCK
         )
       ).to.be.rejectedWith('Ownable: caller is not the owner')
     })

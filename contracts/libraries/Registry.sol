@@ -13,8 +13,7 @@ library RegistryLib {
         bytes requiredInitialDeposit;
         bytes cashbackBalance; /// CHILD CASHBACK TVL
         bytes maxDeposit;
-        /// ToDo:
-        /// LOCK PERIOD
+        uint256 lockPeriod;
     }
 
     function _deposit(Account storage _account, bytes memory _amount) internal {

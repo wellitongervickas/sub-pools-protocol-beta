@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import { router, fakeStrategySingle, loadFixture, ethers, anyValue } from '../fixtures'
 import coderUtils from '../helpers/coder'
-import { createRandomAddress } from '../helpers/address'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 import { DEFAULT_MAX_DEPOSIT, DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
+import { DEFAULT_PERIOD_LOCK } from '../helpers/time'
 
 describe('Router', () => {
   describe('Additional Deposit', () => {
@@ -22,7 +22,8 @@ describe('Router', () => {
         amount,
         DEFAULT_FEES_FRACTION,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
 
       const receipt1 = await tx1.wait()
@@ -49,7 +50,8 @@ describe('Router', () => {
         amount,
         DEFAULT_FEES_FRACTION,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
 
       const receipt1 = await tx1.wait()

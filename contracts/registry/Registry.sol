@@ -58,7 +58,8 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             _msgSender(),
             FractionLib.Fraction(0, 100),
             Coder.defaultRequiredInitialDeposit(_strategyMode()),
-            Coder.defaultMaxDeposit(_strategyMode())
+            Coder.defaultMaxDeposit(_strategyMode()),
+            0 // lockperiod
         );
     }
 
@@ -71,7 +72,8 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         address _accountAddress,
         FractionLib.Fraction memory _fees,
         bytes memory _requiredInitialDeposit,
-        bytes memory _maxDeposit
+        bytes memory _maxDeposit,
+        uint256 _lockPeriod
     ) public onlyRouter whenNotAccount(_accountAddress) {
         _setupAccount(
             _accountAddress,
@@ -81,7 +83,8 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             _parentAddress,
             _requiredInitialDeposit,
             Coder.defaultCashbackBalance(_strategyMode()),
-            _maxDeposit
+            _maxDeposit,
+            _lockPeriod
         );
 
         emit IRegistry.Joined(_accountAddress);

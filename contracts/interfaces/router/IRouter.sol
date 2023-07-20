@@ -15,7 +15,8 @@ interface IRouter {
         bytes memory _initialAmount,
         FractionLib.Fraction memory _fees,
         bytes memory _requiredInitialDeposit,
-        bytes memory _maxDeposit
+        bytes memory _maxDeposit,
+        uint256 _lockPeriod
     ) external returns (address);
 
     function join(
@@ -24,7 +25,8 @@ interface IRouter {
         bytes memory _initialAmount,
         FractionLib.Fraction memory _fees,
         bytes memory _requiredInitialDeposit,
-        bytes memory _maxDeposit
+        bytes memory _maxDeposit,
+        uint256 _lockPeriod
     ) external returns (address);
 
     function additionalDeposit(address _nodeAddress, bytes memory _additionalAmount) external;

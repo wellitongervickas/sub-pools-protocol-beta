@@ -4,6 +4,7 @@ import coderUtils from '../helpers/coder'
 import { createRandomAddress } from '../helpers/address'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 import { DEFAULT_REQUIRED_INITIAL_AMOUNT, DEFAULT_MAX_DEPOSIT } from '../helpers/tokens'
+import { DEFAULT_PERIOD_LOCK } from '../helpers/time'
 
 describe('Router', () => {
   describe('Create', () => {
@@ -24,7 +25,8 @@ describe('Router', () => {
           initialAmount,
           DEFAULT_FEES_FRACTION,
           DEFAULT_REQUIRED_INITIAL_AMOUNT,
-          DEFAULT_MAX_DEPOSIT
+          DEFAULT_MAX_DEPOSIT,
+          DEFAULT_PERIOD_LOCK
         )
       ).to.not.reverted
     })
@@ -45,7 +47,8 @@ describe('Router', () => {
         initialAmount,
         DEFAULT_FEES_FRACTION,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[2].args
@@ -74,7 +77,8 @@ describe('Router', () => {
           initialAmount,
           DEFAULT_FEES_FRACTION,
           DEFAULT_REQUIRED_INITIAL_AMOUNT,
-          DEFAULT_MAX_DEPOSIT
+          DEFAULT_MAX_DEPOSIT,
+          DEFAULT_PERIOD_LOCK
         )
       )
         .to.emit(routerContract, 'NodeCreated')
@@ -97,7 +101,8 @@ describe('Router', () => {
         initialAmount,
         DEFAULT_FEES_FRACTION,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[2].args
@@ -124,7 +129,8 @@ describe('Router', () => {
           initialAmount,
           DEFAULT_FEES_FRACTION,
           DEFAULT_REQUIRED_INITIAL_AMOUNT,
-          DEFAULT_MAX_DEPOSIT
+          DEFAULT_MAX_DEPOSIT,
+          DEFAULT_PERIOD_LOCK
         )
       )
         .to.emit(routerContract, 'RegistryJoined')
@@ -143,7 +149,8 @@ describe('Router', () => {
           initialAmount,
           DEFAULT_FEES_FRACTION,
           DEFAULT_REQUIRED_INITIAL_AMOUNT,
-          DEFAULT_MAX_DEPOSIT
+          DEFAULT_MAX_DEPOSIT,
+          DEFAULT_PERIOD_LOCK
         )
       ).to.be.revertedWithCustomError(routerContract, 'NonRegistry()')
     })
@@ -164,7 +171,8 @@ describe('Router', () => {
         initialAmount,
         DEFAULT_FEES_FRACTION,
         DEFAULT_REQUIRED_INITIAL_AMOUNT,
-        DEFAULT_MAX_DEPOSIT
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
       )
 
       await expect(
@@ -174,7 +182,8 @@ describe('Router', () => {
           initialAmount,
           DEFAULT_FEES_FRACTION,
           DEFAULT_REQUIRED_INITIAL_AMOUNT,
-          DEFAULT_MAX_DEPOSIT
+          DEFAULT_MAX_DEPOSIT,
+          DEFAULT_PERIOD_LOCK
         )
       ).to.be.revertedWithCustomError(routerContract, 'NonRegistry()')
     })
