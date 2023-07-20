@@ -6,8 +6,8 @@ import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 import { DEFAULT_MAX_DEPOSIT, DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
 
 describe('Router', () => {
-  describe('Additional Deposit', () => {
-    it('should emit Deposited on additional deposit', async function () {
+  describe('Withdraw', () => {
+    it('should emit Withdrew on withdraw balance', async function () {
       const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
@@ -28,12 +28,14 @@ describe('Router', () => {
       const receipt1 = await tx1.wait()
       const [nodeAddress] = receipt1.logs[2].args
 
-      await expect(routerContract.additionalDeposit(nodeAddress, amount))
-        .to.emit(routerContract, 'RegistryDeposited')
+      await routerContract.additionalDeposit(nodeAddress, amount)
+
+      await expect(routerContract.withdraw(nodeAddress, amount))
+        .to.emit(routerContract, 'RegistryWithdrew')
         .withArgs(registryAddress, anyValue, amount)
     })
 
-    it('should revert if try to additional deposit to a non node manager ', async function () {
+    it('should revert if try to withdraw balance of a non node manager ', async function () {
       const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
       const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
       const [, otherAccount] = accounts
@@ -57,7 +59,7 @@ describe('Router', () => {
 
       const otherAccountRouterInstance = routerContract.connect(otherAccount) as any
 
-      await expect(otherAccountRouterInstance.additionalDeposit(nodeAddress, amount)).to.be.revertedWithCustomError(
+      await expect(otherAccountRouterInstance.withdraw(nodeAddress, amount)).to.be.revertedWithCustomError(
         otherAccountRouterInstance,
         'NotNodeManager()'
       )

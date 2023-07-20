@@ -55,6 +55,10 @@ contract RegistryControl is IRegistryControl {
         accounts[_accountAddress]._setCashbackBalance(_amount);
     }
 
+    function _withdrawAccount(address _accountAddress, bytes memory _amount) internal {
+        accounts[_accountAddress]._withdraw(_amount);
+    }
+
     function _parentAccount(address _accountAddress) internal view returns (RegistryLib.Account storage) {
         return accounts[accounts[_accountAddress].parent];
     }

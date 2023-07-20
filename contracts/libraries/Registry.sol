@@ -26,6 +26,10 @@ library RegistryLib {
         _account.additionalBalance = _amount;
     }
 
+    function _withdraw(Account storage _account, bytes memory _amount) internal {
+        _account.additionalBalance = _amount;
+    }
+
     function _setCashbackBalance(Account storage _account, bytes memory _amount) internal {
         _account.cashbackBalance = _amount;
     }

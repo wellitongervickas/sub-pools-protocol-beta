@@ -8,6 +8,12 @@ import {FractionLib} from '../libraries/Fraction.sol';
 import {RouterPivot} from './RouterPivot.sol';
 
 contract Router is IRouter, RouterPivot, RouterControl {
+    modifier onlyNodeManager(address _nodeAddress) {
+        Node _node = Node(_nodeAddress);
+        if (_node.manager() != msg.sender) revert IRouter.NotNodeManager();
+        _;
+    }
+
     function registry(address _strategyAddress) external returns (address) {
         return _createRegistry(_strategyAddress);
     }
@@ -31,6 +37,7 @@ contract Router is IRouter, RouterPivot, RouterControl {
             _requiredInitialDeposit,
             _maxDeposit
         );
+
         return _nodeAddress;
     }
 
@@ -48,6 +55,7 @@ contract Router is IRouter, RouterPivot, RouterControl {
         address _nodeAddress = _deployNode(address(_parent), msg.sender, _invitedAddresses, _parentRegistry);
 
         _parent.join(_nodeAddress, msg.sender);
+
         _setupAccount(
             _parentAddress,
             _parentRegistry,
@@ -61,10 +69,20 @@ contract Router is IRouter, RouterPivot, RouterControl {
         return _nodeAddress;
     }
 
-    function additionalDeposit(address _nodeAddress, bytes memory _additionalAmount) external {
+    function additionalDeposit(
+        address _nodeAddress,
+        bytes memory _additionalAmount
+    ) external onlyNodeManager(_nodeAddress) {
         Node _node = Node(_nodeAddress);
         address _registryAddress = _node.registry();
 
         _additionalDeposit(_registryAddress, _nodeAddress, _additionalAmount);
+    }
+
+    function withdraw(address _nodeAddress, bytes memory _additionalAmount) external onlyNodeManager(_nodeAddress) {
+        Node _node = Node(_nodeAddress);
+        address _registryAddress = _node.registry();
+
+        _withdraw(_registryAddress, _nodeAddress, _additionalAmount);
     }
 }

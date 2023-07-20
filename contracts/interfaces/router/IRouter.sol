@@ -5,6 +5,8 @@ import {RegistryLib} from '../../libraries/Registry.sol';
 import {FractionLib} from '../../libraries/Fraction.sol';
 
 interface IRouter {
+    error NotNodeManager();
+
     function registry(address _strategyAddress) external returns (address);
 
     function create(
@@ -24,4 +26,8 @@ interface IRouter {
         bytes memory _requiredInitialDeposit,
         bytes memory _maxDeposit
     ) external returns (address);
+
+    function additionalDeposit(address _nodeAddress, bytes memory _additionalAmount) external;
+
+    function withdraw(address _nodeAddress, bytes memory _amount) external;
 }

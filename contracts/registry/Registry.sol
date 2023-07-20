@@ -38,6 +38,11 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         _;
     }
 
+    modifier checkAccountAdditionalDeposit(address _accountAddress, bytes memory _amount) {
+        _checkAccountAdditionalDeposit(_accountAddress, _amount);
+        _;
+    }
+
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
 
@@ -112,10 +117,10 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             RegistryLib.Account storage _parent = _parentAccount(_accountAddress);
 
             uint256 _feesAmount = _parent._calculateFees(_decodedAmount);
-            _updateAdditionalBalanceAccount(_account.parent, _feesAmount);
+            _increaseAdditionalBalanceAccount(_account.parent, _feesAmount);
 
             uint256 _remainingAmount = _decodedAmount - _feesAmount;
-            _updateCashbackBalanceAccount(_account.parent, _remainingAmount);
+            _increaseCashbackBalanceAccount(_account.parent, _remainingAmount);
 
             return Coder.encodeSingleAssetAmount(_remainingAmount);
         } else {
@@ -156,12 +161,12 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         _transferStrategyAssets(_depositor, _amount);
         _depositStrategyAssets(_amount);
 
-        _updateAdditionalBalanceAccount(_accountAddress, Coder.decodeSingleAssetAmount(_amount));
+        _increaseAdditionalBalanceAccount(_accountAddress, Coder.decodeSingleAssetAmount(_amount));
 
         emit IRegistry.Deposited(_accountAddress, _amount);
     }
 
-    function _updateAdditionalBalanceAccount(address _accountAddress, uint256 _amount) private {
+    function _increaseAdditionalBalanceAccount(address _accountAddress, uint256 _amount) private {
         if (_strategyMode() == Coder.Mode.Single) {
             RegistryLib.Account storage _account = _account(_accountAddress);
 
@@ -174,7 +179,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         }
     }
 
-    function _updateCashbackBalanceAccount(address _accountAddress, uint256 _amount) private {
+    function _increaseCashbackBalanceAccount(address _accountAddress, uint256 _amount) private {
         if (_strategyMode() == Coder.Mode.Single) {
             RegistryLib.Account storage _account = _account(_accountAddress);
 
@@ -190,6 +195,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
 
     function _checkParentMaxDeposit(address _accountAddress, bytes memory _amount) private view {
         if (_checkIsRootAccount(_accountAddress)) return;
+
         RegistryLib.Account storage _account = _account(_accountAddress);
         RegistryLib.Account storage _parent = _parentAccount(_accountAddress);
 
@@ -203,6 +209,44 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             if (_maxAmount > 0 && _subTotal > _maxAmount) revert IRegistry.ExceedsMaxDeposit();
         } else {
             /// ToDo
+        }
+    }
+
+    function withdraw(
+        address _requisitor,
+        address _accountAddress,
+        bytes memory _amount
+    ) external onlyRouter checkAccountAdditionalDeposit(_accountAddress, _amount) {
+        _decreaseAdditionalBalanceAccount(_accountAddress, Coder.decodeSingleAssetAmount(_amount));
+
+        strategy.withdraw(_requisitor, _amount);
+
+        emit IRegistry.Withdrew(_accountAddress, _amount);
+    }
+
+    function _decreaseAdditionalBalanceAccount(address _accountAddress, uint256 _amount) private {
+        if (_strategyMode() == Coder.Mode.Single) {
+            RegistryLib.Account storage _account = _account(_accountAddress);
+
+            uint256 _decodedAdditionalBalance = Coder.decodeSingleAssetAmount(_account.additionalBalance);
+            uint256 _updatedAdditionalBalance = _decodedAdditionalBalance - _amount;
+
+            _withdrawAccount(_accountAddress, Coder.encodeSingleAssetAmount(_updatedAdditionalBalance));
+        } else {
+            /// TODO
+        }
+    }
+
+    function _checkAccountAdditionalDeposit(address _accountAddress, bytes memory _amount) private view {
+        if (_strategyMode() == Coder.Mode.Single) {
+            RegistryLib.Account storage _account = _account(_accountAddress);
+
+            uint256 _decodedAdditionalBalance = Coder.decodeSingleAssetAmount(_account.additionalBalance);
+            uint256 _decodedAmount = Coder.decodeSingleAssetAmount(_amount);
+
+            if (_decodedAdditionalBalance < _decodedAmount) revert IRegistry.InsufficientAdditionalBalance();
+        } else {
+            /// TODO
         }
     }
 }
