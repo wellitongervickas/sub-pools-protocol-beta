@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import {IRouterPivot} from '../interfaces/router/IRouterPivot.sol';
-import {Registry} from '../registry/Registry.sol';
+import {Registry, IRegistry} from '../registry/Registry.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 
 contract RouterPivot is IRouterPivot {
@@ -36,7 +36,7 @@ contract RouterPivot is IRouterPivot {
         bytes memory _maxDeposit,
         uint256 _lockPeriod
     ) internal {
-        Registry(_registryAddress).join(
+        IRegistry(_registryAddress).join(
             _parentAddress,
             _nodeAddress,
             _fees,
@@ -45,24 +45,24 @@ contract RouterPivot is IRouterPivot {
             _lockPeriod
         );
 
-        Registry(_registryAddress).deposit(msg.sender, _nodeAddress, _initialAmount);
+        IRegistry(_registryAddress).deposit(msg.sender, _nodeAddress, _initialAmount);
         emit IRouterPivot.RegistryJoined(_registryAddress, _nodeAddress, _initialAmount);
 
         registries[_registryAddress] = false;
     }
 
     function _additionalDeposit(address _registryAddress, address _nodeAddress, bytes memory _initialAmount) internal {
-        Registry(_registryAddress).additionalDeposit(msg.sender, _nodeAddress, _initialAmount);
+        IRegistry(_registryAddress).additionalDeposit(msg.sender, _nodeAddress, _initialAmount);
         emit RegistryDeposited(_registryAddress, _nodeAddress, _initialAmount);
     }
 
     function _withdraw(address _registryAddress, address _nodeAddress, bytes memory _amount) internal {
-        Registry(_registryAddress).withdraw(msg.sender, _nodeAddress, _amount);
+        IRegistry(_registryAddress).withdraw(msg.sender, _nodeAddress, _amount);
         emit RegistryWithdrew(_registryAddress, _nodeAddress, _amount);
     }
 
     function _withdrawInitialBalance(address _registryAddress, address _nodeAddress, bytes memory _amount) internal {
-        Registry(_registryAddress).withdrawInitialBalance(msg.sender, _nodeAddress, _amount);
+        IRegistry(_registryAddress).withdrawInitialBalance(msg.sender, _nodeAddress, _amount);
         emit RegistryWithdrew(_registryAddress, _nodeAddress, _amount);
     }
 }

@@ -24,9 +24,11 @@ interface IRegistry {
         uint256 _lockPeriod
     ) external;
 
-    function deposit(address _from, address _accountAddress, bytes memory _amount) external;
+    function deposit(address _depositor, address _accountAddress, bytes memory _amount) external;
 
-    function additionalDeposit(address _from, address _accountAddress, bytes memory _amount) external;
+    function additionalDeposit(address _depositor, address _accountAddress, bytes memory _amount) external;
 
-    function withdraw(address _from, address _accountAddress, bytes memory _amount) external;
+    function withdraw(address _requisitor, address _accountAddress, bytes memory _amount) external;
+
+    function withdrawInitialBalance(address _requisitor, address _accountAddress, bytes memory _amount) external;
 }
