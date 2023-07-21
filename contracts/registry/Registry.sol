@@ -56,14 +56,14 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
 
-        join(
-            address(0),
-            _msgSender(),
-            FractionLib.Fraction(0, 100),
-            Coder.defaultRequiredInitialDeposit(_strategyMode()),
-            Coder.defaultMaxDeposit(_strategyMode()),
-            0 // lockperiod
-        );
+        // join(
+        //     address(0),
+        //     _msgSender(),
+        //     FractionLib.Fraction(0, 100),
+        //     Coder.defaultRequiredInitialDeposit(_strategyMode()),
+        //     Coder.defaultMaxDeposit(_strategyMode()),
+        //     0 // lockperiod
+        // );
     }
 
     function _strategyMode() private view returns (Coder.Mode) {
@@ -126,7 +126,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function _checkIsRootAccount(address _accountAddress) private view returns (bool) {
-        return accounts[_accountAddress].id == 2;
+        return accounts[_accountAddress].id == 1;
     }
 
     function _checkParentRequiredInitialDeposit(address _accountAddress, bytes memory _amount) private view {

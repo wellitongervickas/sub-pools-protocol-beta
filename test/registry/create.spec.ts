@@ -32,7 +32,7 @@ describe('Registry', () => {
       )
 
       expect([id, initialBalance, additionalBalance, fees, parentAddress]).to.deep.equal([
-        ethers.toBigInt(2),
+        ethers.toBigInt(1),
         '0x0000000000000000000000000000000000000000000000000000000000000000',
         '0x0000000000000000000000000000000000000000000000000000000000000000',
         [accountFees.value, accountFees.divider],
