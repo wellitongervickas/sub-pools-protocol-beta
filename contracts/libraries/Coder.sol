@@ -115,7 +115,6 @@ function checkAssetsExceedsAmount(Mode _mode, bytes memory _amount, bytes memory
         if (_otherDecodedAmount == 0) return false;
 
         uint256 _decodedAmount = decodeSingleAssetAmount(_amount);
-
         return _otherDecodedAmount > 0 && _decodedAmount > _otherDecodedAmount;
     } else {
         /// todo

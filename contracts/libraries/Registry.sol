@@ -16,7 +16,7 @@ library RegistryLib {
         uint256 lockPeriod;
     }
 
-    function _setAccountBalance(Account storage _account, bytes memory _amount) internal {
+    function _setInitialBalance(Account storage _account, bytes memory _amount) internal {
         _account.initialBalance = _amount;
     }
 

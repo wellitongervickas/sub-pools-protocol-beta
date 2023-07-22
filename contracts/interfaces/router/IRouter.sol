@@ -32,4 +32,6 @@ interface IRouter {
     function additionalDeposit(address _nodeAddress, bytes memory _additionalAmount) external;
 
     function withdraw(address _nodeAddress, bytes memory _amount) external;
+
+    function withdrawInitialBalance(address _nodeAddress, bytes memory _amount) external;
 }

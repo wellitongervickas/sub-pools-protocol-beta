@@ -49,21 +49,12 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     modifier onlyParentUnlockedPeriod(address _accountAddress) {
-        if (_account(accounts[_accountAddress].parent)._isLocked()) revert IRegistry.LockPeriod();
+        if (_account(_account(_accountAddress).parent)._isLocked()) revert IRegistry.LockPeriod();
         _;
     }
 
     constructor(address _strategy) {
         strategy = IStrategy(_strategy);
-
-        // join(
-        //     address(0),
-        //     _msgSender(),
-        //     FractionLib.Fraction(0, 100),
-        //     Coder.defaultRequiredInitialDeposit(_strategyMode()),
-        //     Coder.defaultMaxDeposit(_strategyMode()),
-        //     0 // lockperiod
-        // );
     }
 
     function _strategyMode() private view returns (Coder.Mode) {
@@ -100,7 +91,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     ) external onlyRouter checkParentRequiredInitialDeposit(_accountAddress, _amount) {
         strategy.deposit(_depositor, _amount);
 
-        accounts[_accountAddress]._setAccountBalance(_chargeParentDepositFees(_accountAddress, _amount));
+        _account(_accountAddress)._setInitialBalance(_chargeParentDepositFees(_accountAddress, _amount));
 
         emit IRegistry.Deposited(_accountAddress, _amount);
     }
@@ -108,7 +99,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     function _chargeParentDepositFees(address _accountAddress, bytes memory _amount) private returns (bytes memory) {
         if (_checkIsRootAccount(_accountAddress)) return _amount;
 
-        RegistryLib.Account memory _parent = _account(accounts[_accountAddress].parent);
+        RegistryLib.Account memory _parent = _account(_account(_accountAddress).parent);
 
         bytes memory _feesAmount = Coder.encodeAssetDecrementFraction(
             _strategyMode(),
@@ -117,16 +108,16 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             _amount
         );
 
-        _increaseAdditionalBalance(accounts[_accountAddress].parent, _feesAmount);
+        _increaseAdditionalBalance(_account(_accountAddress).parent, _feesAmount);
 
         bytes memory _remainingAmount = Coder.encodeAssetDecrement(_strategyMode(), _amount, _feesAmount);
-        _increaseCashbackBalance(accounts[_accountAddress].parent, _remainingAmount);
+        _increaseCashbackBalance(_account(_accountAddress).parent, _remainingAmount);
 
         return _remainingAmount;
     }
 
     function _checkIsRootAccount(address _accountAddress) private view returns (bool) {
-        return accounts[_accountAddress].id == 1;
+        return _account(_accountAddress).id == 1;
     }
 
     function _checkParentRequiredInitialDeposit(address _accountAddress, bytes memory _amount) private view {
@@ -136,7 +127,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
             !Coder.checkAssetsEqualAmount(
                 _strategyMode(),
                 _amount,
-                _account(accounts[_accountAddress].parent).requiredInitialDeposit
+                _account(_account(_accountAddress).parent).requiredInitialDeposit
             )
         ) {
             revert IRegistry.InvalidInitialAmount();
@@ -161,8 +152,8 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         if (
             Coder.checkAssetsExceedsAmount(
                 _strategyMode(),
-                Coder.encodeAssetIncrement(_strategyMode(), accounts[_accountAddress].additionalBalance, _amount),
-                _account(accounts[_accountAddress].parent).maxDeposit
+                Coder.encodeAssetIncrement(_strategyMode(), _account(_accountAddress).additionalBalance, _amount),
+                _account(_account(_accountAddress).parent).maxDeposit
             )
         ) {
             revert IRegistry.ExceedsMaxDeposit();
@@ -170,20 +161,20 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function _increaseAdditionalBalance(address _accountAddress, bytes memory _amount) private {
-        accounts[_accountAddress]._setAdditionalBalance(
-            Coder.encodeAssetIncrement(_strategyMode(), accounts[_accountAddress].additionalBalance, _amount)
+        _account(_accountAddress)._setAdditionalBalance(
+            Coder.encodeAssetIncrement(_strategyMode(), _account(_accountAddress).additionalBalance, _amount)
         );
     }
 
     function _increaseCashbackBalance(address _accountAddress, bytes memory _amount) private {
-        accounts[_accountAddress]._setCashbackBalance(
-            Coder.encodeAssetIncrement(_strategyMode(), accounts[_accountAddress].cashbackBalance, _amount)
+        _account(_accountAddress)._setCashbackBalance(
+            Coder.encodeAssetIncrement(_strategyMode(), _account(_accountAddress).cashbackBalance, _amount)
         );
     }
 
     function _decreaseCashbackBalance(address _accountAddress, bytes memory _amount) private {
-        accounts[_accountAddress]._setCashbackBalance(
-            Coder.encodeAssetDecrement(_strategyMode(), accounts[_accountAddress].cashbackBalance, _amount)
+        _account(_accountAddress)._setCashbackBalance(
+            Coder.encodeAssetDecrement(_strategyMode(), _account(_accountAddress).cashbackBalance, _amount)
         );
     }
 
@@ -200,13 +191,13 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function _decreaseAdditionalBalance(address _accountAddress, bytes memory _amount) private {
-        accounts[_accountAddress]._setAdditionalBalance(
-            Coder.encodeAssetDecrement(_strategyMode(), accounts[_accountAddress].additionalBalance, _amount)
+        _account(_accountAddress)._setAdditionalBalance(
+            Coder.encodeAssetDecrement(_strategyMode(), _account(_accountAddress).additionalBalance, _amount)
         );
     }
 
     function _checkAdditionalBalance(address _accountAddress, bytes memory _amount) private view {
-        if (Coder.checkAssetsGreaterThanAmount(_strategyMode(), _amount, accounts[_accountAddress].additionalBalance)) {
+        if (Coder.checkAssetsGreaterThanAmount(_strategyMode(), _amount, _account(_accountAddress).additionalBalance)) {
             revert IRegistry.InsufficientAdditionalBalance();
         }
     }
@@ -219,7 +210,7 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         _decreaseInitialBalance(_accountAddress, _amount);
 
         if (!_checkIsRootAccount(_accountAddress)) {
-            _decreaseCashbackBalance(accounts[_accountAddress].parent, _amount);
+            _decreaseCashbackBalance(_account(_accountAddress).parent, _amount);
         }
 
         strategy.withdraw(_requisitor, _amount);
@@ -228,14 +219,14 @@ contract Registry is IRegistry, RegistryControl, Ownable {
     }
 
     function _checkInitialBalance(address _accountAddress, bytes memory _amount) private view {
-        if (Coder.checkAssetsGreaterThanAmount(_strategyMode(), _amount, accounts[_accountAddress].initialBalance)) {
+        if (Coder.checkAssetsGreaterThanAmount(_strategyMode(), _amount, _account(_accountAddress).initialBalance)) {
             revert IRegistry.InsufficientInitialBalance();
         }
     }
 
     function _decreaseInitialBalance(address _accountAddress, bytes memory _amount) private {
-        accounts[_accountAddress]._setAccountBalance(
-            Coder.encodeAssetDecrement(_strategyMode(), accounts[_accountAddress].initialBalance, _amount)
+        _account(_accountAddress)._setInitialBalance(
+            Coder.encodeAssetDecrement(_strategyMode(), _account(_accountAddress).initialBalance, _amount)
         );
     }
 }

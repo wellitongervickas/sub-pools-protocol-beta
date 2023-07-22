@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import {IRouter} from '../interfaces/router/IRouter.sol';
 import {RouterControl} from './RouterControl.sol';
-import {Node} from '../node/Node.sol';
+import {Node, INode} from '../node/Node.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 import {RouterPivot} from './RouterPivot.sol';
 
@@ -52,7 +52,7 @@ contract Router is IRouter, RouterPivot, RouterControl {
         bytes memory _maxDeposit,
         uint256 _lockPeriod
     ) external returns (address) {
-        Node _parent = Node(_parentAddress);
+        INode _parent = INode(_parentAddress);
 
         address _parentRegistry = _parent.registry();
         address _nodeAddress = _deployNode(address(_parent), msg.sender, _invitedAddresses, _parentRegistry);
@@ -77,17 +77,17 @@ contract Router is IRouter, RouterPivot, RouterControl {
         address _nodeAddress,
         bytes memory _additionalAmount
     ) external onlyNodeManager(_nodeAddress) {
-        _additionalDeposit(Node(_nodeAddress).registry(), _nodeAddress, _additionalAmount);
+        _additionalDeposit(INode(_nodeAddress).registry(), _nodeAddress, _additionalAmount);
     }
 
     function withdraw(address _nodeAddress, bytes memory _additionalAmount) external onlyNodeManager(_nodeAddress) {
-        _withdraw(Node(_nodeAddress).registry(), _nodeAddress, _additionalAmount);
+        _withdraw(INode(_nodeAddress).registry(), _nodeAddress, _additionalAmount);
     }
 
     function withdrawInitialBalance(
         address _nodeAddress,
         bytes memory _additionalAmount
     ) external onlyNodeManager(_nodeAddress) {
-        _withdrawInitialBalance(Node(_nodeAddress).registry(), _nodeAddress, _additionalAmount);
+        _withdrawInitialBalance(INode(_nodeAddress).registry(), _nodeAddress, _additionalAmount);
     }
 }
