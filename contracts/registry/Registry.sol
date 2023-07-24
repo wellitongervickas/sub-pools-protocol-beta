@@ -105,29 +105,9 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
         emit IRegistry.Deposited(_accountAddress, _amount);
     }
 
-    function isContract(address _address) public view returns (bool) {
-        uint32 size;
-        assembly {
-            size := extcodesize(_address)
-        }
-        return (size > 0);
-    }
-
-    function _chargeProtocolFees(bytes memory _amount) private view returns (bytes memory) {
-        if (!isContract(owner())) return _amount;
-
-        address _routerAddress = owner();
-
-        try IRouter(_routerAddress).protocolFees() returns (FractionLib.Fraction memory _fees) {
-            bytes memory _fractionAmount = _amount.toFraction(_strategyMode(), _fees.value, _fees.divider);
-            bytes memory _remainingAmount = _amount.decrement(_strategyMode(), _fractionAmount);
-
-            return _remainingAmount;
-        } catch {
-            return _amount;
-        }
-
-        // return _amount;
+    /// ToDo
+    function _chargeProtocolFees(bytes memory _amount) private pure returns (bytes memory) {
+        return _amount;
     }
 
     function _chargeParentJoinFees(address _accountAddress, bytes memory _amount) private returns (bytes memory) {

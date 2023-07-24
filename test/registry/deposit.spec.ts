@@ -1,9 +1,10 @@
 import { expect } from 'chai'
-import { loadFixture, fakeStrategySingle, registry, token, ethers } from '../fixtures'
+import { loadFixture, fakeStrategySingle, registry, token, ethers, router } from '../fixtures'
 import coderUtils from '../helpers/coder'
 import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 import { DEFAULT_MAX_DEPOSIT, DEFAULT_REQUIRED_INITIAL_AMOUNT } from '../helpers/tokens'
 import { DEFAULT_PERIOD_LOCK } from '../helpers/time'
+import { FractionLib } from './../../typechain-types/contracts/registry/Registry'
 
 describe('Registry', () => {
   describe('Deposit', () => {
@@ -46,6 +47,7 @@ describe('Registry', () => {
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
+
       const [deployer, otherAccount] = accounts
 
       const initialAmountNumber = '1000000000000000000'
@@ -192,6 +194,7 @@ describe('Registry', () => {
       const { registryContract, accounts } = await loadFixture(
         registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
       )
+
       const [deployer, managerAccount, invitedAccount] = accounts
 
       const initialAmountNumber = '1000000000000000000'
