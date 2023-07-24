@@ -187,5 +187,31 @@ describe('Router', () => {
         )
       ).to.be.revertedWithCustomError(routerContract, 'NonRegistry()')
     })
+
+    it('should revert if try to create a node without being the manager', async function () {
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
+      const [, otherAccount] = accounts
+
+      const tx = await routerContract.registry(fakeStrategyAddress)
+      const receipt = await tx.wait()
+      const [registryAddress] = receipt.logs[2].args
+
+      const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
+
+      const otherAccountRouterInstance = routerContract.connect(otherAccount) as any
+
+      await expect(
+        otherAccountRouterInstance.create(
+          registryAddress,
+          [],
+          initialAmount,
+          DEFAULT_FEES_FRACTION,
+          DEFAULT_REQUIRED_INITIAL_AMOUNT,
+          DEFAULT_MAX_DEPOSIT,
+          DEFAULT_PERIOD_LOCK
+        )
+      ).to.be.revertedWithCustomError(otherAccountRouterInstance, 'InvalidManager()')
+    })
   })
 })

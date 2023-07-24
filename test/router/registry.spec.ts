@@ -18,5 +18,18 @@ describe('Router', () => {
         .to.emit(routerContract, 'RegistryCreated')
         .withArgs(anyValue)
     })
+
+    it('should revert if try to use a registry without being the manager', async function () {
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
+      const [, otherAccount] = accounts
+
+      const otherAccountRouterInstance = routerContract.connect(otherAccount) as any
+
+      await expect(otherAccountRouterInstance.registry(fakeStrategyAddress)).to.be.revertedWithCustomError(
+        otherAccountRouterInstance,
+        'InvalidManager()'
+      )
+    })
   })
 })
