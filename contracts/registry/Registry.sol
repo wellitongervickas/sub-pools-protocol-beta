@@ -99,7 +99,7 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
         strategy.deposit(_depositor, _amount);
 
         _account(_accountAddress)._setInitialBalance(
-            _chargeProtocolFees(_chargeParentJoinFees(_accountAddress, _amount))
+            _chargeParentJoinFees(_accountAddress, _chargeProtocolFees(_amount))
         );
 
         emit IRegistry.Deposited(_accountAddress, _amount);
