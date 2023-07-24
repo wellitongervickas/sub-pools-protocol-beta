@@ -11,6 +11,9 @@ import {RegistryControl} from './RegistryControl.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 import {BytesLib, Mode} from '../libraries/Bytes.sol';
 import {Manager} from '../manager/Manager.sol';
+import {IRouter} from '../interfaces/router/IRouter.sol';
+
+import 'hardhat/console.sol';
 
 import '../libraries/Constants.sol' as Constants;
 
@@ -20,7 +23,6 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
     using BytesLib for bytes;
 
     IStrategy public immutable strategy;
-    address public immutable treasuryAddress;
 
     modifier onlyRouter() {
         _checkOwner();
@@ -57,11 +59,9 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
         _;
     }
 
-    constructor(address _strategy, address _managerAddress, address _treasuryAddress) {
+    constructor(address _strategy, address _managerAddress) {
         strategy = IStrategy(_strategy);
         _setManagerRole(_managerAddress);
-
-        treasuryAddress = _treasuryAddress;
     }
 
     function _strategyMode() private view returns (Mode) {
@@ -98,9 +98,36 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
     ) external onlyRouter checkParentRequiredInitialDeposit(_accountAddress, _amount) {
         strategy.deposit(_depositor, _amount);
 
-        _account(_accountAddress)._setInitialBalance(_chargeParentJoinFees(_accountAddress, _amount));
+        _account(_accountAddress)._setInitialBalance(
+            _chargeProtocolFees(_chargeParentJoinFees(_accountAddress, _amount))
+        );
 
         emit IRegistry.Deposited(_accountAddress, _amount);
+    }
+
+    function isContract(address _address) public view returns (bool) {
+        uint32 size;
+        assembly {
+            size := extcodesize(_address)
+        }
+        return (size > 0);
+    }
+
+    function _chargeProtocolFees(bytes memory _amount) private view returns (bytes memory) {
+        if (!isContract(owner())) return _amount;
+
+        address _routerAddress = owner();
+
+        try IRouter(_routerAddress).protocolFees() returns (FractionLib.Fraction memory _fees) {
+            bytes memory _fractionAmount = _amount.toFraction(_strategyMode(), _fees.value, _fees.divider);
+            bytes memory _remainingAmount = _amount.decrement(_strategyMode(), _fractionAmount);
+
+            return _remainingAmount;
+        } catch {
+            return _amount;
+        }
+
+        // return _amount;
     }
 
     function _chargeParentJoinFees(address _accountAddress, bytes memory _amount) private returns (bytes memory) {

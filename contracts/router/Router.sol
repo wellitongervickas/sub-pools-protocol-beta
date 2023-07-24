@@ -19,9 +19,7 @@ contract Router is IRouter, Manager, RouterPivot, RouterControl {
 
     constructor(address _managerAddress, address _treasuryAddress, FractionLib.Fraction memory _fees) {
         _setManagerRole(_managerAddress);
-
         _setTreasuryAddress(_treasuryAddress);
-
         _setProtocolFees(_fees);
     }
 
@@ -46,7 +44,7 @@ contract Router is IRouter, Manager, RouterPivot, RouterControl {
     }
 
     function registry(address _strategyAddress) external onlyManager(_strategyAddress) returns (address) {
-        return _createRegistry(_strategyAddress, msg.sender, treasuryAddress);
+        return _createRegistry(_strategyAddress, msg.sender);
     }
 
     function create(

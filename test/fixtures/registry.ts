@@ -1,13 +1,11 @@
 import { ethers } from 'hardhat'
-import { createRandomAddress } from '../helpers/address'
 
-export async function deployRegistryFixture(strategy: string) {
-  const treasuryAddress = createRandomAddress()
+export async function deployRegistryFixture(strategy: string, manager: string) {
   const accounts = await ethers.getSigners()
   const Registry = await ethers.getContractFactory('Registry')
-  const registryContract = await Registry.deploy(strategy, accounts[0].address, treasuryAddress)
+  const registryContract = await Registry.deploy(strategy, manager || accounts[0].address)
 
-  return { accounts, registryContract, treasuryAddress }
+  return { accounts, registryContract }
 }
 
 const fixtures = {

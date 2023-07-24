@@ -10,14 +10,5 @@ describe('Registry', () => {
 
       expect(strategyAddress).to.equal(fakeStrategyAddress)
     })
-
-    it('set treasury address', async function () {
-      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
-      const { registryContract, treasuryAddress } = await loadFixture(
-        registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
-      )
-
-      expect(await registryContract.treasuryAddress()).to.be.equal(treasuryAddress)
-    })
   })
 })
