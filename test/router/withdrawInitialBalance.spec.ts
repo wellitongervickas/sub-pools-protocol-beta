@@ -14,7 +14,7 @@ describe('Router', () => {
 
       const tx = await routerContract.registry(fakeStrategyAddress)
       const receipt = await tx.wait()
-      const [registryAddress] = receipt.logs[1].args
+      const [registryAddress] = receipt.logs[2].args
 
       const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
       const tx1 = await routerContract.create(
@@ -42,7 +42,7 @@ describe('Router', () => {
 
       const tx = await routerContract.registry(fakeStrategyAddress)
       const receipt = await tx.wait()
-      const [registryAddress] = receipt.logs[1].args
+      const [registryAddress] = receipt.logs[2].args
 
       const amount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
       const tx1 = await routerContract.create(
@@ -62,7 +62,7 @@ describe('Router', () => {
 
       await expect(
         otherAccountRouterInstance.withdrawInitialBalance(nodeAddress, amount)
-      ).to.be.revertedWithCustomError(otherAccountRouterInstance, 'NotNodeManager()')
+      ).to.be.revertedWithCustomError(otherAccountRouterInstance, 'InvalidManager()')
     })
   })
 })

@@ -5,8 +5,11 @@ import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {BytesLib, Mode} from '../libraries/Bytes.sol';
+import {Manager} from '../manager/Manager.sol';
 
-contract FakeStrategySingle is IStrategy {
+/// @notice This is a fake strategy for testing purposes, theres no validation rules
+
+contract FakeStrategySingle is IStrategy, Manager {
     using SafeERC20 for IERC20;
     using BytesLib for bytes;
 
@@ -15,6 +18,7 @@ contract FakeStrategySingle is IStrategy {
 
     constructor(bytes memory _token) {
         token = _token;
+        _setManagerRole(msg.sender);
     }
 
     function deposit(address _depositor, bytes memory _amount) public {

@@ -5,8 +5,6 @@ import {RegistryLib} from '../../libraries/Registry.sol';
 import {FractionLib} from '../../libraries/Fraction.sol';
 
 interface IRouter {
-    error NotNodeManager();
-
     function registry(address _strategyAddress) external returns (address);
 
     function create(

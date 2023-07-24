@@ -5,9 +5,9 @@ import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 
 import {INode} from '../interfaces/node/INode.sol';
 import {NodeControl} from './NodeControl.sol';
-import {Manager} from '../manager/Manager.sol';
+import {NodeManager} from '../node/NodeManager.sol';
 
-contract Node is INode, NodeControl, Manager, Ownable {
+contract Node is INode, NodeControl, NodeManager, Ownable {
     address public immutable parent;
     address public immutable registry;
 

@@ -10,10 +10,11 @@ import {RegistryLib} from '../libraries/Registry.sol';
 import {RegistryControl} from './RegistryControl.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 import {BytesLib, Mode} from '../libraries/Bytes.sol';
+import {Manager} from '../manager/Manager.sol';
 
 import '../libraries/Constants.sol' as Constants;
 
-contract Registry is IRegistry, RegistryControl, Ownable {
+contract Registry is IRegistry, RegistryControl, Ownable, Manager {
     using SafeERC20 for IERC20;
     using RegistryLib for RegistryLib.Account;
     using BytesLib for bytes;
@@ -55,8 +56,9 @@ contract Registry is IRegistry, RegistryControl, Ownable {
         _;
     }
 
-    constructor(address _strategy) {
+    constructor(address _strategy, address _managerAddress) {
         strategy = IStrategy(_strategy);
+        _setManagerRole(_managerAddress);
     }
 
     function _strategyMode() private view returns (Mode) {

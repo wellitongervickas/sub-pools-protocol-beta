@@ -2,9 +2,7 @@
 pragma solidity =0.8.19;
 
 interface IManager {
-    function invitedOnly() external view returns (bool);
+    error InvalidManager();
 
-    function setInvitedOnly(bool _invitedOnly) external;
-
-    function invite(address _invitedAddress) external;
+    function hasRoleManager(address _address) external view returns (bool);
 }

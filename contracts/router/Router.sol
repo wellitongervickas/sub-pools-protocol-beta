@@ -6,16 +6,16 @@ import {RouterControl} from './RouterControl.sol';
 import {Node, INode} from '../node/Node.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 import {RouterPivot} from './RouterPivot.sol';
+import {IManager} from '../manager/Manager.sol';
 
 contract Router is IRouter, RouterPivot, RouterControl {
-    modifier onlyNodeManager(address _nodeAddress) {
-        Node _node = Node(_nodeAddress);
-        if (_node.manager() != msg.sender) revert IRouter.NotNodeManager();
+    modifier onlyManager(address _address) {
+        if (!IManager(_address).hasRoleManager(msg.sender)) revert IManager.InvalidManager();
         _;
     }
 
-    function registry(address _strategyAddress) external returns (address) {
-        return _createRegistry(_strategyAddress);
+    function registry(address _strategyAddress) external onlyManager(_strategyAddress) returns (address) {
+        return _createRegistry(_strategyAddress, msg.sender);
     }
 
     function create(
@@ -26,7 +26,7 @@ contract Router is IRouter, RouterPivot, RouterControl {
         bytes memory _requiredInitialDeposit,
         bytes memory _maxDeposit,
         uint256 _lockPeriod
-    ) external onlyValidRegistry(_registryAddress) returns (address) {
+    ) external onlyValidRegistry(_registryAddress) onlyManager(_registryAddress) returns (address) {
         address _nodeAddress = _createRootNode(_registryAddress, _invitedAddresses);
 
         _setupAccount(
@@ -76,18 +76,18 @@ contract Router is IRouter, RouterPivot, RouterControl {
     function additionalDeposit(
         address _nodeAddress,
         bytes memory _additionalAmount
-    ) external onlyNodeManager(_nodeAddress) {
+    ) external onlyManager(_nodeAddress) {
         _additionalDeposit(INode(_nodeAddress).registry(), _nodeAddress, _additionalAmount);
     }
 
-    function withdraw(address _nodeAddress, bytes memory _additionalAmount) external onlyNodeManager(_nodeAddress) {
+    function withdraw(address _nodeAddress, bytes memory _additionalAmount) external onlyManager(_nodeAddress) {
         _withdraw(INode(_nodeAddress).registry(), _nodeAddress, _additionalAmount);
     }
 
     function withdrawInitialBalance(
         address _nodeAddress,
         bytes memory _additionalAmount
-    ) external onlyNodeManager(_nodeAddress) {
+    ) external onlyManager(_nodeAddress) {
         _withdrawInitialBalance(INode(_nodeAddress).registry(), _nodeAddress, _additionalAmount);
     }
 }

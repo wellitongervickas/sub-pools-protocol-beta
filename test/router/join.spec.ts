@@ -14,7 +14,7 @@ describe('Router', () => {
 
       const tx = await routerContract.registry(fakeStrategyAddress)
       const receipt = await tx.wait()
-      const [registryAddress] = receipt.logs[1].args
+      const [registryAddress] = receipt.logs[2].args
 
       const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
@@ -52,7 +52,7 @@ describe('Router', () => {
 
       const tx = await routerContract.registry(fakeStrategyAddress)
       const receipt = await tx.wait()
-      const [registryAddress] = receipt.logs[1].args
+      const [registryAddress] = receipt.logs[2].args
 
       const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
@@ -94,7 +94,7 @@ describe('Router', () => {
 
       const tx = await routerContract.registry(fakeStrategyAddress)
       const receipt = await tx.wait()
-      const [registryAddress] = receipt.logs[1].args
+      const [registryAddress] = receipt.logs[2].args
 
       const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
@@ -136,7 +136,7 @@ describe('Router', () => {
 
       const tx = await routerContract.registry(fakeStrategyAddress)
       const receipt = await tx.wait()
-      const [registryAddress] = receipt.logs[1].args
+      const [registryAddress] = receipt.logs[2].args
 
       const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
@@ -176,7 +176,7 @@ describe('Router', () => {
 
       const tx = await routerContract.registry(fakeStrategyAddress)
       const receipt = await tx.wait()
-      const [registryAddress] = receipt.logs[1].args
+      const [registryAddress] = receipt.logs[2].args
 
       const initialAmount = coderUtils.build(['0'], ['uint256']) // bypass allowance check
 
