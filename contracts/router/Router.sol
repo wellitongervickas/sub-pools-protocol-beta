@@ -6,12 +6,27 @@ import {RouterControl} from './RouterControl.sol';
 import {Node, INode} from '../node/Node.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 import {RouterPivot} from './RouterPivot.sol';
-import {IManager} from '../manager/Manager.sol';
+import {Manager, IManager} from '../manager/Manager.sol';
 
-contract Router is IRouter, RouterPivot, RouterControl {
+contract Router is IRouter, Manager, RouterPivot, RouterControl {
+    address public treasury;
+
     modifier onlyManager(address _address) {
         if (!IManager(_address).hasRoleManager(msg.sender)) revert IManager.InvalidManager();
         _;
+    }
+
+    constructor(address _managerAddress, address _treasuryAddress) {
+        _setManagerRole(_managerAddress);
+        _setTreasury(_treasuryAddress);
+    }
+
+    function setTreasury(address _treasuryAddress) external onlyManager(address(this)) {
+        _setTreasury(_treasuryAddress);
+    }
+
+    function _setTreasury(address _treasuryAddress) private {
+        treasury = _treasuryAddress;
     }
 
     function registry(address _strategyAddress) external onlyManager(_strategyAddress) returns (address) {
