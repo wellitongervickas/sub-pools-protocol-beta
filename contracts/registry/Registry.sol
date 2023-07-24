@@ -20,6 +20,7 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
     using BytesLib for bytes;
 
     IStrategy public immutable strategy;
+    address public immutable treasuryAddress;
 
     modifier onlyRouter() {
         _checkOwner();
@@ -56,9 +57,11 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
         _;
     }
 
-    constructor(address _strategy, address _managerAddress) {
+    constructor(address _strategy, address _managerAddress, address _treasuryAddress) {
         strategy = IStrategy(_strategy);
         _setManagerRole(_managerAddress);
+
+        treasuryAddress = _treasuryAddress;
     }
 
     function _strategyMode() private view returns (Mode) {

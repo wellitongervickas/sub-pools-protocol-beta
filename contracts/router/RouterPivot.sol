@@ -17,8 +17,12 @@ contract RouterPivot is IRouterPivot {
         if (!registries[_registryAddress]) revert IRouterPivot.NonRegistry();
     }
 
-    function _createRegistry(address _strategyAddress, address _managerAddress) internal returns (address) {
-        address _registryAddress = address(new Registry(_strategyAddress, _managerAddress));
+    function _createRegistry(
+        address _strategyAddress,
+        address _managerAddress,
+        address _treasuryAddress
+    ) internal returns (address) {
+        address _registryAddress = address(new Registry(_strategyAddress, _managerAddress, _treasuryAddress));
 
         emit IRouterPivot.RegistryCreated(_registryAddress);
 

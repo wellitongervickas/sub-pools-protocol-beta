@@ -9,28 +9,44 @@ import {RouterPivot} from './RouterPivot.sol';
 import {Manager, IManager} from '../manager/Manager.sol';
 
 contract Router is IRouter, Manager, RouterPivot, RouterControl {
-    address public treasury;
+    address public treasuryAddress;
+    FractionLib.Fraction private _protocolFees;
 
     modifier onlyManager(address _address) {
         if (!IManager(_address).hasRoleManager(msg.sender)) revert IManager.InvalidManager();
         _;
     }
 
-    constructor(address _managerAddress, address _treasuryAddress) {
+    constructor(address _managerAddress, address _treasuryAddress, FractionLib.Fraction memory _fees) {
         _setManagerRole(_managerAddress);
-        _setTreasury(_treasuryAddress);
+
+        _setTreasuryAddress(_treasuryAddress);
+
+        _setProtocolFees(_fees);
     }
 
-    function setTreasury(address _treasuryAddress) external onlyManager(address(this)) {
-        _setTreasury(_treasuryAddress);
+    function setTreasuryAddress(address _treasuryAddress) external onlyManager(address(this)) {
+        _setTreasuryAddress(_treasuryAddress);
     }
 
-    function _setTreasury(address _treasuryAddress) private {
-        treasury = _treasuryAddress;
+    function _setTreasuryAddress(address _treasuryAddress) private {
+        treasuryAddress = _treasuryAddress;
+    }
+
+    function setProtocolFees(FractionLib.Fraction memory _fees) external onlyManager(address(this)) {
+        _setProtocolFees(_fees);
+    }
+
+    function _setProtocolFees(FractionLib.Fraction memory _fees) private {
+        _protocolFees = _fees;
+    }
+
+    function protocolFees() external view returns (FractionLib.Fraction memory) {
+        return _protocolFees;
     }
 
     function registry(address _strategyAddress) external onlyManager(_strategyAddress) returns (address) {
-        return _createRegistry(_strategyAddress, msg.sender);
+        return _createRegistry(_strategyAddress, msg.sender, treasuryAddress);
     }
 
     function create(

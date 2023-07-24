@@ -5,6 +5,14 @@ import {RegistryLib} from '../../libraries/Registry.sol';
 import {FractionLib} from '../../libraries/Fraction.sol';
 
 interface IRouter {
+    function treasuryAddress() external view returns (address);
+
+    function setTreasuryAddress(address _treasuryAddress) external;
+
+    function protocolFees() external view returns (FractionLib.Fraction memory);
+
+    function setProtocolFees(FractionLib.Fraction memory _fees) external;
+
     function registry(address _strategyAddress) external returns (address);
 
     function create(

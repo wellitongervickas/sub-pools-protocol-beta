@@ -1,5 +1,7 @@
 import { expect } from 'chai'
-import { router, loadFixture } from '../fixtures'
+import { router, loadFixture, ethers } from '../fixtures'
+import { FractionLib } from './../../typechain-types/contracts/registry/Registry'
+import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
 
 describe('Router', () => {
   describe('Deploy', () => {
@@ -14,19 +16,16 @@ describe('Router', () => {
     it('should set treasury address', async function () {
       const { routerContract, treasuryAddress } = await loadFixture(router.deployRouterFixture)
 
-      expect(await routerContract.treasury()).to.be.equal(treasuryAddress)
+      expect(await routerContract.treasuryAddress()).to.be.equal(treasuryAddress)
     })
 
-    it('should revert if try to change treansury address without being the manager', async function () {
-      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
-      const [, otherAccount] = accounts
+    it('should set protocol fees', async function () {
+      const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-      const otherAccountRouterInstance = routerContract.connect(otherAccount) as any
-
-      await expect(otherAccountRouterInstance.setTreasury(otherAccount.address)).to.be.revertedWithCustomError(
-        otherAccountRouterInstance,
-        'InvalidManager()'
-      )
+      expect(await routerContract.protocolFees()).to.be.deep.equal([
+        DEFAULT_FEES_FRACTION.value,
+        DEFAULT_FEES_FRACTION.divider,
+      ])
     })
   })
 })
