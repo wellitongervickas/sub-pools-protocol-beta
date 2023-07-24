@@ -2,11 +2,10 @@
 pragma solidity =0.8.19;
 
 import '@openzeppelin/contracts/utils/Counters.sol';
-import {IRegistryControl} from '../interfaces/registry/IRegistryControl.sol';
 import {RegistryLib} from '../libraries/Registry.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 
-contract RegistryControl is IRegistryControl {
+contract RegistryControl {
     using RegistryLib for RegistryLib.Account;
     using Counters for Counters.Counter;
 
