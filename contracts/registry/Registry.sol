@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
+import '../libraries/Constants.sol' as Constants;
+
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
@@ -12,10 +14,7 @@ import {FractionLib} from '../libraries/Fraction.sol';
 import {BytesLib, Mode} from '../libraries/Bytes.sol';
 import {Manager} from '../manager/Manager.sol';
 import {IRouter} from '../interfaces/router/IRouter.sol';
-
-import 'hardhat/console.sol';
-
-import '../libraries/Constants.sol' as Constants;
+import {IProtocol} from '../interfaces/fee/IProtocol.sol';
 
 contract Registry is IRegistry, RegistryControl, Ownable, Manager {
     using SafeERC20 for IERC20;
@@ -23,6 +22,7 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
     using BytesLib for bytes;
 
     IStrategy public immutable strategy;
+    IProtocol public immutable override protocol;
 
     modifier onlyRouter() {
         _checkOwner();
@@ -63,9 +63,11 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
         _;
     }
 
-    constructor(address _strategy, address _managerAddress) {
+    constructor(address _strategy, address _managerAddress, IProtocol _protocol) {
         strategy = IStrategy(_strategy);
         _setManagerRole(_managerAddress);
+
+        protocol = _protocol;
     }
 
     function _strategyMode() private view returns (Mode) {

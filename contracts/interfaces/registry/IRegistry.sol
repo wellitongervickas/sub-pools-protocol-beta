@@ -2,6 +2,7 @@
 pragma solidity =0.8.19;
 
 import {FractionLib} from '../../libraries/Fraction.sol';
+import {IProtocol} from '../fee/IProtocol.sol';
 
 interface IRegistry {
     event Joined(address indexed _accountAddress);
@@ -14,6 +15,8 @@ interface IRegistry {
     error InsufficientAdditionalBalance();
     error InsufficientInitialBalance();
     error LockPeriod();
+
+    function protocol() external view returns (IProtocol);
 
     function join(
         address _parentAddress,

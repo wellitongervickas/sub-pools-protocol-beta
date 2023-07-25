@@ -7,44 +7,27 @@ import {Node, INode} from '../node/Node.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
 import {RouterPivot} from './RouterPivot.sol';
 import {Manager, IManager} from '../manager/Manager.sol';
+import {IProtocol} from '../interfaces/fee/IProtocol.sol';
 
-contract Router is IRouter, Manager, RouterPivot, RouterControl {
-    address public treasuryAddress;
-    FractionLib.Fraction private _protocolFees;
+contract Router is IRouter, RouterPivot, Manager, RouterControl {
+    IProtocol public override protocol;
 
     modifier onlyManager(address _address) {
         if (!IManager(_address).hasRoleManager(msg.sender)) revert IManager.InvalidManager();
         _;
     }
 
-    constructor(address _managerAddress, address _treasuryAddress, FractionLib.Fraction memory _fees) {
-        _setManagerRole(_managerAddress);
-        _setTreasuryAddress(_treasuryAddress);
-        _setProtocolFees(_fees);
-    }
-
-    function setTreasuryAddress(address _treasuryAddress) external onlyManager(address(this)) {
-        _setTreasuryAddress(_treasuryAddress);
-    }
-
-    function _setTreasuryAddress(address _treasuryAddress) private {
-        treasuryAddress = _treasuryAddress;
-    }
-
-    function setProtocolFees(FractionLib.Fraction memory _fees) external onlyManager(address(this)) {
-        _setProtocolFees(_fees);
-    }
-
-    function _setProtocolFees(FractionLib.Fraction memory _fees) private {
-        _protocolFees = _fees;
-    }
-
-    function protocolFees() external view returns (FractionLib.Fraction memory) {
-        return _protocolFees;
+    constructor(IProtocol _protocol) {
+        protocol = _protocol;
+        _setManagerRole(msg.sender);
     }
 
     function registry(address _strategyAddress) external onlyManager(_strategyAddress) returns (address) {
-        return _createRegistry(_strategyAddress, msg.sender);
+        return _createRegistry(_strategyAddress, msg.sender, protocol);
+    }
+
+    function setProtocol(IProtocol _protocol) external onlyManager(address(this)) {
+        protocol = _protocol;
     }
 
     function create(

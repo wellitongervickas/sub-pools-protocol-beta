@@ -3,15 +3,12 @@ pragma solidity =0.8.19;
 
 import {RegistryLib} from '../../libraries/Registry.sol';
 import {FractionLib} from '../../libraries/Fraction.sol';
+import {IProtocol} from '../fee/IProtocol.sol';
 
 interface IRouter {
-    function treasuryAddress() external view returns (address);
+    function protocol() external view returns (IProtocol);
 
-    function setTreasuryAddress(address _treasuryAddress) external;
-
-    function protocolFees() external view returns (FractionLib.Fraction memory);
-
-    function setProtocolFees(FractionLib.Fraction memory _fees) external;
+    function setProtocol(IProtocol _protocol) external;
 
     function registry(address _strategyAddress) external returns (address);
 

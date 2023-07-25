@@ -1,7 +1,5 @@
 import { expect } from 'chai'
-import { router, loadFixture, ethers } from '../fixtures'
-import { FractionLib } from './../../typechain-types/contracts/registry/Registry'
-import { DEFAULT_FEES_FRACTION } from '../helpers/fees'
+import { router, loadFixture } from '../fixtures'
 
 describe('Router', () => {
   describe('Deploy', () => {
@@ -13,19 +11,9 @@ describe('Router', () => {
       expect(await routerContract.hasRoleManager(manager.address)).to.be.true
     })
 
-    it('should set treasury address', async function () {
-      const { routerContract, treasuryAddress } = await loadFixture(router.deployRouterFixture)
-
-      expect(await routerContract.treasuryAddress()).to.be.equal(treasuryAddress)
-    })
-
     it('should set protocol fees', async function () {
-      const { routerContract } = await loadFixture(router.deployRouterFixture)
-
-      expect(await routerContract.protocolFees()).to.be.deep.equal([
-        DEFAULT_FEES_FRACTION.value,
-        DEFAULT_FEES_FRACTION.divider,
-      ])
+      const { routerContract, protocolAddress } = await loadFixture(router.deployRouterFixture)
+      expect(await routerContract.protocol()).to.be.equal(protocolAddress)
     })
   })
 })

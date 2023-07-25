@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import {IRouterPivot} from '../interfaces/router/IRouterPivot.sol';
 import {Registry, IRegistry} from '../registry/Registry.sol';
 import {FractionLib} from '../libraries/Fraction.sol';
+import {IProtocol} from '../interfaces/fee/IProtocol.sol';
 
 contract RouterPivot is IRouterPivot {
     mapping(address => bool) public registries;
@@ -17,8 +18,12 @@ contract RouterPivot is IRouterPivot {
         if (!registries[_registryAddress]) revert IRouterPivot.NonRegistry();
     }
 
-    function _createRegistry(address _strategyAddress, address _managerAddress) internal returns (address) {
-        address _registryAddress = address(new Registry(_strategyAddress, _managerAddress));
+    function _createRegistry(
+        address _strategyAddress,
+        address _managerAddress,
+        IProtocol _protocol
+    ) internal returns (address) {
+        address _registryAddress = address(new Registry(_strategyAddress, _managerAddress, _protocol));
 
         emit IRouterPivot.RegistryCreated(_registryAddress);
 
