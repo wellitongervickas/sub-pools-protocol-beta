@@ -111,9 +111,13 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
         emit IRegistry.Deposited(_accountAddress, _amount);
     }
 
-    /// ToDo
-    function _chargeProtocolFees(bytes memory _amount) private pure returns (bytes memory) {
-        return _amount;
+    function _chargeProtocolFees(bytes memory _amount) private returns (bytes memory) {
+        FractionLib.Fraction memory _protocolFees = protocol.protocolFees();
+        bytes memory _feesAmount = _amount.toFraction(_strategyMode(), _protocolFees.value, _protocolFees.divider);
+
+        strategy.withdraw(protocol.treasuryAddress(), _feesAmount);
+
+        return _amount.decrement(_strategyMode(), _feesAmount);
     }
 
     function _chargeParentJoinFees(address _accountAddress, bytes memory _amount) private returns (bytes memory) {
