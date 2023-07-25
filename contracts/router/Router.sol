@@ -85,21 +85,15 @@ contract Router is IRouter, RouterPivot, Manager, RouterControl {
         return _nodeAddress;
     }
 
-    function additionalDeposit(
-        address _nodeAddress,
-        bytes memory _additionalAmount
-    ) external onlyManager(_nodeAddress) {
-        _additionalDeposit(INode(_nodeAddress).registry(), _nodeAddress, _additionalAmount);
+    function additionalDeposit(address _nodeAddress, bytes memory _amount) external onlyManager(_nodeAddress) {
+        _additionalDeposit(INode(_nodeAddress).registry(), _nodeAddress, _amount);
     }
 
-    function withdraw(address _nodeAddress, bytes memory _additionalAmount) external onlyManager(_nodeAddress) {
-        _withdraw(INode(_nodeAddress).registry(), _nodeAddress, _additionalAmount);
+    function withdraw(address _nodeAddress, bytes memory _amount) external onlyManager(_nodeAddress) {
+        _withdraw(INode(_nodeAddress).registry(), _nodeAddress, _amount);
     }
 
-    function withdrawInitialBalance(
-        address _nodeAddress,
-        bytes memory _additionalAmount
-    ) external onlyManager(_nodeAddress) {
-        _withdrawInitialBalance(INode(_nodeAddress).registry(), _nodeAddress, _additionalAmount);
+    function withdrawInitialBalance(address _nodeAddress, bytes memory _amount) external onlyManager(_nodeAddress) {
+        _withdrawInitialBalance(INode(_nodeAddress).registry(), _nodeAddress, _amount);
     }
 }
