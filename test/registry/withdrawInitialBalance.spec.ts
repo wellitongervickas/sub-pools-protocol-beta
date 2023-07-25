@@ -247,5 +247,55 @@ describe('Registry', () => {
         otherAccountRegistryContract.withdrawInitialBalance(otherAccount.address, otherAccount.address, initialAmount)
       ).to.be.rejectedWith('Ownable: caller is not the owner')
     })
+    it('should revert if try to withdraw initial balance as root in lock period', async function () {
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+
+      const { registryContract, accounts } = await loadFixture(
+        registry.deployRegistryFixture.bind(this, fakeStrategyAddress)
+      )
+      const [deployer, managerAccount, invitedAccount] = accounts
+
+      const initialAmountNumber = '1000000000000000000'
+      const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
+      const withdrewAmountNumber = '995000000000000000'
+      const withdrewAmount = coderUtils.build([withdrewAmountNumber], ['uint256'])
+
+      const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60
+      const unlockTime = (await time.latest()) + ONE_YEAR_IN_SECS
+
+      const accountFees = {
+        value: ethers.toBigInt(1),
+        divider: ethers.toBigInt(200),
+      }
+
+      await registryContract.join(
+        deployer.address,
+        managerAccount.address,
+        accountFees,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT,
+        unlockTime
+      )
+
+      await registryContract.join(
+        managerAccount.address,
+        invitedAccount.address,
+        accountFees,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
+      )
+
+      await tokenContract.transfer(invitedAccount.address, initialAmountNumber)
+
+      const invitedAccountTokenContract = tokenContract.connect(invitedAccount) as any
+      await invitedAccountTokenContract.approve(fakeStrategyAddress, initialAmount)
+
+      await registryContract.deposit(invitedAccount.address, invitedAccount.address, initialAmount)
+      await expect(
+        registryContract.withdrawInitialBalance(managerAccount.address, invitedAccount.address, withdrewAmount)
+      ).to.be.revertedWithCustomError(registryContract, 'LockPeriod()')
+    })
   })
 })

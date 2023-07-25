@@ -54,7 +54,11 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
         _;
     }
 
-    modifier onlyParentUnlockedPeriod(address _accountAddress) {
+    modifier onlyUnlockPeriod(address _accountAddress) {
+        if (_checkIsRootAccount(_accountAddress) && _account(_accountAddress)._isLocked()) {
+            revert IRegistry.LockPeriod();
+        }
+
         if (_account(_account(_accountAddress).parent)._isLocked()) revert IRegistry.LockPeriod();
         _;
     }
@@ -212,7 +216,7 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
         address _requisitor,
         address _accountAddress,
         bytes memory _amount
-    ) external onlyRouter onlyParentUnlockedPeriod(_accountAddress) checkInitialBalance(_accountAddress, _amount) {
+    ) external onlyRouter onlyUnlockPeriod(_accountAddress) checkInitialBalance(_accountAddress, _amount) {
         _decreaseInitialBalance(_accountAddress, _amount);
 
         if (!_checkIsRootAccount(_accountAddress)) {
