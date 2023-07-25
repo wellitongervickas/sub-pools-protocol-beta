@@ -294,7 +294,7 @@ describe('Registry', () => {
 
       await registryContract.deposit(invitedAccount.address, invitedAccount.address, initialAmount)
       await expect(
-        registryContract.withdrawInitialBalance(managerAccount.address, invitedAccount.address, withdrewAmount)
+        registryContract.withdrawInitialBalance(managerAccount.address, managerAccount.address, withdrewAmount)
       ).to.be.revertedWithCustomError(registryContract, 'LockPeriod()')
     })
   })
