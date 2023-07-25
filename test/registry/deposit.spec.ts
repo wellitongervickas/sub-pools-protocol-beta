@@ -295,7 +295,7 @@ describe('Registry', () => {
       ).to.be.revertedWithCustomError(registryContract, 'InvalidInitialAmount()')
     })
 
-    it('should decrement amount from protocol fees on deposit', async function () {
+    it('should decrement amount to protocol fees on deposit', async function () {
       const { tokenContract } = await loadFixture(token.deployTokenFixture)
       const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
 
@@ -323,14 +323,12 @@ describe('Registry', () => {
       )
 
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
-
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
       await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmount)
-
       await registryContract.deposit(otherAccount.address, otherAccount.address, initialAmount)
-      const [, initialBalance] = await registryContract.accounts(otherAccount.address)
 
-      expect(initialBalance).to.be.deep.equal(ethers.toBigInt('925000000000000000'))
+      const [, initialBalance] = await registryContract.accounts(otherAccount.address)
+      expect(initialBalance).to.be.equal(coderUtils.build(['925000000000000000'], ['uint256']))
     })
 
     it('should transfer to treasury when charge protocol fees on deposit', async function () {
@@ -361,12 +359,11 @@ describe('Registry', () => {
       )
 
       await tokenContract.transfer(otherAccount.address, initialAmountNumber)
-
       const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
       await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmount)
-
       await registryContract.deposit(otherAccount.address, otherAccount.address, initialAmount)
-      expect(await tokenContract.balanceOf(treasuryAddrees)).to.be.deep.equal(ethers.toBigInt('75000000000000000'))
+
+      expect(await tokenContract.balanceOf(treasuryAddrees)).to.be.equal(ethers.toBigInt('75000000000000000'))
     })
   })
 })

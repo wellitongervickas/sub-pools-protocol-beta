@@ -231,5 +231,77 @@ describe('Registry', () => {
         registryContract.additionalDeposit(invitedAccount.address, invitedAccount.address, amount)
       ).to.be.revertedWithCustomError(registryContract, 'ExceedsMaxDeposit()')
     })
+
+    it('should decrement amount to protocol fees on additional deposit', async function () {
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+
+      const fees = {
+        value: ethers.toBigInt(15),
+        divider: ethers.toBigInt(200),
+      }
+
+      const { registryContract, accounts } = await loadFixture(
+        registry.deployRegistryFixture.bind(this, fakeStrategyAddress, fees)
+      )
+
+      const [deployer, otherAccount] = accounts
+
+      const initialAmountNumber = '1000000000000000000'
+      const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
+
+      await registryContract.join(
+        deployer.address,
+        otherAccount.address,
+        DEFAULT_FEES_FRACTION,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
+      )
+
+      await tokenContract.transfer(otherAccount.address, initialAmountNumber)
+      const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
+      await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmount)
+      await registryContract.additionalDeposit(otherAccount.address, otherAccount.address, initialAmount)
+
+      const [, , additionalBalance] = await registryContract.accounts(otherAccount.address)
+      expect(additionalBalance).to.be.equal(coderUtils.build(['925000000000000000'], ['uint256']))
+    })
+
+    it('should transfer to treasury when charge protocol fees on additional deposit', async function () {
+      const { tokenContract } = await loadFixture(token.deployTokenFixture)
+      const { fakeStrategyAddress } = await loadFixture(fakeStrategySingle.deployFakeStrategySingleFixture)
+
+      const fees = {
+        value: ethers.toBigInt(15),
+        divider: ethers.toBigInt(200),
+      }
+
+      const { registryContract, accounts, treasuryAddrees } = await loadFixture(
+        registry.deployRegistryFixture.bind(this, fakeStrategyAddress, fees)
+      )
+
+      const [deployer, otherAccount] = accounts
+
+      const initialAmountNumber = '1000000000000000000'
+      const initialAmount = coderUtils.build([initialAmountNumber], ['uint256'])
+
+      await registryContract.join(
+        deployer.address,
+        otherAccount.address,
+        DEFAULT_FEES_FRACTION,
+        DEFAULT_REQUIRED_INITIAL_AMOUNT,
+        DEFAULT_MAX_DEPOSIT,
+        DEFAULT_PERIOD_LOCK
+      )
+
+      await tokenContract.transfer(otherAccount.address, initialAmountNumber)
+
+      const otherAccountTokenContract = tokenContract.connect(otherAccount) as any
+      await otherAccountTokenContract.approve(fakeStrategyAddress, initialAmount)
+
+      await registryContract.additionalDeposit(otherAccount.address, otherAccount.address, initialAmount)
+      expect(await tokenContract.balanceOf(treasuryAddrees)).to.be.deep.equal(ethers.toBigInt('75000000000000000'))
+    })
   })
 })

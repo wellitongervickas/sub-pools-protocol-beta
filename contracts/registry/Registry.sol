@@ -158,7 +158,7 @@ contract Registry is IRegistry, RegistryControl, Ownable, Manager {
     ) external onlyRouter checkParentMaxDeposit(_accountAddress, _amount) {
         strategy.deposit(_depositor, _amount);
 
-        _increaseAdditionalBalance(_accountAddress, _amount);
+        _increaseAdditionalBalance(_accountAddress, _chargeProtocolFees(_amount));
 
         emit IRegistry.Deposited(_accountAddress, _amount);
     }
