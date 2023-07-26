@@ -6,8 +6,8 @@ import {IProtocol} from '../fee/IProtocol.sol';
 
 interface IRegistry {
     event Joined(address indexed _accountAddress);
-    event Deposited(address indexed _accountAddress, bytes _amount);
-    event Withdrew(address indexed _accountAddress, bytes _amount);
+    // event Deposited(address indexed _accountAddress, bytes _amount);
+    // event Withdrew(address indexed _accountAddress, bytes _amount);
 
     error AlreadyJoined();
     error InvalidInitialAmount();

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import '../libraries/Constants.sol' as Constants;
+import '../libraries/Constants.sol' as CONSTATNS;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {IRegistry} from '../interfaces/registry/IRegistry.sol';
@@ -73,12 +73,12 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
     ) public onlyRouter whenNotAccount(_accountAddress) {
         _setupAccount(
             _accountAddress,
-            Constants.DEFAULT_INITIAL_BALANCE(strategyMode()),
-            Constants.DEFAULT_ADDITIONAL_BALANCE(strategyMode()),
+            CONSTATNS.DEFAULT_INITIAL_BALANCE(strategyMode()),
+            CONSTATNS.DEFAULT_ADDITIONAL_BALANCE(strategyMode()),
             _fees,
             _parentAddress,
             _requiredInitialDeposit,
-            Constants.DEFAULT_CASHBACK_BALANCE(strategyMode()),
+            CONSTATNS.DEFAULT_CASHBACK_BALANCE(strategyMode()),
             _maxDeposit,
             _lockPeriod
         );
@@ -96,8 +96,6 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
         _account(_accountAddress)._setInitialBalance(
             _chargeParentJoinFees(_accountAddress, _chargeProtocolFees(_amount))
         );
-
-        emit IRegistry.Deposited(_accountAddress, _amount);
     }
 
     function _chargeProtocolFees(bytes memory _amount) private returns (bytes memory) {
@@ -145,8 +143,6 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
         _deposit(_depositor, _amount);
 
         _increaseAdditionalBalance(_accountAddress, _chargeProtocolFees(_amount));
-
-        emit IRegistry.Deposited(_accountAddress, _amount);
     }
 
     function _checkParentMaxDeposit(address _accountAddress, bytes memory _amount) private view {
@@ -186,10 +182,7 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
         bytes memory _amount
     ) external onlyRouter checkAdditionalBalance(_accountAddress, _amount) {
         _decreaseAdditionalBalance(_accountAddress, _amount);
-
         _withdraw(_requisitor, _amount);
-
-        emit IRegistry.Withdrew(_accountAddress, _amount);
     }
 
     function _decreaseAdditionalBalance(address _accountAddress, bytes memory _amount) private {
@@ -216,8 +209,6 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
         }
 
         _withdraw(_requisitor, _amount);
-
-        emit IRegistry.Withdrew(_accountAddress, _amount);
     }
 
     function _checkInitialBalance(address _accountAddress, bytes memory _amount) private view {

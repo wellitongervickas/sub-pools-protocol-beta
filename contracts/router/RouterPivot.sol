@@ -58,16 +58,16 @@ contract RouterPivot is IRouterPivot {
 
     function _additionalDeposit(address _registryAddress, address _nodeAddress, bytes memory _initialAmount) internal {
         IRegistry(_registryAddress).additionalDeposit(msg.sender, _nodeAddress, _initialAmount);
-        emit RegistryDeposited(_registryAddress, _nodeAddress, _initialAmount);
+        emit IRouterPivot.RegistryDeposited(_registryAddress, _nodeAddress, _initialAmount);
     }
 
     function _withdraw(address _registryAddress, address _nodeAddress, bytes memory _amount) internal {
         IRegistry(_registryAddress).withdraw(msg.sender, _nodeAddress, _amount);
-        emit RegistryWithdrew(_registryAddress, _nodeAddress, _amount);
+        emit IRouterPivot.RegistryWithdrew(_registryAddress, _nodeAddress, _amount);
     }
 
     function _withdrawInitialBalance(address _registryAddress, address _nodeAddress, bytes memory _amount) internal {
         IRegistry(_registryAddress).withdrawInitialBalance(msg.sender, _nodeAddress, _amount);
-        emit RegistryWithdrew(_registryAddress, _nodeAddress, _amount);
+        emit IRouterPivot.RegistryWithdrew(_registryAddress, _nodeAddress, _amount);
     }
 }

@@ -8,8 +8,8 @@ import {NodeControl} from './NodeControl.sol';
 import {NodeManager} from '../node/NodeManager.sol';
 
 contract Node is INode, NodeControl, NodeManager, Ownable {
-    address public immutable parent;
-    address public immutable registry;
+    address public immutable override parent;
+    address public immutable override registry;
 
     constructor(
         address _parentAddress,

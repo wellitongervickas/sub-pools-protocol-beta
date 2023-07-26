@@ -10,7 +10,7 @@ contract NodeManager is INodeManager, Manager {
 
     INodeManager.Manager public manager;
 
-    bool public invitedOnly = true;
+    bool public override invitedOnly = true;
 
     modifier checkInvitation(address _invitedAddress) {
         bool _isInvited = hasInvitedRole(_invitedAddress);
