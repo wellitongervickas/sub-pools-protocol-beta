@@ -2,9 +2,10 @@
 pragma solidity =0.8.19;
 
 import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
+import {IRegistryPivot} from '../interfaces/registry/IRegistryPivot.sol';
 import {Mode} from '../libraries/Bytes.sol';
 
-contract RegistryPivot {
+contract RegistryPivot is IRegistryPivot {
     IStrategy public immutable strategy;
 
     constructor(address _strategy) {
