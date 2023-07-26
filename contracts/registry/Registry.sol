@@ -91,7 +91,7 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
         address _accountAddress,
         bytes memory _amount
     ) external onlyRouter checkParentRequiredInitialDeposit(_accountAddress, _amount) {
-        _deposit(_depositor, _amount);
+        _strategyDeposit(_depositor, _amount);
 
         _account(_accountAddress)._setInitialBalance(
             _chargeParentJoinFees(_accountAddress, _chargeProtocolFees(_amount))
@@ -102,7 +102,7 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
         FractionLib.Fraction memory _protocolFees = protocol.protocolFees();
         bytes memory _feesAmount = _amount.toFraction(strategyMode(), _protocolFees.value, _protocolFees.divider);
 
-        _withdraw(protocol.treasuryAddress(), _feesAmount);
+        _strategyWithdraw(protocol.treasuryAddress(), _feesAmount);
 
         return _amount.decrement(strategyMode(), _feesAmount);
     }
@@ -140,7 +140,7 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
         address _accountAddress,
         bytes memory _amount
     ) external onlyRouter checkParentMaxDeposit(_accountAddress, _amount) {
-        _deposit(_depositor, _amount);
+        _strategyDeposit(_depositor, _amount);
 
         _increaseAdditionalBalance(_accountAddress, _chargeProtocolFees(_amount));
     }
@@ -182,7 +182,7 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
         bytes memory _amount
     ) external onlyRouter checkAdditionalBalance(_accountAddress, _amount) {
         _decreaseAdditionalBalance(_accountAddress, _amount);
-        _withdraw(_requisitor, _amount);
+        _strategyWithdraw(_requisitor, _amount);
     }
 
     function _decreaseAdditionalBalance(address _accountAddress, bytes memory _amount) private {
@@ -208,7 +208,7 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
             _decreaseCashbackBalance(_account(_accountAddress).parent, _amount);
         }
 
-        _withdraw(_requisitor, _amount);
+        _strategyWithdraw(_requisitor, _amount);
     }
 
     function _checkInitialBalance(address _accountAddress, bytes memory _amount) private view {

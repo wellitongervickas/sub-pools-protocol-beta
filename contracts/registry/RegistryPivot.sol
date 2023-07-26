@@ -16,13 +16,13 @@ contract RegistryPivot is IRegistryPivot {
         return strategy.mode();
     }
 
-    function _deposit(address _depositor, bytes memory _amount) internal {
+    function _strategyDeposit(address _depositor, bytes memory _amount) internal {
         strategy.deposit(_depositor, _amount);
 
         emit IRegistryPivot.Deposited(_depositor, _amount);
     }
 
-    function _withdraw(address _requisitor, bytes memory _amount) internal {
+    function _strategyWithdraw(address _requisitor, bytes memory _amount) internal {
         strategy.withdraw(_requisitor, _amount);
 
         emit IRegistryPivot.Withdrew(_requisitor, _amount);
