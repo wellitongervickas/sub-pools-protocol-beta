@@ -33,7 +33,7 @@ contract NodeManager is INodeManager, Manager {
         _;
     }
 
-    function setInvitedOnly(bool _invitedOnly) external onlyRole(MANAGER_ROLE) {
+    function setInvitedOnly(bool _invitedOnly) external onlyManager(address(this)) {
         invitedOnly = _invitedOnly;
     }
 
@@ -41,7 +41,7 @@ contract NodeManager is INodeManager, Manager {
         address _invitedAddress
     )
         external
-        onlyRole(MANAGER_ROLE)
+        onlyManager(address(this))
         whenNotInvited(_invitedAddress)
         whenNotNode(_invitedAddress)
         whenNotManager(_invitedAddress)

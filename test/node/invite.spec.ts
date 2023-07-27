@@ -35,8 +35,9 @@ describe('Node', () => {
 
       const notManagerContractInstance = nodeContract.connect(notManager) as any
 
-      await expect(notManagerContractInstance.setInvitedOnly(false)).to.be.revertedWith(
-        `AccessControl: account ${notManager.address.toLowerCase()} is missing role ${MANAGER_ROLE}`
+      await expect(notManagerContractInstance.setInvitedOnly(false)).to.be.revertedWithCustomError(
+        nodeContract,
+        `InvalidManager()`
       )
     })
 
@@ -46,8 +47,9 @@ describe('Node', () => {
 
       const notManagerContractInstance = nodeContract.connect(notManager) as any
 
-      await expect(notManagerContractInstance.invite(ZERO_ADDRESS)).to.be.revertedWith(
-        `AccessControl: account ${notManager.address.toLowerCase()} is missing role ${MANAGER_ROLE}`
+      await expect(notManagerContractInstance.invite(ZERO_ADDRESS)).to.be.revertedWithCustomError(
+        nodeContract,
+        `InvalidManager()`
       )
     })
 

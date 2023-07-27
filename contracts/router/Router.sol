@@ -12,11 +12,6 @@ import {IProtocol} from '../interfaces/fee/IProtocol.sol';
 contract Router is IRouter, RouterPivot, Manager, RouterControl {
     IProtocol public override protocol;
 
-    modifier onlyManager(address _address) {
-        if (!IManager(_address).hasRoleManager(msg.sender)) revert IManager.InvalidManager();
-        _;
-    }
-
     constructor(IProtocol _protocol) {
         protocol = _protocol;
         _setManagerRole(msg.sender);

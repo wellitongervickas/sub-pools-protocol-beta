@@ -14,7 +14,7 @@ library BytesLib {
         return abi.decode(_data, (address));
     }
 
-    function toFraction(
+    function fraction(
         bytes memory _self,
         Mode _mode,
         uint256 _value,
@@ -81,7 +81,7 @@ library BytesLib {
         }
     }
 
-    function greaterThanAmount(bytes memory _self, Mode _mode, bytes memory _otherAmount) internal pure returns (bool) {
+    function greaterThan(bytes memory _self, Mode _mode, bytes memory _otherAmount) internal pure returns (bool) {
         if (_mode == Mode.Single) {
             uint256 _decodedAmount = toSingleAmount(_self);
             uint256 _decodedOtherAmount = toSingleAmount(_otherAmount);

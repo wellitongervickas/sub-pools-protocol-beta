@@ -100,7 +100,7 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
 
     function _chargeProtocolFees(bytes memory _amount) private returns (bytes memory) {
         FractionLib.Fraction memory _protocolFees = protocol.protocolFees();
-        bytes memory _feesAmount = _amount.toFraction(strategyMode(), _protocolFees.value, _protocolFees.divider);
+        bytes memory _feesAmount = _amount.fraction(strategyMode(), _protocolFees.value, _protocolFees.divider);
 
         _strategyWithdraw(protocol.treasuryAddress(), _feesAmount);
 
@@ -112,7 +112,7 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
 
         RegistryLib.Account memory _parent = _account(_account(_accountAddress).parent);
 
-        bytes memory _fractionAmount = _amount.toFraction(strategyMode(), _parent.fees.value, _parent.fees.divider);
+        bytes memory _fractionAmount = _amount.fraction(strategyMode(), _parent.fees.value, _parent.fees.divider);
         _increaseAdditionalBalance(_account(_accountAddress).parent, _fractionAmount);
 
         bytes memory _remainingAmount = _amount.decrement(strategyMode(), _fractionAmount);
@@ -192,7 +192,7 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
     }
 
     function _checkAdditionalBalance(address _accountAddress, bytes memory _amount) private view {
-        if (_amount.greaterThanAmount(strategyMode(), _account(_accountAddress).additionalBalance)) {
+        if (_amount.greaterThan(strategyMode(), _account(_accountAddress).additionalBalance)) {
             revert IRegistry.InsufficientAdditionalBalance();
         }
     }
@@ -212,7 +212,7 @@ contract Registry is IRegistry, RegistryPivot, RegistryControl, Ownable, Manager
     }
 
     function _checkInitialBalance(address _accountAddress, bytes memory _amount) private view {
-        if (_amount.greaterThanAmount(strategyMode(), _account(_accountAddress).initialBalance)) {
+        if (_amount.greaterThan(strategyMode(), _account(_accountAddress).initialBalance)) {
             revert IRegistry.InsufficientInitialBalance();
         }
     }
