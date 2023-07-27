@@ -9,9 +9,10 @@ contract Protocol is IProtocol, ProtocolManager {
     address public treasuryAddress;
     FractionLib.Fraction private _protocolFees;
 
-    constructor(address _treasuryAddress, FractionLib.Fraction memory _fees) ProtocolManager() {
+    constructor(address _treasuryAddress, FractionLib.Fraction memory _fees) {
         _setTreasuryAddress(_treasuryAddress);
         _setProtocolFees(_fees);
+        _setupManager(msg.sender);
     }
 
     function setTreasuryAddress(address _treasuryAddress) external onlyManager(address(this)) {
