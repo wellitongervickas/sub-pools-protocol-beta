@@ -40,5 +40,17 @@ describe('Node', () => {
         'Node_NotInvited()'
       )
     })
+
+    it('should revert if try to join twice as node when not invited only', async function () {
+      const { nodeContract, accounts } = await loadFixture(node.deployNodeFixture.bind(this, [], false))
+      const [, nodeTest] = accounts
+
+      await nodeContract.join(nodeTest.address, nodeTest.address)
+
+      await expect(nodeContract.join(nodeTest.address, nodeTest.address)).to.be.revertedWithCustomError(
+        nodeContract,
+        'Node_AlreadyJoined()'
+      )
+    })
   })
 })

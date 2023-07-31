@@ -49,7 +49,10 @@ contract Node is INode, NodeManager, Ownable {
     }
 
     ///@inheritdoc INode
-    function join(address _nodeAddress, address _managerAddress) external onlyRouter checkInvitation(_managerAddress) {
+    function join(
+        address _nodeAddress,
+        address _managerAddress
+    ) external onlyRouter checkInvitation(_managerAddress) whenNotJoined(_nodeAddress) {
         _updateInvitedRole(_managerAddress);
 
         emit INode.Node_Joined(_nodeAddress, _managerAddress);
