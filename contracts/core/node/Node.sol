@@ -58,6 +58,7 @@ contract Node is INode, NodeManager, Ownable {
         emit INode.Node_Joined(_nodeAddress, _managerAddress);
     }
 
+    /// @dev check if the invited address is not joined yet
     function invite(address _invitedAddress) public override whenNotJoined(_invitedAddress) {
         super.invite(_invitedAddress);
     }
