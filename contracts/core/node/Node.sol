@@ -3,10 +3,9 @@ pragma solidity =0.8.19;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {INode} from '../interfaces/node/INode.sol';
-import {NodeControl} from './NodeControl.sol';
 import {NodeManager} from './NodeManager.sol';
 
-contract Node is INode, NodeControl, NodeManager, Ownable {
+contract Node is INode, NodeManager, Ownable {
     /// @inheritdoc INode
     address public immutable override parent;
 
@@ -48,7 +47,8 @@ contract Node is INode, NodeControl, NodeManager, Ownable {
         address _nodeAddress,
         address _managerAddress
     ) external onlyRouter checkInvitation(_managerAddress) whenNotNode(_managerAddress) {
-        _setupAccount(_nodeAddress, _managerAddress);
         _updateInvitedRole(_managerAddress);
+
+        emit INode.Node_Joined(_nodeAddress, _managerAddress);
     }
 }

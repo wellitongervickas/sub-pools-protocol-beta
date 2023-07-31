@@ -16,8 +16,12 @@ interface INode {
 
     /**
      * @notice join as node
-     * @param _nodeAddress address of the node to create an account
+     * @param _nodeAddress address of the invited node
      * @param _managerAddress address of the manager to create an account
+     * @dev must only be called by router
+     * @dev must only join address if is invited
+     * @dev must only join address if not a node yet
+     * @dev emits a {Node_Joined} event
      */
     function join(address _nodeAddress, address _managerAddress) external;
 }
