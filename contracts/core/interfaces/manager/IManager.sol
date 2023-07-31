@@ -15,5 +15,5 @@ interface IManager {
      * @param _address the address to check
      * @return true if the address has the manager role
      */
-    function hasRoleManager(address _address) external view returns (bool);
+    function hasManagerRole(address _address) external view returns (bool);
 }

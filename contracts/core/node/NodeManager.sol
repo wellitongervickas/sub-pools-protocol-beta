@@ -26,19 +26,13 @@ contract NodeManager is INodeManager, Manager {
 
     /// @dev modifier to check if the address is not a manager
     modifier whenNotManager(address _address) {
-        if (hasRoleManager(_address)) revert INodeManager.NodeManager_ManagerNotAllowed();
+        if (hasManagerRole(_address)) revert INodeManager.NodeManager_ManagerNotAllowed();
         _;
     }
 
     /// @dev modifier to check if the address is not invited
     modifier whenNotInvited(address _address) {
         if (hasInvitedRole(_address)) revert INodeManager.NodeManager_AlreadyInvited();
-        _;
-    }
-
-    /// @dev modifier to check if the address is not a node
-    modifier whenNotNode(address _address) {
-        if (hasNodeRole(_address)) revert INodeManager.NodeManager_AlreadyNode();
         _;
     }
 
@@ -51,14 +45,7 @@ contract NodeManager is INodeManager, Manager {
     /// @inheritdoc INodeManager
     function invite(
         address _invitedAddress
-    )
-        external
-        override
-        onlyManager(address(this))
-        whenNotInvited(_invitedAddress)
-        whenNotNode(_invitedAddress)
-        whenNotManager(_invitedAddress)
-    {
+    ) public virtual onlyManager(address(this)) whenNotInvited(_invitedAddress) whenNotManager(_invitedAddress) {
         _grantInvitedRole(_invitedAddress);
         emit INodeManager.NodeManager_Invited(_invitedAddress);
     }

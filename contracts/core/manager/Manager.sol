@@ -25,12 +25,12 @@ contract Manager is IManager, AccessControl {
      * @param _address the address to check
      */
     modifier onlyManager(address _address) {
-        if (!IManager(_address).hasRoleManager(msg.sender)) revert IManager.Manager_Invalid();
+        if (!IManager(_address).hasManagerRole(msg.sender)) revert IManager.Manager_Invalid();
         _;
     }
 
     /// @inheritdoc IManager
-    function hasRoleManager(address _address) public view override returns (bool) {
+    function hasManagerRole(address _address) public view override returns (bool) {
         return hasRole(MANAGER_ROLE, _address);
     }
 }

@@ -8,6 +8,9 @@ interface INode {
     /// @dev throws if the node is not invited
     error Node_NotInvited();
 
+    /// @dev throws if the invited address is already a node
+    error Node_AlreadyJoined();
+
     /// @notice registry address
     function registry() external view returns (address);
 
