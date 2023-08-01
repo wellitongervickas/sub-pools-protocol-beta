@@ -11,8 +11,8 @@ interface INode {
     // /// @notice registry address
     // function registry() external view returns (address);
 
-    // /// @notice node parent address, zero if root
-    // function parent() external view returns (address);
+    /// @notice node parent address, zero if root
+    function parent() external view returns (address);
 
     /**
      * @notice join as node

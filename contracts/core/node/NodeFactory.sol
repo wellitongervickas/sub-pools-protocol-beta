@@ -6,12 +6,16 @@ import {Node} from './Node.sol';
 
 contract NodeFactory is INodeFactory {
     /// @inheritdoc INodeFactory
-    function build(address _managerAddress, address[] memory _invitedAddresses) public returns (address) {
-        Node _node = new Node(_managerAddress, _invitedAddresses);
+    function build(
+        address _managerAddress,
+        address[] memory _invitedAddresses,
+        address _parentAddress
+    ) public returns (address) {
+        Node _node = new Node(_managerAddress, _invitedAddresses, _parentAddress);
 
         _node.transferOwnership(msg.sender);
 
-        emit INodeFactory.NodeFactory_NodeCreated(address(_node));
+        emit INodeFactory.NodeFactory_NodeCreated(address(_node), _invitedAddresses, _parentAddress);
 
         return address(_node);
     }

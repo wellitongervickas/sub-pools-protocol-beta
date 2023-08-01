@@ -7,7 +7,7 @@ import {NodeManager} from './NodeManager.sol';
 
 contract Node is INode, NodeManager, Ownable {
     /// @inheritdoc INode
-    // address public immutable override parent;
+    address public immutable override parent;
 
     /// @inheritdoc INode
     // address public immutable override registry;
@@ -19,8 +19,11 @@ contract Node is INode, NodeManager, Ownable {
      */
     constructor(
         address _managerAddress,
-        address[] memory _invitedAddresses
-    ) NodeManager(_managerAddress, _invitedAddresses) {}
+        address[] memory _invitedAddresses,
+        address _parentAddress
+    ) NodeManager(_managerAddress, _invitedAddresses) {
+        parent = _parentAddress;
+    }
 
     /// @dev modifier to check if _address is invited when invited only mode
     modifier checkInvitation(address _address) {

@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import { anyValue, ethers, loadFixture, nodeFactory } from '../../fixtures'
+import { FAKE_PARENT } from '../../helpers/address'
 
 describe('NodeFactory', () => {
   describe('Build', () => {
@@ -8,9 +9,9 @@ describe('NodeFactory', () => {
 
       const [manager] = accounts
 
-      await expect(nodeFactoryContract.build(manager.address, []))
+      await expect(nodeFactoryContract.build(manager.address, [], FAKE_PARENT))
         .to.emit(nodeFactoryContract, 'NodeFactory_NodeCreated')
-        .withArgs(anyValue)
+        .withArgs(anyValue, [], FAKE_PARENT)
     })
 
     it("should set the node's manager as the sender", async function () {
@@ -18,7 +19,7 @@ describe('NodeFactory', () => {
 
       const [manager] = accounts
 
-      const tx = await nodeFactoryContract.build(manager.address, [])
+      const tx = await nodeFactoryContract.build(manager.address, [], FAKE_PARENT)
       const receipt = await tx.wait()
 
       const nodeContract = await ethers.getContractAt('Node', receipt.logs[3].args[0])

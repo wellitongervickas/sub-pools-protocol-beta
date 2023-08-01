@@ -4,12 +4,12 @@ import { FAKE_PARENT, FAKE_REGISTRY } from '../../helpers/address'
 
 describe('Node', () => {
   describe('Deploy', () => {
-    // it('should set parent on deploy', async function () {
-    //   const { nodeContract } = await loadFixture(node.deployNodeFixture)
-    //   const parentAddress = await nodeContract.parent()
+    it('should set parent on deploy', async function () {
+      const { nodeContract } = await loadFixture(node.deployNodeFixture)
+      const parentAddress = await nodeContract.parent()
 
-    //   expect(parentAddress).to.equal(FAKE_PARENT)
-    // })
+      expect(parentAddress).to.equal(FAKE_PARENT)
+    })
 
     // it('should set registry on deploy', async function () {
     //   const { nodeContract } = await loadFixture(node.deployNodeFixture)
