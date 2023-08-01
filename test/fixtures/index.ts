@@ -5,3 +5,4 @@ export { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 export { ethers, loadFixture, time }
 
 export { default as node } from './node'
+export { default as nodeFactory } from './nodeFactory'

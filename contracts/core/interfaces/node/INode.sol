@@ -8,11 +8,11 @@ interface INode {
     /// @dev throws if the node is not invited
     error Node_NotInvited();
 
-    /// @notice registry address
-    function registry() external view returns (address);
+    // /// @notice registry address
+    // function registry() external view returns (address);
 
-    /// @notice node parent address, zero if root
-    function parent() external view returns (address);
+    // /// @notice node parent address, zero if root
+    // function parent() external view returns (address);
 
     /**
      * @notice join as node
