@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { ethers, loadFixture, router } from '../../fixtures'
+import { loadFixture, router } from '../../fixtures'
 
 describe('Router', () => {
   describe('Deploy', () => {

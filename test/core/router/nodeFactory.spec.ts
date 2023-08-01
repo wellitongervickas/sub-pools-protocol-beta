@@ -13,12 +13,12 @@ describe('Router', () => {
       expect(await routerContract.nodeFactory()).to.equal(newNodeFactoryAddress)
     })
 
-    it('should emit NodeFactory_Updated when update node factory', async function () {
+    it('should emit Router_NodeFactoryUpdated when update node factory', async function () {
       const newNodeFactoryAddress = createRandomAddress()
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
       await expect(routerContract.updateNodeFactory(newNodeFactoryAddress))
-        .to.emit(routerContract, 'NodeFactory_Updated')
+        .to.emit(routerContract, 'Router_NodeFactoryUpdated')
         .withArgs(newNodeFactoryAddress)
     })
 
