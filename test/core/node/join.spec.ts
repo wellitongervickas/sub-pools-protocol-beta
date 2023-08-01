@@ -49,7 +49,7 @@ describe('Node', () => {
 
       await expect(nodeContract.join(nodeTest.address, nodeTest.address)).to.be.revertedWithCustomError(
         nodeContract,
-        'Node_AlreadyJoined()'
+        'NodeManager_AlreadyNode()'
       )
     })
   })

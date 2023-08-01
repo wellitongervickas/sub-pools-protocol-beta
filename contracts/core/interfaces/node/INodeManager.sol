@@ -14,6 +14,8 @@ interface INodeManager {
     /// @dev throws if the invited address is already invited
     error NodeManager_AlreadyInvited();
 
+    error NodeManager_AlreadyNode();
+
     /**
      * @notice check if the contract is in invited only mode
      * @return true if the contract is in invited only mode

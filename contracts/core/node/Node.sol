@@ -42,24 +42,18 @@ contract Node is INode, NodeManager, Ownable {
         _;
     }
 
-    /// @dev modifier to check if the address is not a node
-    modifier whenNotJoined(address _address) {
-        if (hasNodeRole(_address)) revert INode.Node_AlreadyJoined();
-        _;
-    }
-
     ///@inheritdoc INode
     function join(
         address _nodeAddress,
         address _managerAddress
-    ) external onlyRouter checkInvitation(_managerAddress) whenNotJoined(_nodeAddress) {
+    ) external onlyRouter checkInvitation(_managerAddress) whenNotNode(_nodeAddress) {
         _updateInvitedRole(_managerAddress);
 
         emit INode.Node_Joined(_nodeAddress, _managerAddress);
     }
 
     /// @dev check if the invited address is not joined yet
-    function invite(address _invitedAddress) public override whenNotJoined(_invitedAddress) {
+    function invite(address _invitedAddress) public override whenNotNode(_invitedAddress) {
         super.invite(_invitedAddress);
     }
 }
