@@ -29,7 +29,7 @@ contract Node is INode, NodeManager, Ownable {
         _;
     }
 
-    /// @dev modifier to check if the sender is the owner
+    /// @dev modifier to check if the sender is the router
     modifier onlyRouter() {
         _checkOwner();
         _;

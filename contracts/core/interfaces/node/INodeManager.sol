@@ -8,6 +8,9 @@ interface INodeManager {
     /// @dev Emmits when change invited only mode
     event NodeManager_InvitedOnly(bool _invitedOnly);
 
+    /// @dev Emmits when a node role has updated
+    event InvitedRoleUpdated(address indexed _address, bytes32 _newRole);
+
     /// @dev throws if the invited address the menager
     error NodeManager_ManagerNotAllowed();
 

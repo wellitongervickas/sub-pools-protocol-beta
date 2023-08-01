@@ -13,8 +13,6 @@ contract NodeManager is INodeManager, Manager {
     /// @inheritdoc INodeManager
     bool public override invitedOnly = true;
 
-    event InvitedRoleUpdated(address indexed _address, bytes32 _newRole);
-
     /**
      * @notice construct the node manager contract
      * @param _managerAddress the address of the manager
@@ -85,7 +83,7 @@ contract NodeManager is INodeManager, Manager {
     function _grantInvitedRole(address _address) private {
         _grantRole(INVITED_ROLE, _address);
 
-        emit InvitedRoleUpdated(_address, INVITED_ROLE);
+        emit INodeManager.InvitedRoleUpdated(_address, INVITED_ROLE);
     }
 
     /**
@@ -99,7 +97,7 @@ contract NodeManager is INodeManager, Manager {
         _revokeInvitedRole(_address);
         _grantNodeRole(_address);
 
-        emit InvitedRoleUpdated(_address, NODE_ROLE);
+        emit INodeManager.InvitedRoleUpdated(_address, NODE_ROLE);
     }
 
     /**
