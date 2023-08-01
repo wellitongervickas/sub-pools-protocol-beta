@@ -52,7 +52,7 @@ contract NodeManager is INodeManager, Manager {
     function invite(
         address _invitedAddress
     )
-        public
+        external
         virtual
         onlyManager(address(this))
         whenNotInvited(_invitedAddress)
