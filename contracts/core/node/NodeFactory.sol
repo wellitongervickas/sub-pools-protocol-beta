@@ -5,6 +5,7 @@ import {INodeFactory} from '../interfaces/node/INodeFactory.sol';
 import {Node} from './Node.sol';
 
 contract NodeFactory is INodeFactory {
+    /// @inheritdoc INodeFactory
     function build(address _managerAddress, address[] memory _invitedAddresses) public returns (address) {
         Node _node = new Node(_managerAddress, _invitedAddresses);
 
