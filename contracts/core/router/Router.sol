@@ -10,6 +10,10 @@ contract Router is IRouter, Manager {
     /// @inheritdoc IRouter
     INodeFactory public override nodeFactory;
 
+    /**
+     * @notice construct the router contract
+     * @param _nodeFactoryAddress address of the node factory
+     */
     constructor(address _nodeFactoryAddress) Manager(msg.sender) {
         _updateNodeFactory(_nodeFactoryAddress);
     }
@@ -45,7 +49,6 @@ contract Router is IRouter, Manager {
      * @return the address of the node
      */
     function _createNode(address[] memory _invitedAddresses, address _parentAddress) private returns (address) {
-        ///@dev zero address when root
         address _nodeAddress = nodeFactory.build(msg.sender, _invitedAddresses, _parentAddress);
         return _nodeAddress;
     }
@@ -58,7 +61,6 @@ contract Router is IRouter, Manager {
         INode _parent = INode(_parentNodeAddress);
 
         address _nodeAddress = _createNode(_invitedAddresses, _parentNodeAddress);
-
         _parent.join(_nodeAddress, msg.sender);
 
         emit IRouter.Router_NodeJoined(_parentNodeAddress, _nodeAddress);
