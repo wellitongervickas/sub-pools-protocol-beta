@@ -16,6 +16,14 @@ contract AdapterVault is ERC4626, Ownable {
     }
 
     /**
+     * @dev only owner can mint shares
+     * @inheritdoc ERC4626
+     */
+    function mint(uint256 shares, address receiver) public override onlyOwner returns (uint256) {
+        return super.mint(shares, receiver);
+    }
+
+    /**
      * @dev only owner can withdraw assets
      * @inheritdoc ERC4626
      */
@@ -23,9 +31,11 @@ contract AdapterVault is ERC4626, Ownable {
         return super.withdraw(assets, receiver, owner);
     }
 
-    /// @dev disabled function since it's not used
-    function mint(uint256 shares, address receiver) public override onlyOwner returns (uint256) {}
-
-    /// @dev disabled function since it's not used
-    function redeem(uint256 shares, address receiver, address owner) public override onlyOwner returns (uint256) {}
+    /**
+     * @dev only owner can redeem assets
+     * @inheritdoc ERC4626
+     */
+    function redeem(uint256 shares, address receiver, address owner) public override onlyOwner returns (uint256) {
+        return super.withdraw(shares, receiver, owner);
+    }
 }
