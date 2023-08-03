@@ -5,8 +5,6 @@ import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {ERC4626, ERC20} from '@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol';
 
 contract AdapterVault is ERC4626, Ownable {
-    error AdapterVault_FunctionDisabled();
-
     constructor(ERC20 _asset) ERC4626(_asset) ERC20('AdapterVault', 'AV') {}
 
     /**
@@ -25,7 +23,9 @@ contract AdapterVault is ERC4626, Ownable {
         return super.withdraw(assets, receiver, owner);
     }
 
-    function mint(uint256 shares, address receiver) public override returns (uint256) {}
+    /// @dev disabled function since it's not used
+    function mint(uint256 shares, address receiver) public override onlyOwner returns (uint256) {}
 
-    function redeem(uint256 shares, address receiver, address owner) public override returns (uint256) {}
+    /// @dev disabled function since it's not used
+    function redeem(uint256 shares, address receiver, address owner) public override onlyOwner returns (uint256) {}
 }
