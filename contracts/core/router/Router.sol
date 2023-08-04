@@ -6,7 +6,6 @@ import {RouterManager} from './RouterManager.sol';
 import {INodeFactory} from '../interfaces/node/INodeFactory.sol';
 import {INode} from '../interfaces/node/INode.sol';
 import {IStrategyProxyFactory} from '../interfaces/strategyProxy/IStrategyProxyFactory.sol';
-import {Manager} from '../manager/Manager.sol';
 
 contract Router is IRouter, RouterManager {
     /// @dev see IRouterManager

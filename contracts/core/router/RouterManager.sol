@@ -4,9 +4,7 @@ pragma solidity =0.8.19;
 import {IRouterManager} from '../interfaces/router/IRouterManager.sol';
 import {Manager} from '../manager/Manager.sol';
 import {INodeFactory} from '../interfaces/node/INodeFactory.sol';
-import {INode} from '../interfaces/node/INode.sol';
 import {IStrategyProxyFactory} from '../interfaces/strategyProxy/IStrategyProxyFactory.sol';
-import {IStrategyProxy} from '../interfaces/strategyProxy/IStrategyProxy.sol';
 import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 
 contract RouterManager is IRouterManager, Manager {
