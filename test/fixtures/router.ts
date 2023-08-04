@@ -11,7 +11,7 @@ export async function deployRouterFixture() {
   const Router = await ethers.getContractFactory('Router')
   const routerContract = await Router.deploy(nodeFactoryAddress, strategyProxyFactoryAddress)
 
-  return { accounts, routerContract, nodeFactoryAddress }
+  return { accounts, routerContract, nodeFactoryAddress, strategyProxyFactoryAddress }
 }
 
 const fixtures = {

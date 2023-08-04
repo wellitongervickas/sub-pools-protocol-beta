@@ -5,21 +5,21 @@ import { createRandomAddress } from '../../helpers/address'
 describe('Router', () => {
   describe('NodeFactory', () => {
     it('should update node factory', async function () {
-      const newNodeFactoryAddress = createRandomAddress()
+      const newStrategyProxyFactoryAddress = createRandomAddress()
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-      await routerContract.updateNodeFactory(newNodeFactoryAddress)
+      await routerContract.updateStrategyProxyFactory(newStrategyProxyFactoryAddress)
 
-      expect(await routerContract.nodeFactory()).to.equal(newNodeFactoryAddress)
+      expect(await routerContract.strategyProxyFactory()).to.equal(newStrategyProxyFactoryAddress)
     })
 
-    it('should emit RouterManager_NodeFactoryUpdated when update node factory', async function () {
-      const newNodeFactoryAddress = createRandomAddress()
+    it('should emit RouterManager_StrategyProxyFactoryUpdated when update strategy proxy factory', async function () {
+      const newStrategyProxyFactoryAddress = createRandomAddress()
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-      await expect(routerContract.updateNodeFactory(newNodeFactoryAddress))
-        .to.emit(routerContract, 'RouterManager_NodeFactoryUpdated')
-        .withArgs(newNodeFactoryAddress)
+      await expect(routerContract.updateStrategyProxyFactory(newStrategyProxyFactoryAddress))
+        .to.emit(routerContract, 'RouterManager_StrategyProxyFactoryUpdated')
+        .withArgs(newStrategyProxyFactoryAddress)
     })
 
     it('should revert if try to update node factory without being the manager', async function () {
@@ -29,7 +29,7 @@ describe('Router', () => {
       const notManagerNodeFactoryContract = routerContract.connect(notManager) as any
 
       await expect(
-        notManagerNodeFactoryContract.updateNodeFactory(createRandomAddress())
+        notManagerNodeFactoryContract.updateStrategyProxyFactory(createRandomAddress())
       ).to.be.revertedWithCustomError(routerContract, 'Manager_Invalid()')
     })
   })

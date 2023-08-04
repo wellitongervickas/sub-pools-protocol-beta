@@ -20,6 +20,11 @@ contract StrategyProxyFactory is IStrategyProxyFactory {
         return address(strategyProxy);
     }
 
+    /**
+     * @notice set the deployer as the owner of the strategy proxy
+     * @param _strategyProxy the strategy proxy to set the owner of
+     * @param deployerAddress_ the address of the deployer
+     */
     function _setDeployerAsOwner(StrategyProxy _strategyProxy, address deployerAddress_) private {
         _strategyProxy.transferOwnership(deployerAddress_);
     }
