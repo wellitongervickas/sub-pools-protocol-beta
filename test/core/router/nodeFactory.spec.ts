@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { ethers, loadFixture, router, nodeFactory } from '../../fixtures'
+import { loadFixture, router } from '../../fixtures'
 import { createRandomAddress } from '../../helpers/address'
 
 describe('Router', () => {
