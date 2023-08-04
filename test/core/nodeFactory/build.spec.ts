@@ -14,7 +14,7 @@ describe('NodeFactory', () => {
         .withArgs(anyValue, [], FAKE_PARENT)
     })
 
-    it("should set the node's manager as the sender", async function () {
+    it('should set the node owner as the sender', async function () {
       const { nodeFactoryContract, accounts } = await loadFixture(nodeFactory.deployNodeFactoryFixture)
 
       const [manager] = accounts

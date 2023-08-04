@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
+import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
+import {IStrategyProxy} from '../interfaces/strategyProxy/IStrategyProxy.sol';
 import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 
-contract StrategyProxy {
+contract StrategyProxy is IStrategyProxy, Ownable {
     IStrategy public immutable strategy;
 
     constructor(IStrategy strategy_) {
