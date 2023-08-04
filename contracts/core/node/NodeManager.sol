@@ -70,7 +70,6 @@ contract NodeManager is INodeManager, Manager {
     function _grantInvites(address[] memory _invitedAddresses) private {
         for (uint256 i = 0; i < _invitedAddresses.length; i++) {
             _grantInvitedRole(_invitedAddresses[i]);
-            emit INodeManager.NodeManager_Invited(_invitedAddresses[i]);
         }
     }
 
@@ -78,12 +77,10 @@ contract NodeManager is INodeManager, Manager {
      * @notice grant the invited role to the node
      * @param _address the address of the node
      * @dev the node address is granted the invited role
-     * @dev emits a {InvitedRoleUpdated} event
+     * @dev emits a {NodeManager_RoleUpdated} event
      */
     function _grantInvitedRole(address _address) private {
         _grantRole(INVITED_ROLE, _address);
-
-        emit INodeManager.InvitedRoleUpdated(_address, INVITED_ROLE);
     }
 
     /**
@@ -91,13 +88,11 @@ contract NodeManager is INodeManager, Manager {
      * @param _address the address of the node
      * @dev the node address is revoked the invited role
      * @dev the node address is granted the node role
-     * @dev emits a {InvitedRoleUpdated} event
+     * @dev emits a {NodeManager_RoleUpdated} event
      */
     function _updateInvitedRole(address _address) internal {
         _revokeInvitedRole(_address);
         _grantNodeRole(_address);
-
-        emit INodeManager.InvitedRoleUpdated(_address, NODE_ROLE);
     }
 
     /**
@@ -111,12 +106,10 @@ contract NodeManager is INodeManager, Manager {
     /**
      * @dev grant the node role to the node
      * @param _address the address of the node
-     * @dev emits a {InvitedRoleUpdated} event
+     * @dev emits a {NodeManager_RoleUpdated} event
      */
     function _grantNodeRole(address _address) private {
         _grantRole(NODE_ROLE, _address);
-
-        emit InvitedRoleUpdated(_address, NODE_ROLE);
     }
 
     /// @inheritdoc INodeManager

@@ -2,10 +2,11 @@
 pragma solidity =0.8.19;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
-import {ERC4626, ERC20} from '@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol';
+import {ERC4626, IERC20, ERC20} from '@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol';
 
 contract AdapterVault is ERC4626, Ownable {
-    constructor(ERC20 _asset) ERC4626(_asset) ERC20('AdapterVault', 'AV') {}
+    ///CONSTRUIR o proprio ERC4626 para o AdapterVault controlar o THIS
+    constructor(IERC20 _asset) ERC4626(_asset) ERC20('AdapterVault', 'AV') {}
 
     /**
      * @dev only owner can deposit assets

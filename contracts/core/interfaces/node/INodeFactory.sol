@@ -2,7 +2,12 @@
 pragma solidity =0.8.19;
 
 interface INodeFactory {
-    event NodeFactory_NodeCreated(address indexed _nodeAddress, address[] _invitedAddresses, address _parentAddress);
+    event NodeFactory_NodeCreated(
+        address _nodeAddress,
+        address[] _invitedAddresses,
+        address _parentAddress,
+        address _registryAddress
+    );
 
     /**
      * @notice build a new node contract
@@ -14,6 +19,7 @@ interface INodeFactory {
     function build(
         address _managerAddress,
         address[] memory _invitedAddresses,
-        address _parentAddress
+        address _parentAddress,
+        address _registryAddress
     ) external returns (address);
 }

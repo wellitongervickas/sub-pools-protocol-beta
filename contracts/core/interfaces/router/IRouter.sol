@@ -4,15 +4,9 @@ pragma solidity =0.8.19;
 import {INodeFactory} from '../node/INodeFactory.sol';
 
 interface IRouter {
-    event Router_NodeFactoryUpdated(address _nodeFactoryAddress);
-
     event Router_NodeCreated(address indexed _nodeAddress);
 
     event Router_NodeJoined(address indexed _parentAddress, address indexed _nodeAddress);
-
-    function nodeFactory() external view returns (INodeFactory);
-
-    function updateNodeFactory(address _nodeFactoryAddress) external;
 
     /**
      * @notice create a node
@@ -20,7 +14,7 @@ interface IRouter {
      * @return the address of the node
      * @dev emits a {Router_NodeCreated} event
      */
-    function createNode(address[] memory _invitedAddresses) external returns (address);
+    function createNode(address[] memory _invitedAddresses, address _registryAddress) external returns (address);
 
     /**
      * @notice create a node

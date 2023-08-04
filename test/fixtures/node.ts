@@ -1,14 +1,20 @@
 import { ethers } from 'hardhat'
-import { FAKE_PARENT } from '../helpers/address'
+import { FAKE_PARENT, FAKE_REGISTRY } from '../helpers/address'
 
 export async function deployNodeFixture(
   invitedAddresses: string[] = [],
   invitedOnly: boolean = true,
-  parentAddress?: string
+  parentAddress?: string,
+  registryAddress?: string
 ) {
   const accounts = await ethers.getSigners()
   const Node = await ethers.getContractFactory('Node')
-  const nodeContract = await Node.deploy(accounts[0].address, invitedAddresses, parentAddress || FAKE_PARENT)
+  const nodeContract = await Node.deploy(
+    accounts[0].address, // manager
+    invitedAddresses,
+    parentAddress || FAKE_PARENT,
+    registryAddress || FAKE_REGISTRY
+  )
 
   await nodeContract.setInvitedOnly(invitedOnly)
 

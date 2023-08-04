@@ -18,7 +18,7 @@ describe('Router', () => {
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
       await expect(routerContract.updateNodeFactory(newNodeFactoryAddress))
-        .to.emit(routerContract, 'Router_NodeFactoryUpdated')
+        .to.emit(routerContract, 'RouterManager_NodeFactoryUpdated')
         .withArgs(newNodeFactoryAddress)
     })
 

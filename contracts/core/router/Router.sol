@@ -2,68 +2,54 @@
 pragma solidity =0.8.19;
 
 import {IRouter} from '../interfaces/router/IRouter.sol';
+import {RouterManager} from './RouterManager.sol';
 import {INodeFactory} from '../interfaces/node/INodeFactory.sol';
 import {INode} from '../interfaces/node/INode.sol';
 import {Manager} from '../manager/Manager.sol';
 
-contract Router is IRouter, Manager {
-    /// @inheritdoc IRouter
-    INodeFactory public override nodeFactory;
-
-    /**
-     * @notice construct the router contract
-     * @param _nodeFactoryAddress address of the node factory
-     */
-    constructor(address _nodeFactoryAddress) Manager(msg.sender) {
-        _updateNodeFactory(_nodeFactoryAddress);
-    }
+contract Router is IRouter, RouterManager {
+    /// @dev see IRouterManager
+    constructor(address _nodeFactoryAddress) RouterManager(_nodeFactoryAddress) {}
 
     /// @inheritdoc IRouter
-    function updateNodeFactory(address _nodeFactoryAddress) public override onlyManager(address(this)) {
-        _updateNodeFactory(_nodeFactoryAddress);
-        emit IRouter.Router_NodeFactoryUpdated(_nodeFactoryAddress);
-    }
-
-    /**
-     * @notice update the node factory
-     * @param _nodeFactoryAddress address of the node factory
-     */
-    function _updateNodeFactory(address _nodeFactoryAddress) private {
-        nodeFactory = INodeFactory(_nodeFactoryAddress);
-    }
-
-    /// @inheritdoc IRouter
-    function createNode(address[] memory _invitedAddresses) public override returns (address) {
+    function createNode(
+        address[] memory invitedAddresses_,
+        address registryAddress_
+    ) public override returns (address) {
         ///@dev zero address when root
-        address _nodeAddress = _createNode(_invitedAddresses, address(0));
+        address nodeAddress = _createNode(invitedAddresses_, address(0), registryAddress_);
 
-        emit IRouter.Router_NodeCreated(_nodeAddress);
+        emit IRouter.Router_NodeCreated(nodeAddress);
 
-        return _nodeAddress;
+        return nodeAddress;
     }
 
     /**
      * @notice create a node
-     * @param _invitedAddresses the addresses of the invited nodes
-     * @param _parentAddress the address of the parent node
+     * @param invitedAddresses_ the addresses of the invited nodes
+     * @param parentAddress_ the address of the parent node
      * @return the address of the node
      */
-    function _createNode(address[] memory _invitedAddresses, address _parentAddress) private returns (address) {
-        address _nodeAddress = nodeFactory.build(msg.sender, _invitedAddresses, _parentAddress);
+    function _createNode(
+        address[] memory invitedAddresses_,
+        address parentAddress_,
+        address registryAddress_
+    ) private returns (address) {
+        address _nodeAddress = nodeFactory.build(msg.sender, invitedAddresses_, parentAddress_, registryAddress_);
         return _nodeAddress;
     }
 
     /// @inheritdoc IRouter
     function joinNode(
-        address _parentNodeAddress,
-        address[] memory _invitedAddresses
+        address parentNodeAddress_,
+        address[] memory invitedAddresses_
     ) external override returns (address) {
-        INode _parent = INode(_parentNodeAddress);
+        INode parent = INode(parentNodeAddress_);
 
-        address _nodeAddress = _createNode(_invitedAddresses, _parentNodeAddress);
-        _parent.join(_nodeAddress, msg.sender);
+        address _nodeAddress = _createNode(invitedAddresses_, parentNodeAddress_, parent.registry());
+        parent.join(_nodeAddress, msg.sender);
 
-        emit IRouter.Router_NodeJoined(_parentNodeAddress, _nodeAddress);
+        emit IRouter.Router_NodeJoined(parentNodeAddress_, _nodeAddress);
 
         return _nodeAddress;
     }

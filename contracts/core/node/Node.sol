@@ -10,19 +10,23 @@ contract Node is INode, NodeManager, Ownable {
     address public immutable override parent;
 
     /// @inheritdoc INode
-    // address public immutable override registry;
+    address public immutable override registry;
 
     /**
      * @notice construct the node contract
-     * @param _managerAddress address of the manager
-     * @param _invitedAddresses addresses of the invited nodes
+     * @param managerAddress_ address of the manager
+     * @param invitedAddresses_ addresses of the invited nodes
+     * @param parentAddress_ address of the parent node, zero when root
+     * @param registryAddress_ address of the registry
      */
     constructor(
-        address _managerAddress,
-        address[] memory _invitedAddresses,
-        address _parentAddress
-    ) NodeManager(_managerAddress, _invitedAddresses) {
-        parent = _parentAddress;
+        address managerAddress_,
+        address[] memory invitedAddresses_,
+        address parentAddress_,
+        address registryAddress_
+    ) NodeManager(managerAddress_, invitedAddresses_) {
+        parent = parentAddress_;
+        registry = registryAddress_;
     }
 
     /// @dev modifier to check if _address is invited when invited only mode
@@ -41,10 +45,10 @@ contract Node is INode, NodeManager, Ownable {
     ///@inheritdoc INode
     function join(
         address _nodeAddress,
-        address _managerAddress
-    ) external onlyRouter checkInvitation(_managerAddress) whenNotNode(_nodeAddress) {
-        _updateInvitedRole(_managerAddress);
+        address managerAddress_
+    ) external onlyRouter checkInvitation(managerAddress_) whenNotNode(_nodeAddress) {
+        _updateInvitedRole(managerAddress_);
 
-        emit INode.Node_Joined(_nodeAddress, _managerAddress);
+        emit INode.Node_Joined(_nodeAddress, managerAddress_);
     }
 }
