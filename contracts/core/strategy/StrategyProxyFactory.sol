@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {IStrategyProxyFactory} from '../interfaces/strategyProxy/IStrategyProxyFactory.sol';
+import {IStrategyProxyFactory} from '../interfaces/strategy/IStrategyProxyFactory.sol';
 import {StrategyProxy, IStrategyProxy} from './StrategyProxy.sol';
 import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 

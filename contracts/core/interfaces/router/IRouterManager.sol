@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import {INodeFactory} from '../node/INodeFactory.sol';
 import {INode} from '../node/INode.sol';
-import {IStrategyProxyFactory} from '../strategyProxy/IStrategyProxyFactory.sol';
+import {IStrategyProxyFactory} from '../strategy/IStrategyProxyFactory.sol';
 
 interface IRouterManager {
     /// @dev Emitted when the node factory is updated
