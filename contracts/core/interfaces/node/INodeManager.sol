@@ -3,10 +3,10 @@ pragma solidity =0.8.19;
 
 interface INodeManager {
     /// @dev Emmits when a node is invited
-    event NodeManager_Invited(address indexed _invitedAddress);
+    event NodeManager_Invited(address invitedAddress_);
 
     /// @dev Emmits when change invited only mode
-    event NodeManager_InvitedOnly(bool indexed _invitedOnly);
+    event NodeManager_InvitedOnly(bool invitedOnly_);
 
     /// @dev throws if the invited address the menager
     error NodeManager_ManagerNotAllowed();
@@ -25,34 +25,34 @@ interface INodeManager {
 
     /**
      * @notice set the contract to invited only mode
-     * @param _invitedOnly true if the contract is in invited only mode
+     * @param invitedOnly_ true if the contract is in invited only mode
      * @dev must only be called by the manager
-     * @dev emits a {NodeManager_InvitedOnly} event
+     * @dev emits a {NodeManagerInvitedOnly_} event
      */
-    function setInvitedOnly(bool _invitedOnly) external;
+    function setInvitedOnly(bool invitedOnly_) external;
 
     /**
      * @notice invite a node
-     * @param _invitedAddress the address of the invited node
+     * @param invitedAddress_ the address of the invited node
      * @dev must only be called by the manager
      * @dev must only invite address if not is invited yet
      * @dev must only invite address if not a node yet
      * @dev must only invite address if not is the manager itself
      * @dev emits a {NodeManager_Invited} event
      */
-    function invite(address _invitedAddress) external;
+    function invite(address invitedAddress_) external;
 
     /**
      * @notice check if the address is invited
-     * @param _address the address of the node
+     * @param address_ the address of the node
      * @return true if the address is invited
      */
-    function hasInvitedRole(address _address) external view returns (bool);
+    function hasInvitedRole(address address_) external view returns (bool);
 
     /**
      * @notice check if the address is a node
-     * @param _address the address of the node
+     * @param address_ the address of the node
      * @return true if the address is a node
      */
-    function hasNodeRole(address _address) external view returns (bool);
+    function hasNodeRole(address address_) external view returns (bool);
 }

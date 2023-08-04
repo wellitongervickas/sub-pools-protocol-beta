@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 interface INode {
     /// @dev Emmits when a node is joined
-    event Node_Joined(address indexed _nodeAddress, address indexed _managerAddress);
+    event Node_Joined(address nodeAddress_, address managerAddress_);
 
     /// @dev throws if the node is not invited
     error Node_NotInvited();
@@ -16,12 +16,12 @@ interface INode {
 
     /**
      * @notice join as node
-     * @param _nodeAddress address of the invited node
-     * @param _managerAddress address of the manager to create an account
+     * @param nodeAddress_ address of the invited node
+     * @param managerAddress_ address of the manager to create an account
      * @dev must only be called by router
      * @dev must only join address if is invited
      * @dev must only join address if not a node yet
      * @dev emits a {Node_Joined} event
      */
-    function join(address _nodeAddress, address _managerAddress) external;
+    function join(address nodeAddress_, address managerAddress_) external;
 }

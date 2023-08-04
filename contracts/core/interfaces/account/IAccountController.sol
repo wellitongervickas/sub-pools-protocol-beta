@@ -9,8 +9,8 @@ interface IAccountController {
 
     /**
      * @notice get the account of the address
-     * @param _accountAddress the address of the account
+     * @param accountAddress_ the address of the account
      * @return the account
      */
-    function accounts(address _accountAddress) external view returns (Account memory);
+    function accounts(address accountAddress_) external view returns (Account memory);
 }

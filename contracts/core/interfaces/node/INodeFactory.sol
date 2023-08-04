@@ -3,23 +3,23 @@ pragma solidity =0.8.19;
 
 interface INodeFactory {
     event NodeFactory_NodeCreated(
-        address _nodeAddress,
-        address[] _invitedAddresses,
-        address _parentAddress,
-        address _registryAddress
+        address nodeAddress_,
+        address[] invitedAddresses_,
+        address parentAddress_,
+        address registryAddress_
     );
 
     /**
      * @notice build a new node contract
-     * @param _managerAddress address of the manager
-     * @param _invitedAddresses addresses of the invited nodes
-     * @param _parentAddress address of the parent node, zero when root
+     * @param managerAddress_ address of the manager
+     * @param invitedAddresses_ addresses of the invited nodes
+     * @param parentAddress_ address of the parent node, zero when root
      * @return address of the new node contract
      */
     function build(
-        address _managerAddress,
-        address[] memory _invitedAddresses,
-        address _parentAddress,
-        address _registryAddress
+        address managerAddress_,
+        address[] memory invitedAddresses_,
+        address parentAddress_,
+        address registryAddress_
     ) external returns (address);
 }

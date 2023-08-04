@@ -14,6 +14,7 @@ contract NodeFactory is INodeFactory {
     ) public returns (address) {
         Node node = new Node(managerAddress_, invitedAddresses_, parentAddress_, registryAddress_);
 
+        /// @dev set router as owner
         node.transferOwnership(msg.sender);
 
         emit INodeFactory.NodeFactory_NodeCreated(address(node), invitedAddresses_, parentAddress_, registryAddress_);
