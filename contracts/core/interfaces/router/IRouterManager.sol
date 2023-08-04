@@ -21,6 +21,7 @@ interface IRouterManager {
      * @notice update the node factory
      * @param nodeFactoryAddress_ address of the node factory
      * @dev only the manager can update the strategy proxy factory
+     * @dev emits a {RouterManager_NodeFactoryUpdated} event
      */
     function updateNodeFactory(INodeFactory nodeFactoryAddress_) external;
 
@@ -28,6 +29,7 @@ interface IRouterManager {
      * @notice update the strategy proxy factory
      * @param strategyFactory_ address of the strategy proxy factory
      * @dev only the manager can update the strategy proxy factory
+     * @dev emits a {RouterManager_StrategyProxyFactoryUpdated} event
      */
     function updateStrategyProxyFactory(IStrategyProxyFactory strategyFactory_) external;
 }

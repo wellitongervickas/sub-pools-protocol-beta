@@ -16,18 +16,18 @@ contract RouterManager is IRouterManager, Manager {
 
     /**
      * @notice construct the router contract
-     * @param nodeFactoryAddress_ address of the node factory
+     * @param nodeFactory_ address of the node factory
      * @param strategyFactory_ address of the strategy proxy factory
      */
-    constructor(INodeFactory nodeFactoryAddress_, IStrategyProxyFactory strategyFactory_) Manager(msg.sender) {
-        _updateNodeFactory(nodeFactoryAddress_);
+    constructor(INodeFactory nodeFactory_, IStrategyProxyFactory strategyFactory_) Manager(msg.sender) {
+        _updateNodeFactory(nodeFactory_);
         _updateStrategyProxyFactory(strategyFactory_);
     }
 
     /// @inheritdoc IRouterManager
-    function updateNodeFactory(INodeFactory nodeFactoryAddress_) public override onlyManager(address(this)) {
-        _updateNodeFactory(nodeFactoryAddress_);
-        emit IRouterManager.RouterManager_NodeFactoryUpdated(address(nodeFactoryAddress_));
+    function updateNodeFactory(INodeFactory nodeFactory_) public override onlyManager(address(this)) {
+        _updateNodeFactory(nodeFactory_);
+        emit IRouterManager.RouterManager_NodeFactoryUpdated(address(nodeFactory_));
     }
 
     /// @inheritdoc IRouterManager
@@ -38,8 +38,8 @@ contract RouterManager is IRouterManager, Manager {
         emit IRouterManager.RouterManager_StrategyProxyFactoryUpdated(address(strategyFactory_));
     }
 
-    function _updateNodeFactory(INodeFactory nodeFactoryAddress_) private {
-        nodeFactory = INodeFactory(nodeFactoryAddress_);
+    function _updateNodeFactory(INodeFactory nodeFactory_) private {
+        nodeFactory = nodeFactory_;
     }
 
     function _updateStrategyProxyFactory(IStrategyProxyFactory strategyFactory_) private {

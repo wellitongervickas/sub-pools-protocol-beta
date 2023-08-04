@@ -7,6 +7,7 @@ import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 
 /// ToDO: only deployer can build
 contract StrategyProxyFactory is IStrategyProxyFactory {
+    /// @inheritdoc IStrategyProxyFactory
     function build(IStrategy strategy_) public returns (address) {
         StrategyProxy strategyProxy = new StrategyProxy(strategy_);
 
