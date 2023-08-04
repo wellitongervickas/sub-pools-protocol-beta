@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import { loadFixture, router, anyValue, ethers } from '../../fixtures'
+import { createRandomAddress } from '../../helpers/address'
 
 describe('Router', () => {
   describe('JoinNode', () => {
@@ -37,6 +38,18 @@ describe('Router', () => {
       const [nodeParentAddress] = receipt1.logs[7].args
 
       expect(nodeParentAddress).to.equal(parentNodeAddress)
+    })
+
+    it('should revert if try to join a node that does not registered', async function () {
+      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
+
+      const [, invited] = accounts
+      const invitedRouterContract = routerContract.connect(invited) as any
+
+      await expect(invitedRouterContract.joinNode(createRandomAddress(), [])).to.be.revertedWithCustomError(
+        invitedRouterContract,
+        'Router_OnlyRegisteredNode()'
+      )
     })
   })
 })

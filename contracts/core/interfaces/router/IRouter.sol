@@ -10,6 +10,9 @@ interface IRouter {
     /// @dev Emitted when a node is joined
     event Router_NodeJoined(address parentAddress_, address nodeAddress_);
 
+    /// @dev throws if the node is not registered
+    error Router_OnlyRegisteredNode();
+
     /**
      * @notice create a node
      * @param invitedAddresses_ the addresses of the invited nodes
@@ -20,10 +23,11 @@ interface IRouter {
 
     /**
      * @notice create a node
-     * @param _parentNodeAddress the address of the parent node
+     * @param parentNodeAddress_ the address of the parent node
      * @param invitedAddresses_ the addresses of the invited nodes
      * @return the address of the node
+     * @dev only registered parent node can be joined
      * @dev emits a {Router_NodeJoined} event
      */
-    function joinNode(address _parentNodeAddress, address[] memory invitedAddresses_) external returns (address);
+    function joinNode(address parentNodeAddress_, address[] memory invitedAddresses_) external returns (address);
 }

@@ -2,6 +2,7 @@
 pragma solidity =0.8.19;
 
 import {INodeFactory} from '../node/INodeFactory.sol';
+import {INode} from '../node/INode.sol';
 import {IStrategyProxyFactory} from '../strategyProxy/IStrategyProxyFactory.sol';
 
 interface IRouterManager {
@@ -32,4 +33,11 @@ interface IRouterManager {
      * @dev emits a {RouterManager_StrategyProxyFactoryUpdated} event
      */
     function updateStrategyProxyFactory(IStrategyProxyFactory strategyFactory_) external;
+
+    /**
+     * @notice return true if the node is registered
+     * @param nodeAddress_ the address of the node
+     * @return true if the node is registered
+     */
+    function nodes(INode nodeAddress_) external view returns (bool);
 }

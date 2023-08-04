@@ -14,6 +14,12 @@ contract Router is IRouter, RouterManager {
         IStrategyProxyFactory strategyProxyFactory_
     ) RouterManager(_nodeFactoryAddress, strategyProxyFactory_) {}
 
+    /// @dev Modifier to check if the node is registered
+    modifier onlyRegisteredNode(address nodeAddress_) {
+        if (!nodes(INode(nodeAddress_))) revert IRouter.Router_OnlyRegisteredNode();
+        _;
+    }
+
     /// @inheritdoc IRouter
     function createNode(address[] memory invitedAddresses_) public override returns (address) {
         ///@dev zero address when root
@@ -28,7 +34,7 @@ contract Router is IRouter, RouterManager {
     function joinNode(
         address parentNodeAddress_,
         address[] memory invitedAddresses_
-    ) external override returns (address) {
+    ) external override onlyRegisteredNode(parentNodeAddress_) returns (address) {
         INode parent = INode(parentNodeAddress_);
 
         address _nodeAddress = _buildNode(invitedAddresses_, parentNodeAddress_);

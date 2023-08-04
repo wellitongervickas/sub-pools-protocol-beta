@@ -3,8 +3,10 @@ pragma solidity =0.8.19;
 
 import {IRouterManager} from '../interfaces/router/IRouterManager.sol';
 import {Manager} from '../manager/Manager.sol';
+import {INode} from '../interfaces/node/INode.sol';
 import {INodeFactory} from '../interfaces/node/INodeFactory.sol';
 import {IStrategyProxyFactory} from '../interfaces/strategyProxy/IStrategyProxyFactory.sol';
+import {IStrategyProxy} from '../interfaces/strategyProxy/IStrategyProxy.sol';
 import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 
 contract RouterManager is IRouterManager, Manager {
@@ -13,6 +15,12 @@ contract RouterManager is IRouterManager, Manager {
 
     /// @inheritdoc IRouterManager
     IStrategyProxyFactory public override strategyProxyFactory;
+
+    /// @dev mapping of the registered nodes
+    mapping(INode => bool) private _nodes;
+
+    /// @dev mapping of the registered strategy proxies
+    mapping(IStrategyProxy => bool) private _strategyProxies;
 
     /**
      * @notice construct the router contract
@@ -38,10 +46,18 @@ contract RouterManager is IRouterManager, Manager {
         emit IRouterManager.RouterManager_StrategyProxyFactoryUpdated(address(strategyFactory_));
     }
 
+    /**
+     * @notice update the node factory
+     * @param nodeFactory_ address of the node factory
+     */
     function _updateNodeFactory(INodeFactory nodeFactory_) private {
         nodeFactory = nodeFactory_;
     }
 
+    /**
+     * @notice update the strategy proxy factory
+     * @param strategyFactory_ address of the strategy proxy factory
+     */
     function _updateStrategyProxyFactory(IStrategyProxyFactory strategyFactory_) private {
         strategyProxyFactory = strategyFactory_;
     }
@@ -54,7 +70,18 @@ contract RouterManager is IRouterManager, Manager {
      */
     function _buildNode(address[] memory invitedAddresses_, address parentAddress_) internal returns (address) {
         address _nodeAddress = nodeFactory.build(msg.sender, invitedAddresses_, parentAddress_);
+
+        _registryNode(_nodeAddress);
+
         return _nodeAddress;
+    }
+
+    /**
+     * @notice registry a node
+     * @param nodeAddress_ the address of the node
+     */
+    function _registryNode(address nodeAddress_) private {
+        _nodes[INode(nodeAddress_)] = true;
     }
 
     /**
@@ -64,6 +91,22 @@ contract RouterManager is IRouterManager, Manager {
      */
     function _buildStrategyProxy(IStrategy strategyAddress_) internal returns (address) {
         address _strategyProxyAddress = strategyProxyFactory.build(strategyAddress_);
+
+        _registryStrategyProxy(_strategyProxyAddress);
+
         return _strategyProxyAddress;
+    }
+
+    /**
+     * @notice registry a strategy proxy
+     * @param strategyProxyAddress_ the address of the strategy proxy
+     */
+    function _registryStrategyProxy(address strategyProxyAddress_) private {
+        _strategyProxies[IStrategyProxy(strategyProxyAddress_)] = true;
+    }
+
+    /// @inheritdoc IRouterManager
+    function nodes(INode nodeAddress_) public view override returns (bool) {
+        return _nodes[INode(nodeAddress_)];
     }
 }
