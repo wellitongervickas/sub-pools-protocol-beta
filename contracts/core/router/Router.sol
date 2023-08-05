@@ -38,12 +38,12 @@ contract Router is IRouter, RouterManager {
     ) external override onlyTrustedNode(parentNodeAddress_) returns (address) {
         INode parent = INode(parentNodeAddress_);
 
-        address _nodeAddress = _buildNode(invitedAddresses_, parentNodeAddress_);
-        parent.join(_nodeAddress, msg.sender);
+        address nodeAddress = _buildNode(invitedAddresses_, parentNodeAddress_);
+        parent.join(nodeAddress, msg.sender);
 
-        emit IRouter.Router_NodeJoined(parentNodeAddress_, _nodeAddress);
+        emit IRouter.Router_NodeJoined(parentNodeAddress_, nodeAddress);
 
-        return _nodeAddress;
+        return nodeAddress;
     }
 
     // function createStrategyProxy(IStrategy strategy_) external override returns (address) {

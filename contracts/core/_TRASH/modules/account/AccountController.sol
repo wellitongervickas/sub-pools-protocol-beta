@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import '@openzeppelin/contracts/utils/Counters.sol';
-import {IAccountController} from '../../interfaces/account/IAccountController.sol';
+import {IAccountController} from './IAccountController.sol';
 
 contract AccountController is IAccountController {
     using Counters for Counters.Counter;

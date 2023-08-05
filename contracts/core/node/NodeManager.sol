@@ -15,110 +15,110 @@ contract NodeManager is INodeManager, Manager {
 
     /**
      * @notice construct the node manager contract
-     * @param _managerAddress the address of the manager
-     * @param _invitedAddresses the addresses of the invited nodes
+     * @param managerAddress_ the address of the manager
+     * @param invitedAddresses_ the addresses of the invited nodes
      */
-    constructor(address _managerAddress, address[] memory _invitedAddresses) Manager(_managerAddress) {
-        _grantInvites(_invitedAddresses);
+    constructor(address managerAddress_, address[] memory invitedAddresses_) Manager(managerAddress_) {
+        _grantInvites(invitedAddresses_);
     }
 
     /// @dev modifier to check if the address is not a manager
-    modifier whenNotManager(address _address) {
-        if (hasManagerRole(_address)) revert INodeManager.NodeManager_ManagerNotAllowed();
+    modifier whenNotManager(address address_) {
+        if (hasManagerRole(address_)) revert INodeManager.NodeManager_ManagerNotAllowed();
         _;
     }
 
     /// @dev modifier to check if the address is not invited
-    modifier whenNotInvited(address _address) {
-        if (hasInvitedRole(_address)) revert INodeManager.NodeManager_AlreadyInvited();
+    modifier whenNotInvited(address address_) {
+        if (hasInvitedRole(address_)) revert INodeManager.NodeManager_AlreadyInvited();
         _;
     }
 
     /// @dev modifier to check if the address is not a node
-    modifier whenNotNode(address _address) {
-        if (hasNodeRole(_address)) revert INodeManager.NodeManager_AlreadyNode();
+    modifier whenNotNode(address address_) {
+        if (hasNodeRole(address_)) revert INodeManager.NodeManager_AlreadyNode();
         _;
     }
 
     /// @inheritdoc INodeManager
-    function setInvitedOnly(bool _invitedOnly) external onlyManager(address(this)) {
-        invitedOnly = _invitedOnly;
-        emit INodeManager.NodeManager_InvitedOnly(_invitedOnly);
+    function setInvitedOnly(bool invitedOnly_) external onlyManager(address(this)) {
+        invitedOnly = invitedOnly_;
+        emit INodeManager.NodeManager_InvitedOnly(invitedOnly_);
     }
 
     /// @inheritdoc INodeManager
     function invite(
-        address _invitedAddress
+        address invitedAddress_
     )
         external
         virtual
         onlyManager(address(this))
-        whenNotInvited(_invitedAddress)
-        whenNotManager(_invitedAddress)
-        whenNotNode(_invitedAddress)
+        whenNotInvited(invitedAddress_)
+        whenNotManager(invitedAddress_)
+        whenNotNode(invitedAddress_)
     {
-        _grantInvitedRole(_invitedAddress);
-        emit INodeManager.NodeManager_Invited(_invitedAddress);
+        _grantInvitedRole(invitedAddress_);
+        emit INodeManager.NodeManager_Invited(invitedAddress_);
     }
 
     /**
      * @dev grant the invited role to the invited addresses
-     * @param _invitedAddresses the addresses of the invited nodes
+     * @param invitedAddresses_ the addresses of the invited nodes
      * @dev the invited addresses are granted the invited role
      * @dev emits a {NodeManager_Invited} event
      */
-    function _grantInvites(address[] memory _invitedAddresses) private {
-        for (uint256 i = 0; i < _invitedAddresses.length; i++) {
-            _grantInvitedRole(_invitedAddresses[i]);
+    function _grantInvites(address[] memory invitedAddresses_) private {
+        for (uint256 i = 0; i < invitedAddresses_.length; i++) {
+            _grantInvitedRole(invitedAddresses_[i]);
         }
     }
 
     /**
      * @notice grant the invited role to the node
-     * @param _address the address of the node
+     * @param address_ the address of the node
      * @dev the node address is granted the invited role
      * @dev emits a {NodeManager_RoleUpdated} event
      */
-    function _grantInvitedRole(address _address) private {
-        _grantRole(INVITED_ROLE, _address);
+    function _grantInvitedRole(address address_) private {
+        _grantRole(INVITED_ROLE, address_);
     }
 
     /**
      *
-     * @param _address the address of the node
+     * @param address_ the address of the node
      * @dev the node address is revoked the invited role
      * @dev the node address is granted the node role
      * @dev emits a {NodeManager_RoleUpdated} event
      */
-    function _updateInvitedRole(address _address) internal {
-        _revokeInvitedRole(_address);
-        _grantNodeRole(_address);
+    function _updateInvitedRole(address address_) internal {
+        _revokeInvitedRole(address_);
+        _grantNodeRole(address_);
     }
 
     /**
      * @dev revoke the invited role to the node
-     * @param _address the address of the node
+     * @param address_ the address of the node
      */
-    function _revokeInvitedRole(address _address) private {
-        _revokeRole(INVITED_ROLE, _address);
+    function _revokeInvitedRole(address address_) private {
+        _revokeRole(INVITED_ROLE, address_);
     }
 
     /**
      * @dev grant the node role to the node
-     * @param _address the address of the node
+     * @param address_ the address of the node
      * @dev emits a {NodeManager_RoleUpdated} event
      */
-    function _grantNodeRole(address _address) private {
-        _grantRole(NODE_ROLE, _address);
+    function _grantNodeRole(address address_) private {
+        _grantRole(NODE_ROLE, address_);
     }
 
     /// @inheritdoc INodeManager
-    function hasInvitedRole(address _address) public view override returns (bool) {
-        return hasRole(INVITED_ROLE, _address);
+    function hasInvitedRole(address address_) public view override returns (bool) {
+        return hasRole(INVITED_ROLE, address_);
     }
 
     /// @inheritdoc INodeManager
-    function hasNodeRole(address _address) public view override returns (bool) {
-        return hasRole(NODE_ROLE, _address);
+    function hasNodeRole(address address_) public view override returns (bool) {
+        return hasRole(NODE_ROLE, address_);
     }
 }

@@ -32,34 +32,6 @@ contract RouterManager is IRouterManager, Manager {
         _updateStrategyProxyFactory(strategyFactory_);
     }
 
-    /// @inheritdoc IRouterManager
-    function updateNodeFactory(INodeFactory nodeFactory_) external override onlyManager(address(this)) {
-        _updateNodeFactory(nodeFactory_);
-        emit IRouterManager.RouterManager_NodeFactoryUpdated(address(nodeFactory_));
-    }
-
-    /// @inheritdoc IRouterManager
-    function updateStrategyProxyFactory(
-        IStrategyProxyFactory strategyFactory_
-    ) external override onlyManager(address(this)) {
-        _updateStrategyProxyFactory(strategyFactory_);
-        emit IRouterManager.RouterManager_StrategyProxyFactoryUpdated(address(strategyFactory_));
-    }
-
-    /// @inheritdoc IRouterManager
-    function trustNode(INode node_, bool isTrusted_) external override onlyManager(address(this)) {
-        _setNodeTrust(node_, isTrusted_);
-
-        emit IRouterManager.RouterManager_NodeTrust(node_, isTrusted_);
-    }
-
-    /// @inheritdoc IRouterManager
-    // function trustStrategyProxy(IStrategyProxy strategyProxy_, bool isTrusted_) external onlyManager(address(this)) {
-    //     _setStrategyProxyTrust(strategyProxy_, isTrusted_);
-
-    //     emit IRouterManager.RouterManager_StrategyProxyTrust(strategyProxy_, isTrusted_);
-    // }
-
     /**
      * @notice update the node factory
      * @param nodeFactory_ address of the node factory
@@ -76,6 +48,20 @@ contract RouterManager is IRouterManager, Manager {
         strategyProxyFactory = strategyFactory_;
     }
 
+    /// @inheritdoc IRouterManager
+    function updateNodeFactory(INodeFactory nodeFactory_) external override onlyManager(address(this)) {
+        _updateNodeFactory(nodeFactory_);
+        emit IRouterManager.RouterManager_NodeFactoryUpdated(address(nodeFactory_));
+    }
+
+    /// @inheritdoc IRouterManager
+    function updateStrategyProxyFactory(
+        IStrategyProxyFactory strategyFactory_
+    ) external override onlyManager(address(this)) {
+        _updateStrategyProxyFactory(strategyFactory_);
+        emit IRouterManager.RouterManager_StrategyProxyFactoryUpdated(address(strategyFactory_));
+    }
+
     /**
      * @notice deploy a new node
      * @param invitedAddresses_ the addresses of the invited nodes
@@ -83,11 +69,11 @@ contract RouterManager is IRouterManager, Manager {
      * @return the address of the node
      */
     function _buildNode(address[] memory invitedAddresses_, address parentAddress_) internal returns (address) {
-        address _nodeAddress = nodeFactory.build(msg.sender, invitedAddresses_, parentAddress_);
+        address nodeAddress = nodeFactory.build(msg.sender, invitedAddresses_, parentAddress_);
 
-        _registryNode(INode(_nodeAddress));
+        _registryNode(INode(nodeAddress));
 
-        return _nodeAddress;
+        return nodeAddress;
     }
 
     /**
@@ -107,6 +93,25 @@ contract RouterManager is IRouterManager, Manager {
     function _setNodeTrust(INode nodeAddress_, bool isTrusted_) private {
         _nodes[nodeAddress_] = isTrusted_;
     }
+
+    /// @inheritdoc IRouterManager
+    function trustNode(INode node_, bool isTrusted_) external override onlyManager(address(this)) {
+        _setNodeTrust(node_, isTrusted_);
+
+        emit IRouterManager.RouterManager_NodeTrust(node_, isTrusted_);
+    }
+
+    /// @inheritdoc IRouterManager
+    function nodes(INode nodeAddress_) public view override returns (bool) {
+        return _nodes[INode(nodeAddress_)];
+    }
+
+    /// @inheritdoc IRouterManager
+    // function trustStrategyProxy(IStrategyProxy strategyProxy_, bool isTrusted_) external onlyManager(address(this)) {
+    //     _setStrategyProxyTrust(strategyProxy_, isTrusted_);
+
+    //     emit IRouterManager.RouterManager_StrategyProxyTrust(strategyProxy_, isTrusted_);
+    // }
 
     /**
      * @notice deploy a new strategy proxy
@@ -138,9 +143,4 @@ contract RouterManager is IRouterManager, Manager {
     // function _setStrategyProxyTrust(IStrategyProxy strategyProxyAddress_, bool isTrusted_) private {
     //     _strategyProxies[strategyProxyAddress_] = isTrusted_;
     // }
-
-    /// @inheritdoc IRouterManager
-    function nodes(INode nodeAddress_) public view override returns (bool) {
-        return _nodes[INode(nodeAddress_)];
-    }
 }
