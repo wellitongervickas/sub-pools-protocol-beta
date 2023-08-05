@@ -5,25 +5,16 @@ import {IRouter} from '../interfaces/router/IRouter.sol';
 import {RouterManager} from './RouterManager.sol';
 import {INodeFactory} from '../interfaces/node/INodeFactory.sol';
 import {INode} from '../interfaces/node/INode.sol';
-import {IStrategyProxyFactory} from '../interfaces/strategy/IStrategyProxyFactory.sol';
-import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 
 contract Router is IRouter, RouterManager {
-    /// @dev see IRouterManager
-    constructor(
-        INodeFactory _nodeFactoryAddress,
-        IStrategyProxyFactory strategyProxyFactory_
-    ) RouterManager(_nodeFactoryAddress, strategyProxyFactory_) {}
+    constructor(INodeFactory nodeFactory_) RouterManager(nodeFactory_) {}
 
-    /// @dev Modifier to check if the node is registered
     modifier onlyTrustedNode(address nodeAddress_) {
         if (!nodes(INode(nodeAddress_))) revert IRouter.Router_OnlyTrustedNode();
         _;
     }
 
-    /// @inheritdoc IRouter
     function createNode(address[] memory invitedAddresses_) public override returns (address) {
-        ///@dev zero address when root
         address nodeAddress = _buildNode(invitedAddresses_, address(0));
 
         emit IRouter.Router_NodeCreated(nodeAddress);
@@ -31,7 +22,6 @@ contract Router is IRouter, RouterManager {
         return nodeAddress;
     }
 
-    /// @inheritdoc IRouter
     function joinNode(
         address parentNodeAddress_,
         address[] memory invitedAddresses_
@@ -45,12 +35,4 @@ contract Router is IRouter, RouterManager {
 
         return nodeAddress;
     }
-
-    // function createStrategyProxy(IStrategy strategy_) external override returns (address) {
-    //     address strategyProxyAddress = strategyProxyFactory.build(strategy_);
-
-    //     emit IRouter.Router_StrategyProxyCreated(strategyProxyAddress);
-
-    //     return strategyProxyAddress;
-    // }
 }
