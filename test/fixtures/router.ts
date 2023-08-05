@@ -1,9 +1,11 @@
 import { ethers } from 'hardhat'
-import { loadFixture, nodeFactory, vaultFactory } from '.'
 
 export async function deployRouterFixture() {
-  const { vaultFactoryContract } = await loadFixture(vaultFactory.deployVaultFactoryFixture)
-  const { nodeFactoryContract } = await loadFixture(nodeFactory.deployNodeFactoryFixture)
+  const VaultFactory = await ethers.getContractFactory('VaultFactory')
+  const vaultFactoryContract = await VaultFactory.deploy()
+  const NodeFactory = await ethers.getContractFactory('NodeFactory')
+  const nodeFactoryContract = await NodeFactory.deploy()
+
   const nodeFactoryAddress = await nodeFactoryContract.getAddress()
   const vaultFactoryAddress = await vaultFactoryContract.getAddress()
 
@@ -11,7 +13,7 @@ export async function deployRouterFixture() {
   const Router = await ethers.getContractFactory('Router')
   const routerContract = await Router.deploy(nodeFactoryAddress, vaultFactoryAddress)
 
-  return { accounts, routerContract, nodeFactoryAddress, vaultFactoryAddress }
+  return { accounts, routerContract, nodeFactoryAddress, vaultFactoryAddress, vaultFactoryContract }
 }
 
 const fixtures = {

@@ -7,7 +7,7 @@ describe('Router', () => {
       const { fakeStrategyAddress } = await loadFixture(fakeStrategy.deployFakeStrategyFixture)
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-      await expect(routerContract.requestStrategyVault(fakeStrategyAddress))
+      await expect(routerContract.createVault(fakeStrategyAddress))
         .to.emit(routerContract, 'Router_StrategyVaultRequest')
         .withArgs(fakeStrategyAddress, anyValue)
     })

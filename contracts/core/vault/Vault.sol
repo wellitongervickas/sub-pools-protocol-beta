@@ -5,8 +5,6 @@ import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {IVault} from '../interfaces/vault/IVault.sol';
 import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 
-///PAUSED UNTIL OWNER CHANGE IT
-
 contract Vault is IVault, Ownable {
     IStrategy public immutable strategy;
 

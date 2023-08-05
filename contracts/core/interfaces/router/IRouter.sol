@@ -14,5 +14,5 @@ interface IRouter {
 
     function joinNode(address parentNodeAddress_, address[] memory invitedAddresses_) external returns (address);
 
-    function requestStrategyVault(address strategyAddress_) external returns (address);
+    function createVault(address strategyAddress_) external returns (address);
 }
