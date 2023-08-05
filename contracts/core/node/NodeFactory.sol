@@ -14,9 +14,11 @@ contract NodeFactory is INodeFactory {
 
         _setDeployerAsOwner(node, msg.sender);
 
-        emit INodeFactory.NodeFactory_NodeCreated(address(node), invitedAddresses_, nodeParentAddress_);
+        address nodeAddress = address(node);
 
-        return address(node);
+        emit INodeFactory.NodeFactory_NodeCreated(nodeAddress, invitedAddresses_, nodeParentAddress_);
+
+        return nodeAddress;
     }
 
     function _setDeployerAsOwner(Node node_, address deployerAddress_) private {

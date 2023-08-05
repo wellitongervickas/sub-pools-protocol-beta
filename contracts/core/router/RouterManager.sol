@@ -55,11 +55,11 @@ contract RouterManager is IRouterManager, Manager {
         return _nodes[node_];
     }
 
-    function _buildVault(IStrategy strategy_) internal returns (address) {
-        address vaultAddress = vaultFactory.build(strategy_);
+    function _buildVault(address strategyAddress_) internal returns (address) {
+        address vaultAddress = vaultFactory.build(strategyAddress_);
 
-        _registryStrategy(strategy_);
-        _registryVault(strategy_, IVault(vaultAddress));
+        // _registryStrategy(IStrategy(strategyAddress_));
+        // _registryVault(IStrategy(strategyAddress_), IVault(vaultAddress));
 
         return vaultAddress;
     }
