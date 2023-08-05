@@ -16,7 +16,7 @@ contract Router is IRouter, RouterManager {
     ) RouterManager(_nodeFactoryAddress, strategyProxyFactory_) {}
 
     /// @dev Modifier to check if the node is registered
-    modifier onlyRegisteredNode(address nodeAddress_) {
+    modifier onlyTrustedNode(address nodeAddress_) {
         if (!nodes(INode(nodeAddress_))) revert IRouter.Router_OnlyTrustedNode();
         _;
     }
@@ -35,11 +35,10 @@ contract Router is IRouter, RouterManager {
     function joinNode(
         address parentNodeAddress_,
         address[] memory invitedAddresses_
-    ) external override onlyRegisteredNode(parentNodeAddress_) returns (address) {
+    ) external override onlyTrustedNode(parentNodeAddress_) returns (address) {
         INode parent = INode(parentNodeAddress_);
 
         address _nodeAddress = _buildNode(invitedAddresses_, parentNodeAddress_);
-        /// @dev node will check child invitation
         parent.join(_nodeAddress, msg.sender);
 
         emit IRouter.Router_NodeJoined(parentNodeAddress_, _nodeAddress);
