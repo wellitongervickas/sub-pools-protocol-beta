@@ -4,7 +4,6 @@ pragma solidity =0.8.19;
 interface IRouter {
     event Router_NodeCreated(address nodeAddress_);
     event Router_NodeJoined(address parentAddress_, address nodeAddress_);
-    event Router_StrategyProxyCreated(address strategyProxyAddress_);
 
     error Router_OnlyTrustedNode();
 
