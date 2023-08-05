@@ -40,7 +40,7 @@ contract Router is IRouter, RouterManager {
     function createVault(address strategy_) public override returns (address) {
         address vaultAddress = _buildVault(strategy_);
 
-        emit IRouter.Router_StrategyVaultRequest(strategy_, vaultAddress);
+        emit IRouter.Router_StrategyCreateVaultRequest(strategy_, vaultAddress);
         return strategy_;
     }
 }

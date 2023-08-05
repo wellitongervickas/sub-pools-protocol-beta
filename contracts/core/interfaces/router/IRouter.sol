@@ -6,7 +6,7 @@ import {IStrategy} from '../strategy/IStrategy.sol';
 interface IRouter {
     event Router_NodeCreated(address nodeAddress_);
     event Router_NodeJoined(address parentAddress_, address nodeAddress_);
-    event Router_StrategyVaultRequest(address strategyAddress_, address vaultAddress_);
+    event Router_StrategyCreateVaultRequest(address strategyAddress_, address vaultAddress_);
 
     error Router_OnlyTrustedNode();
 
