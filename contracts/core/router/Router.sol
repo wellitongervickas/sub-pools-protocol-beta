@@ -6,6 +6,7 @@ import {RouterManager} from './RouterManager.sol';
 import {INodeFactory} from '../interfaces/node/INodeFactory.sol';
 import {INode} from '../interfaces/node/INode.sol';
 import {IStrategyProxyFactory} from '../interfaces/strategy/IStrategyProxyFactory.sol';
+import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 
 contract Router is IRouter, RouterManager {
     /// @dev see IRouterManager
@@ -16,7 +17,7 @@ contract Router is IRouter, RouterManager {
 
     /// @dev Modifier to check if the node is registered
     modifier onlyRegisteredNode(address nodeAddress_) {
-        if (!nodes(INode(nodeAddress_))) revert IRouter.Router_OnlyRegisteredNode();
+        if (!nodes(INode(nodeAddress_))) revert IRouter.Router_OnlyTrustedNode();
         _;
     }
 
@@ -45,4 +46,12 @@ contract Router is IRouter, RouterManager {
 
         return _nodeAddress;
     }
+
+    // function createStrategyProxy(IStrategy strategy_) external override returns (address) {
+    //     address strategyProxyAddress = strategyProxyFactory.build(strategy_);
+
+    //     emit IRouter.Router_StrategyProxyCreated(strategyProxyAddress);
+
+    //     return strategyProxyAddress;
+    // }
 }

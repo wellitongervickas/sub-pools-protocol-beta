@@ -48,7 +48,25 @@ describe('Router', () => {
 
       await expect(invitedRouterContract.joinNode(createRandomAddress(), [])).to.be.revertedWithCustomError(
         invitedRouterContract,
-        'Router_OnlyRegisteredNode()'
+        'Router_OnlyTrustedNode()'
+      )
+    })
+
+    it('should revert if try to join a node that is untrusted', async function () {
+      const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
+
+      const [, invited] = accounts
+      const invitedRouterContract = routerContract.connect(invited) as any
+
+      const tx = await routerContract.createNode([invited.address])
+      const receipt = await tx.wait()
+      const [parentNodeAddress] = receipt.logs[5].args
+
+      await routerContract.trustNode(parentNodeAddress, false)
+
+      await expect(invitedRouterContract.joinNode(parentNodeAddress, [])).to.be.revertedWithCustomError(
+        invitedRouterContract,
+        'Router_OnlyTrustedNode()'
       )
     })
   })

@@ -20,7 +20,7 @@ contract RouterManager is IRouterManager, Manager {
     mapping(INode => bool) private _nodes;
 
     /// @dev mapping of the registered strategy proxies
-    mapping(IStrategyProxy => bool) private _strategyProxies;
+    // mapping(IStrategyProxy => bool) private _strategyProxies;
 
     /**
      * @notice construct the router contract
@@ -33,7 +33,7 @@ contract RouterManager is IRouterManager, Manager {
     }
 
     /// @inheritdoc IRouterManager
-    function updateNodeFactory(INodeFactory nodeFactory_) public override onlyManager(address(this)) {
+    function updateNodeFactory(INodeFactory nodeFactory_) external override onlyManager(address(this)) {
         _updateNodeFactory(nodeFactory_);
         emit IRouterManager.RouterManager_NodeFactoryUpdated(address(nodeFactory_));
     }
@@ -41,10 +41,24 @@ contract RouterManager is IRouterManager, Manager {
     /// @inheritdoc IRouterManager
     function updateStrategyProxyFactory(
         IStrategyProxyFactory strategyFactory_
-    ) public override onlyManager(address(this)) {
+    ) external override onlyManager(address(this)) {
         _updateStrategyProxyFactory(strategyFactory_);
         emit IRouterManager.RouterManager_StrategyProxyFactoryUpdated(address(strategyFactory_));
     }
+
+    /// @inheritdoc IRouterManager
+    function trustNode(INode node_, bool isTrusted_) external override onlyManager(address(this)) {
+        _setNodeTrust(node_, isTrusted_);
+
+        emit IRouterManager.RouterManager_NodeTrust(node_, isTrusted_);
+    }
+
+    /// @inheritdoc IRouterManager
+    // function trustStrategyProxy(IStrategyProxy strategyProxy_, bool isTrusted_) external onlyManager(address(this)) {
+    //     _setStrategyProxyTrust(strategyProxy_, isTrusted_);
+
+    //     emit IRouterManager.RouterManager_StrategyProxyTrust(strategyProxy_, isTrusted_);
+    // }
 
     /**
      * @notice update the node factory
@@ -71,7 +85,7 @@ contract RouterManager is IRouterManager, Manager {
     function _buildNode(address[] memory invitedAddresses_, address parentAddress_) internal returns (address) {
         address _nodeAddress = nodeFactory.build(msg.sender, invitedAddresses_, parentAddress_);
 
-        _registryNode(_nodeAddress);
+        _registryNode(INode(_nodeAddress));
 
         return _nodeAddress;
     }
@@ -80,8 +94,18 @@ contract RouterManager is IRouterManager, Manager {
      * @notice registry a node
      * @param nodeAddress_ the address of the node
      */
-    function _registryNode(address nodeAddress_) private {
-        _nodes[INode(nodeAddress_)] = true;
+    function _registryNode(INode nodeAddress_) private {
+        /// @dev do not required a manual trust since the node factory is trusted
+        _setNodeTrust(nodeAddress_, true);
+    }
+
+    /**
+     * @notice set the status of the node registry
+     * @param nodeAddress_ the address of the node
+     * @param isTrusted_ the status of the node
+     */
+    function _setNodeTrust(INode nodeAddress_, bool isTrusted_) private {
+        _nodes[nodeAddress_] = isTrusted_;
     }
 
     /**
@@ -89,21 +113,31 @@ contract RouterManager is IRouterManager, Manager {
      * @param strategyAddress_ the address of the strategy
      * @return the address of the strategy proxy
      */
-    function _buildStrategyProxy(IStrategy strategyAddress_) internal returns (address) {
-        address _strategyProxyAddress = strategyProxyFactory.build(strategyAddress_);
+    // function _buildStrategyProxy(IStrategy strategyAddress_) internal returns (address) {
+    //     address _strategyProxyAddress = strategyProxyFactory.build(strategyAddress_);
 
-        _registryStrategyProxy(_strategyProxyAddress);
+    //     _registryStrategyProxy(IStrategyProxy(_strategyProxyAddress));
 
-        return _strategyProxyAddress;
-    }
+    //     return _strategyProxyAddress;
+    // }
 
     /**
      * @notice registry a strategy proxy
      * @param strategyProxyAddress_ the address of the strategy proxy
      */
-    function _registryStrategyProxy(address strategyProxyAddress_) private {
-        _strategyProxies[IStrategyProxy(strategyProxyAddress_)] = true;
-    }
+    // function _registryStrategyProxy(IStrategyProxy strategyProxyAddress_) private {
+    //     /// @dev requires a manual trust since strategy is not trusted yet
+    //     _setStrategyProxyTrust(strategyProxyAddress_, false);
+    // }
+
+    /**
+     * @notice set the status of the strategy proxy registry
+     * @param strategyProxyAddress_ the address of the strategy proxy
+     * @param isTrusted_ the status of the strategy proxy
+     */
+    // function _setStrategyProxyTrust(IStrategyProxy strategyProxyAddress_, bool isTrusted_) private {
+    //     _strategyProxies[strategyProxyAddress_] = isTrusted_;
+    // }
 
     /// @inheritdoc IRouterManager
     function nodes(INode nodeAddress_) public view override returns (bool) {

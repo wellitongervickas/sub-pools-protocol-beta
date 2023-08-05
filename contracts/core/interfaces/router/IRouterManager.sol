@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import {INodeFactory} from '../node/INodeFactory.sol';
 import {INode} from '../node/INode.sol';
 import {IStrategyProxyFactory} from '../strategy/IStrategyProxyFactory.sol';
+import {IStrategyProxy} from '../strategy/IStrategyProxy.sol';
 
 interface IRouterManager {
     /// @dev Emitted when the node factory is updated
@@ -11,6 +12,12 @@ interface IRouterManager {
 
     /// @dev Emmitted when the strategy proxy factory is updated
     event RouterManager_StrategyProxyFactoryUpdated(address strategyProxyFactory_);
+
+    /// @dev Emitted when a node is trusted status changed
+    // event RouterManager_StrategyProxyTrust(IStrategyProxy strategyProxy_, bool status_);
+
+    /// @dev Emitted when a strategy proxy is trusted status changed
+    event RouterManager_NodeTrust(INode node_, bool status_);
 
     /// @notice the node factory
     function nodeFactory() external view returns (INodeFactory);
@@ -33,6 +40,20 @@ interface IRouterManager {
      * @dev emits a {RouterManager_StrategyProxyFactoryUpdated} event
      */
     function updateStrategyProxyFactory(IStrategyProxyFactory strategyFactory_) external;
+
+    /**
+     * @notice trust a node
+     * @param node_ the address of the node
+     * @dev only the manager can trust a node
+     */
+    function trustNode(INode node_, bool status_) external;
+
+    /**
+     * @notice trust a strategy proxy
+     * @param strategyProxy_ the address of the strategy proxy
+     * @dev only the manager can trust a strategy proxy
+     */
+    // function trustStrategyProxy(IStrategyProxy strategyProxy_, bool status_) external;
 
     /**
      * @notice return true if the node is registered
