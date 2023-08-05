@@ -43,12 +43,8 @@ contract RouterManager is IRouterManager, Manager {
     function _buildNode(address[] memory invitedAddresses_, address parentAddress_) internal returns (address) {
         address nodeAddress = nodeFactory.build(msg.sender, invitedAddresses_, parentAddress_);
 
-        _registryNode(INode(nodeAddress));
+        _setNodeTrust(INode(nodeAddress), true);
         return nodeAddress;
-    }
-
-    function _registryNode(INode node_) private {
-        _setNodeTrust(node_, true);
     }
 
     function _setNodeTrust(INode node_, bool isTrusted_) private {
@@ -86,10 +82,6 @@ contract RouterManager is IRouterManager, Manager {
     }
 
     function _registryVault(IStrategy strategy_, IVault vault_) private {
-        _setVaultTrust(strategy_, vault_);
-    }
-
-    function _setVaultTrust(IStrategy strategy_, IVault vault_) private {
         _vaults[strategy_] = vault_;
     }
 
