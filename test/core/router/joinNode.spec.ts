@@ -58,13 +58,7 @@ describe('Router', () => {
       const [, invited] = accounts
       const invitedRouterContract = routerContract.connect(invited) as any
 
-      const tx = await routerContract.createNode([invited.address])
-      const receipt = await tx.wait()
-      const [parentNodeAddress] = receipt.logs[5].args
-
-      await routerContract.trustNode(parentNodeAddress, false)
-
-      await expect(invitedRouterContract.joinNode(parentNodeAddress, [])).to.be.revertedWithCustomError(
+      await expect(invitedRouterContract.joinNode(createRandomAddress(), [])).to.be.revertedWithCustomError(
         invitedRouterContract,
         'Router_OnlyTrustedNode()'
       )

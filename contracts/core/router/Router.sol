@@ -25,7 +25,7 @@ contract Router is IRouter, RouterManager {
     function joinNode(
         address parentNodeAddress_,
         address[] memory invitedAddresses_
-    ) external override onlyTrustedNode(parentNodeAddress_) returns (address) {
+    ) public override onlyTrustedNode(parentNodeAddress_) returns (address) {
         INode parent = INode(parentNodeAddress_);
 
         address nodeAddress = _buildNode(invitedAddresses_, parentNodeAddress_);
