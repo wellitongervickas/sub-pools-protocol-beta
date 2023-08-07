@@ -8,10 +8,10 @@ contract FakeStrategy is IStrategy, EncodedERC20Transfer {
     constructor(address[] memory assets_) EncodedERC20Transfer(assets_) {}
 
     function deposit(address depositor_, bytes memory amount_) external returns (bytes memory) {
-        return _receiveAssets(depositor_, amount_);
+        return _deposit(depositor_, amount_);
     }
 
     function withdraw(address requisitor_, bytes memory amount_) external returns (bytes memory) {
-        return _sendAssets(requisitor_, amount_);
+        return _withdraw(requisitor_, amount_);
     }
 }

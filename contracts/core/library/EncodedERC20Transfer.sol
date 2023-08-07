@@ -9,13 +9,13 @@ contract EncodedERC20Transfer {
     using SafeERC20 for IERC20;
     using BytesLib for bytes;
 
-    bytes public assets;
+    bytes private assets;
 
     constructor(address[] memory assets_) {
         assets = BytesLib.fromAddresses(assets_);
     }
 
-    function _receiveAssets(address depositor_, bytes memory amount_) internal returns (bytes memory) {
+    function _deposit(address depositor_, bytes memory amount_) internal returns (bytes memory) {
         address[] memory assets_ = assets.toAddresses();
         uint256[] memory amounts = amount_.toAmounts();
 
@@ -26,7 +26,7 @@ contract EncodedERC20Transfer {
         return amount_;
     }
 
-    function _sendAssets(address requisitor_, bytes memory amount_) internal returns (bytes memory) {
+    function _withdraw(address requisitor_, bytes memory amount_) internal returns (bytes memory) {
         address[] memory assets_ = assets.toAddresses();
         uint256[] memory amounts = amount_.toAmounts();
 
