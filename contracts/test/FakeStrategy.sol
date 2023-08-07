@@ -2,23 +2,16 @@
 pragma solidity ^0.8.9;
 
 import {IStrategy} from '../core/interfaces/strategy/IStrategy.sol';
-import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
-import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {EncodedERC20Transfer} from '../core/library/EncodedERC20Transfer.sol';
 
-contract FakeStrategy is IStrategy {
-    using SafeERC20 for IERC20;
+contract FakeStrategy is IStrategy, EncodedERC20Transfer {
+    constructor(address[] memory assets_) EncodedERC20Transfer(assets_) {}
 
-    bytes public assets;
-
-    constructor(address[] memory assets_) {
-        assets = abi.encode(assets_);
+    function deposit(address depositor_, bytes memory amount_) external returns (bytes memory) {
+        return _receiveAssets(depositor_, amount_);
     }
 
-    function deposit(address _depositor, bytes memory _amount) external returns (bytes memory) {
-        return _amount;
-    }
-
-    function withdraw(address _requisitor, bytes memory _amount) external returns (bytes memory) {
-        return _amount;
+    function withdraw(address requisitor_, bytes memory amount_) external returns (bytes memory) {
+        return _sendAssets(requisitor_, amount_);
     }
 }
