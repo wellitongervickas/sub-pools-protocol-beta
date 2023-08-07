@@ -10,6 +10,10 @@ contract FakeStrategy is IStrategy {
 
     bytes public assets;
 
+    constructor(address[] memory assets_) {
+        assets = abi.encode(assets_);
+    }
+
     function deposit(address _depositor, bytes memory _amount) external returns (bytes memory) {
         return _amount;
     }
