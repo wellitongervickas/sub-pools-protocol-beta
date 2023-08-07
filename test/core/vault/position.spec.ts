@@ -9,7 +9,7 @@ describe('Vault', () => {
       const { vaultContract } = await loadFixture(vault.deployVaultFixture)
       const encodedAmount = coderUtils.build([[100]], ['uint256[]'])
 
-      await expect(vaultContract.addPosition(FAKE_PARENT, encodedAmount))
+      await expect(vaultContract.addPosition(encodedAmount, FAKE_PARENT))
         .to.emit(vaultContract, 'Vault_PositionAdded')
         .withArgs(1, encodedAmount)
     })
@@ -19,7 +19,7 @@ describe('Vault', () => {
       const [manager] = accounts
 
       const encodedAmount = coderUtils.build([[100]], ['uint256[]'])
-      await vaultContract.addPosition(FAKE_PARENT, encodedAmount)
+      await vaultContract.addPosition(encodedAmount, FAKE_PARENT)
 
       expect(await vaultContract.accounts(manager.address)).to.be.deep.equal([ethers.toBigInt(1), FAKE_PARENT])
     })
@@ -28,7 +28,7 @@ describe('Vault', () => {
       const { vaultContract } = await loadFixture(vault.deployVaultFixture)
 
       const encodedAmount = coderUtils.build([[100]], ['uint256[]'])
-      await vaultContract.addPosition(FAKE_PARENT, encodedAmount)
+      await vaultContract.addPosition(encodedAmount, FAKE_PARENT)
 
       expect(await vaultContract.positions(1)).to.be.deep.equal([encodedAmount])
     })
@@ -40,7 +40,7 @@ describe('Vault', () => {
       const encodedAmount = coderUtils.build([[100]], ['uint256[]'])
       const notOwnerVault = vaultContract.connect(notOwner) as any
 
-      await expect(notOwnerVault.addPosition(FAKE_PARENT, encodedAmount)).to.be.rejectedWith(
+      await expect(notOwnerVault.addPosition(encodedAmount, FAKE_PARENT)).to.be.rejectedWith(
         'Ownable: caller is not the owner'
       )
     })
