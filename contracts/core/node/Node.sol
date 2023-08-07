@@ -6,15 +6,8 @@ import {INode} from '../interfaces/node/INode.sol';
 import {NodeManager} from './NodeManager.sol';
 
 contract Node is INode, NodeManager, Ownable {
-    /// @inheritdoc INode
     address public immutable override parent;
 
-    /**
-     * @notice construct the node contract
-     * @param managerAddress_ address of the manager
-     * @param invitedAddresses_ addresses of the invited nodes
-     * @param parentAddress_ address of the parent node, zero when root
-     */
     constructor(
         address managerAddress_,
         address[] memory invitedAddresses_,
@@ -23,20 +16,17 @@ contract Node is INode, NodeManager, Ownable {
         parent = parentAddress_;
     }
 
-    /// @dev modifier to check if _address is invited when invited only mode
     modifier checkInvitation(address _address) {
         bool _isInvited = hasInvitedRole(_address);
         if (invitedOnly && !_isInvited) revert INode.Node_NotInvited();
         _;
     }
 
-    /// @dev modifier to check if the sender is the router
     modifier onlyRouter() {
         _checkOwner();
         _;
     }
 
-    ///@inheritdoc INode
     function join(
         address _nodeAddress,
         address managerAddress_
