@@ -3,6 +3,7 @@ import { ethers } from 'hardhat'
 export async function deployRouterFixture() {
   const VaultFactory = await ethers.getContractFactory('VaultFactory')
   const vaultFactoryContract = await VaultFactory.deploy()
+
   const NodeFactory = await ethers.getContractFactory('NodeFactory')
   const nodeFactoryContract = await NodeFactory.deploy()
 

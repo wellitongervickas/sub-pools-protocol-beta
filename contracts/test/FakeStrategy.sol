@@ -5,10 +5,14 @@ import {IStrategy} from '../core/interfaces/strategy/IStrategy.sol';
 import {EncodedERC20Transfer} from '../core/library/EncodedERC20Transfer.sol';
 
 contract FakeStrategy is IStrategy, EncodedERC20Transfer {
-    address public immutable strategist;
+    bytes private _assets;
 
-    constructor(address[] memory assets_, address strategist_) EncodedERC20Transfer(assets_) {
-        strategist = strategist_;
+    constructor(bytes memory assets_) {
+        _assets = assets_;
+    }
+
+    function assets() public view override(EncodedERC20Transfer, IStrategy) returns (bytes memory) {
+        return _assets;
     }
 
     function deposit(address depositor_, bytes memory amount_) external returns (bytes memory) {

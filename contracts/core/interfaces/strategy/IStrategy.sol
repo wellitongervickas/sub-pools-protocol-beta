@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 interface IStrategy {
-    function strategist() external view returns (address);
+    function assets() external view returns (bytes memory);
 
     function deposit(address _depositor, bytes memory _amount) external returns (bytes memory);
 

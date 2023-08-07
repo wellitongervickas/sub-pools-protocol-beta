@@ -7,8 +7,9 @@ describe('Vault', () => {
   describe('Position', () => {
     it('should emit Vault_PositionAdded on add position', async function () {
       const { vaultContract, tokenContract, fakeStrategyAddress } = await loadFixture(vault.deployVaultFixture)
+      const vaultContractAddress = await vaultContract.getAddress()
       const encodedAmount = coderUtils.build([[100]], ['uint256[]'])
-      await tokenContract.approve(fakeStrategyAddress, 100)
+      await tokenContract.approve(vaultContractAddress, 100)
 
       await expect(vaultContract.addPosition(encodedAmount, FAKE_PARENT))
         .to.emit(vaultContract, 'Vault_PositionAdded')
@@ -21,8 +22,10 @@ describe('Vault', () => {
       )
       const [manager] = accounts
 
-      await tokenContract.approve(fakeStrategyAddress, 100)
+      const vaultContractAddress = await vaultContract.getAddress()
       const encodedAmount = coderUtils.build([[100]], ['uint256[]'])
+      await tokenContract.approve(vaultContractAddress, 100)
+
       await vaultContract.addPosition(encodedAmount, FAKE_PARENT)
 
       expect(await vaultContract.accounts(manager.address)).to.be.deep.equal([ethers.toBigInt(1), FAKE_PARENT])
@@ -30,19 +33,22 @@ describe('Vault', () => {
 
     it('should create a position', async function () {
       const { vaultContract, tokenContract, fakeStrategyAddress } = await loadFixture(vault.deployVaultFixture)
+      const vaultContractAddress = await vaultContract.getAddress()
       const encodedAmount = coderUtils.build([[100]], ['uint256[]'])
-
-      await tokenContract.approve(fakeStrategyAddress, 100)
+      await tokenContract.approve(vaultContractAddress, 100)
       await vaultContract.addPosition(encodedAmount, FAKE_PARENT)
 
       expect(await vaultContract.positions(1)).to.be.deep.equal([encodedAmount])
     })
 
     it('should revert if try to add position without being the owner', async function () {
-      const { vaultContract, accounts } = await loadFixture(vault.deployVaultFixture)
+      const { vaultContract, accounts, tokenContract } = await loadFixture(vault.deployVaultFixture)
       const [_, notOwner] = accounts
 
+      const vaultContractAddress = await vaultContract.getAddress()
       const encodedAmount = coderUtils.build([[100]], ['uint256[]'])
+      await tokenContract.approve(vaultContractAddress, 100)
+
       const notOwnerVault = vaultContract.connect(notOwner) as any
 
       await expect(notOwnerVault.addPosition(encodedAmount, FAKE_PARENT)).to.be.rejectedWith(

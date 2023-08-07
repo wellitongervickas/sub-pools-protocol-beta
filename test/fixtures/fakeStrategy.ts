@@ -1,4 +1,5 @@
 import { ethers } from 'hardhat'
+import coderUtils from '../helpers/coder'
 
 export async function deployFakeStrategyFixture() {
   const supply = '1000000000000000000000000'
@@ -7,7 +8,7 @@ export async function deployFakeStrategyFixture() {
   const tokenAddress = await tokenContract.getAddress()
 
   const FakeStrategy = await ethers.getContractFactory('FakeStrategy')
-  const fakeStrategyContract = await FakeStrategy.deploy([tokenAddress])
+  const fakeStrategyContract = await FakeStrategy.deploy(coderUtils.build([[tokenAddress]], ['address[]']))
   const fakeStrategyAddress = await fakeStrategyContract.getAddress()
 
   return { fakeStrategyAddress, fakeStrategyContract, tokenAddress, supply, tokenContract }

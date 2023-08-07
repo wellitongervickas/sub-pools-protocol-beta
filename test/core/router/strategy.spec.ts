@@ -1,5 +1,6 @@
 import { expect } from 'chai'
-import { loadFixture, router, anyValue, fakeStrategy } from '../../fixtures'
+import { loadFixture, router, anyValue, fakeStrategy, token, ethers } from '../../fixtures'
+import coderUtils from '../../helpers/coder'
 
 describe('Router', () => {
   describe('Strategy', () => {
@@ -56,6 +57,7 @@ describe('Router', () => {
 
     it('should revert if try to change strategy trusted withotu being owner', async function () {
       const { fakeStrategyAddress } = await loadFixture(fakeStrategy.deployFakeStrategyFixture)
+
       const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
       const [, hacker] = accounts
 
