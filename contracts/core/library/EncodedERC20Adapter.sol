@@ -5,7 +5,7 @@ import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {BytesLib} from './BytesLib.sol';
 
-abstract contract EncodedERC20Transfer {
+abstract contract EncodedERC20Adapter {
     using SafeERC20 for IERC20;
     using BytesLib for bytes;
 
@@ -22,23 +22,23 @@ abstract contract EncodedERC20Transfer {
         return amount_;
     }
 
-    function _withdraw(address requisitor_, bytes memory amount_) internal virtual returns (bytes memory) {
+    // function _withdraw(address requisitor_, bytes memory amount_) internal virtual returns (bytes memory) {
+    //     uint256[] memory amounts = amount_._toAmounts();
+    //     address[] memory addressess = _decodeAssetsAddresses();
+
+    //     for (uint256 i = 0; i < addressess.length; i++) {
+    //         IERC20(addressess[i]).safeTransfer(requisitor_, amounts[i]);
+    //     }
+
+    //     return amount_;
+    // }
+
+    function _safeApprove(address spender_, bytes memory amount_) internal virtual returns (bytes memory) {
         uint256[] memory amounts = amount_._toAmounts();
         address[] memory addressess = _decodeAssetsAddresses();
 
         for (uint256 i = 0; i < addressess.length; i++) {
-            IERC20(addressess[i]).safeTransfer(requisitor_, amounts[i]);
-        }
-
-        return amount_;
-    }
-
-    function _safeApprove(address requisitor_, bytes memory amount_) internal virtual returns (bytes memory) {
-        uint256[] memory amounts = amount_._toAmounts();
-        address[] memory addressess = _decodeAssetsAddresses();
-
-        for (uint256 i = 0; i < addressess.length; i++) {
-            IERC20(addressess[i]).safeApprove(requisitor_, amounts[i]);
+            IERC20(addressess[i]).safeApprove(spender_, amounts[i]);
         }
 
         return amount_;
@@ -49,6 +49,6 @@ abstract contract EncodedERC20Transfer {
     }
 
     function _decodeAssetsAddresses() private view returns (address[] memory) {
-        return BytesLib._toAddresses(assets());
+        return assets()._toAddresses();
     }
 }

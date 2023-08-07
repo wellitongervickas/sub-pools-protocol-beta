@@ -2,17 +2,17 @@
 pragma solidity =0.8.19;
 
 import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
-import {EncodedERC20Transfer} from '../library/EncodedERC20Transfer.sol';
+import {EncodedERC20Adapter} from '../library/EncodedERC20Adapter.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
-contract VaultAdapter is EncodedERC20Transfer {
+contract VaultAdapter is EncodedERC20Adapter {
     IStrategy public immutable strategy;
 
     constructor(IStrategy strategy_) {
         strategy = strategy_;
     }
 
-    function assets() public view override(EncodedERC20Transfer) returns (bytes memory) {
+    function assets() public view override(EncodedERC20Adapter) returns (bytes memory) {
         return strategy.assets();
     }
 
