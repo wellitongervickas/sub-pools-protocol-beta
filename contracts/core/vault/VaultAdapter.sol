@@ -19,7 +19,7 @@ contract VaultAdapter is EncodedERC20Transfer {
     function _deposit(address depositor_, bytes memory amount_) internal override returns (bytes memory) {
         super._deposit(depositor_, amount_);
 
-        _safeApproveAssetsTransfer(address(strategy), amount_);
+        _safeApprove(address(strategy), amount_);
 
         return strategy.deposit(address(this), amount_);
     }

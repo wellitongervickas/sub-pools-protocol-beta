@@ -12,39 +12,43 @@ abstract contract EncodedERC20Transfer {
     function assets() public view virtual returns (bytes memory) {}
 
     function _deposit(address depositor_, bytes memory amount_) internal virtual returns (bytes memory) {
-        (address[] memory assets_, uint256[] memory amounts) = _decodeAssetsData(amount_);
+        uint256[] memory amounts = amount_._toAmounts();
+        address[] memory addressess = _decodeAssetsAddresses();
 
-        for (uint256 i = 0; i < assets_.length; i++) {
-            IERC20(assets_[i]).safeTransferFrom(depositor_, address(this), amounts[i]);
+        for (uint256 i = 0; i < addressess.length; i++) {
+            IERC20(addressess[i]).safeTransferFrom(depositor_, address(this), amounts[i]);
         }
 
         return amount_;
     }
 
     function _withdraw(address requisitor_, bytes memory amount_) internal virtual returns (bytes memory) {
-        (address[] memory assets_, uint256[] memory amounts) = _decodeAssetsData(amount_);
+        uint256[] memory amounts = amount_._toAmounts();
+        address[] memory addressess = _decodeAssetsAddresses();
 
-        for (uint256 i = 0; i < assets_.length; i++) {
-            IERC20(assets_[i]).safeTransfer(requisitor_, amounts[i]);
+        for (uint256 i = 0; i < addressess.length; i++) {
+            IERC20(addressess[i]).safeTransfer(requisitor_, amounts[i]);
         }
 
         return amount_;
     }
 
-    function _safeApproveAssetsTransfer(
-        address requisitor_,
-        bytes memory amount_
-    ) internal virtual returns (bytes memory) {
-        (address[] memory assets_, uint256[] memory amounts) = _decodeAssetsData(amount_);
+    function _safeApprove(address requisitor_, bytes memory amount_) internal virtual returns (bytes memory) {
+        uint256[] memory amounts = amount_._toAmounts();
+        address[] memory addressess = _decodeAssetsAddresses();
 
-        for (uint256 i = 0; i < assets_.length; i++) {
-            IERC20(assets_[i]).safeApprove(requisitor_, amounts[i]);
+        for (uint256 i = 0; i < addressess.length; i++) {
+            IERC20(addressess[i]).safeApprove(requisitor_, amounts[i]);
         }
 
         return amount_;
     }
 
-    function _decodeAssetsData(bytes memory amount_) private view returns (address[] memory, uint256[] memory) {
-        return (BytesLib._toAddresses(assets()), amount_._toAmounts());
+    function _decodeAssetAmount(bytes memory amount_) private pure returns (uint256[] memory) {
+        return amount_._toAmounts();
+    }
+
+    function _decodeAssetsAddresses() private view returns (address[] memory) {
+        return BytesLib._toAddresses(assets());
     }
 }
