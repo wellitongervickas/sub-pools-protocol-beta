@@ -7,7 +7,6 @@ import {INodeFactory} from '../interfaces/node/INodeFactory.sol';
 import {INode} from '../interfaces/node/INode.sol';
 import {IVaultFactory} from '../interfaces/vault/IVaultFactory.sol';
 import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
-import {Vault} from '../vault/Vault.sol';
 
 contract Router is IRouter, RouterManager {
     constructor(INodeFactory nodeFactory_, IVaultFactory vaultFactory) RouterManager(nodeFactory_, vaultFactory) {}
@@ -37,10 +36,10 @@ contract Router is IRouter, RouterManager {
         return nodeAddress;
     }
 
-    function createVault(address strategy_) public override returns (address) {
+    function requestStrategyVault(IStrategy strategy_) public override returns (address) {
         address vaultAddress = _buildVault(strategy_);
 
-        emit IRouter.Router_StrategyCreateVaultRequest(strategy_, vaultAddress);
-        return strategy_;
+        emit IRouter.Router_RequestStrategyVault(strategy_, vaultAddress);
+        return vaultAddress;
     }
 }

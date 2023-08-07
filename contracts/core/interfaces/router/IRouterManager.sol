@@ -23,9 +23,9 @@ interface IRouterManager {
 
     function updateVaultFactory(IVaultFactory vaultFactoryAddress_) external;
 
-    // function trustStrategy(IStrategy strategy_, bool status_) external;
+    function trustStrategy(IStrategy strategy_, bool status_) external;
 
-    // function strategies(IStrategy strategyAddress_) external view returns (bool);
-    //
-    // function vaults(IStrategy strategy_) external view returns (IVault);
+    function isStrategyTrusted(IStrategy strategy_) external view returns (bool);
+
+    function vaults(IStrategy strategy_) external view returns (IVault);
 }

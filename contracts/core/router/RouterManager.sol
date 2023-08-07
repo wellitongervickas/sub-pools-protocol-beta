@@ -14,9 +14,8 @@ contract RouterManager is IRouterManager, Manager {
     IVaultFactory public override vaultFactory;
 
     mapping(INode => bool) private _nodes;
-
-    // mapping(IStrategy => bool) private _strategies;
-    // mapping(IStrategy => IVault) private _vaults;
+    mapping(IStrategy => bool) private _strategies;
+    mapping(IStrategy => IVault) private _vaults;
 
     constructor(INodeFactory nodeFactory_, IVaultFactory vaultFactory_) Manager(msg.sender) {
         _updateNodeFactory(nodeFactory_);
@@ -44,8 +43,12 @@ contract RouterManager is IRouterManager, Manager {
     function _buildNode(address[] memory invitedAddresses_, address parentAddress_) internal returns (address) {
         INode node = nodeFactory.build(msg.sender, invitedAddresses_, parentAddress_);
 
-        _setNodeTrust(node, true);
+        _registryNode(node);
         return address(node);
+    }
+
+    function _registryNode(INode node_) private {
+        _setNodeTrust(node_, true);
     }
 
     function _setNodeTrust(INode node_, bool isTrusted_) private {
@@ -56,33 +59,37 @@ contract RouterManager is IRouterManager, Manager {
         return _nodes[node_];
     }
 
-    function _buildVault(address strategyAddress_) internal returns (address) {
-        IVault vault = vaultFactory.build(strategyAddress_);
+    function _buildVault(IStrategy strategy_) internal returns (address) {
+        IVault vault = vaultFactory.build(strategy_);
 
-        // _registryStrategy(IStrategy(strategyAddress_));
-        // _registryVault(IStrategy(strategyAddress_), IVault(vaultAddress));
+        _registryStrategy(strategy_);
+        _registryVault(strategy_, vault);
 
         return address(vault);
     }
 
-    // function _registryStrategy(IStrategy strategy_) private {
-    //     _setStrategyTrust(strategy_, false);
-    // }
+    function _registryStrategy(IStrategy strategy_) private {
+        _setStrategyTrust(strategy_, false);
+    }
 
-    // function _setStrategyTrust(IStrategy strategy_, bool isTrusted_) private {
-    //     _strategies[strategy_] = isTrusted_;
-    // }
+    function _setStrategyTrust(IStrategy strategy_, bool isTrusted_) private {
+        _strategies[strategy_] = isTrusted_;
+    }
 
-    // function trustStrategy(IStrategy strategy_, bool isTrusted_) external override onlyManager(address(this)) {
-    //     _setStrategyTrust(strategy_, isTrusted_);
-    //     emit IRouterManager.RouterManager_StrategyTrust(strategy_, isTrusted_);
-    // }
+    function trustStrategy(IStrategy strategy_, bool isTrusted_) external override onlyManager(address(this)) {
+        _setStrategyTrust(strategy_, isTrusted_);
+        emit IRouterManager.RouterManager_StrategyTrust(strategy_, isTrusted_);
+    }
 
-    // function _registryVault(IStrategy strategy_, IVault vault_) private {
-    //     _vaults[strategy_] = vault_;
-    // }
+    function _registryVault(IStrategy strategy_, IVault vault_) private {
+        _vaults[strategy_] = vault_;
+    }
 
-    // function vaults(IStrategy strategy_) public view override returns (IVault) {
-    //     return _vaults[strategy_];
-    // }
+    function vaults(IStrategy strategy_) public view override returns (IVault) {
+        return _vaults[strategy_];
+    }
+
+    function isStrategyTrusted(IStrategy strategyAddress_) public view override returns (bool) {
+        return _strategies[strategyAddress_];
+    }
 }

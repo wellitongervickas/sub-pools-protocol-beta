@@ -8,7 +8,7 @@ import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 contract Vault is IVault, Ownable {
     IStrategy public immutable strategy;
 
-    constructor(address strategy_) {
-        strategy = IStrategy(strategy_);
+    constructor(IStrategy strategy_) {
+        strategy = strategy_;
     }
 }
