@@ -12,12 +12,12 @@ contract EncodedERC20Transfer {
     bytes private assets;
 
     constructor(address[] memory assets_) {
-        assets = BytesLib.fromAddresses(assets_);
+        assets = BytesLib._fromAddresses(assets_);
     }
 
     function _deposit(address depositor_, bytes memory amount_) internal returns (bytes memory) {
-        address[] memory assets_ = assets.toAddresses();
-        uint256[] memory amounts = amount_.toAmounts();
+        address[] memory assets_ = assets._toAddresses();
+        uint256[] memory amounts = amount_._toAmounts();
 
         for (uint256 i = 0; i < assets_.length; i++) {
             IERC20(assets_[i]).safeTransferFrom(depositor_, address(this), amounts[i]);
@@ -27,8 +27,8 @@ contract EncodedERC20Transfer {
     }
 
     function _withdraw(address requisitor_, bytes memory amount_) internal returns (bytes memory) {
-        address[] memory assets_ = assets.toAddresses();
-        uint256[] memory amounts = amount_.toAmounts();
+        address[] memory assets_ = assets._toAddresses();
+        uint256[] memory amounts = amount_._toAmounts();
 
         for (uint256 i = 0; i < assets_.length; i++) {
             IERC20(assets_[i]).safeTransfer(requisitor_, amounts[i]);
