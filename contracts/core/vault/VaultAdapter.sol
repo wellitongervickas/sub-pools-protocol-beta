@@ -10,12 +10,7 @@ contract VaultAdapter {
         strategy = strategy_;
     }
 
-    function _deposit(bytes memory amount_) internal pure returns (bytes memory) {
-        // uint256 positionId = strategy.addPosition(amount_);
-        // uint256[] memory amounts = abi.decode(amount_, (uint256[]));
-        // console.log('a', amounts.length, amounts[0]);
-
-        /// ToDO = deposit to registry
-        return amount_;
+    function _deposit(address depositor_, bytes memory amount_) internal returns (bytes memory) {
+        return strategy.deposit(depositor_, amount_);
     }
 }

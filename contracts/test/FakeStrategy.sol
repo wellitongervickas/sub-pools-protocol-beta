@@ -8,9 +8,13 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 contract FakeStrategy is IStrategy {
     using SafeERC20 for IERC20;
 
-    bytes public token;
+    bytes public assets;
 
-    function deposit(address _depositor, bytes memory _amount) external returns (bytes memory) {}
+    function deposit(address _depositor, bytes memory _amount) external returns (bytes memory) {
+        return _amount;
+    }
 
-    function withdraw(address _requisitor, bytes memory _amount) external returns (bytes memory) {}
+    function withdraw(address _requisitor, bytes memory _amount) external returns (bytes memory) {
+        return _amount;
+    }
 }

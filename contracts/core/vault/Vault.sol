@@ -7,7 +7,6 @@ import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
 import {VaultAdapter} from './VaultAdapter.sol';
 import {VaultAccount} from './VaultAccount.sol';
 import {VaultPosition} from './VaultPosition.sol';
-import 'hardhat/console.sol';
 
 contract Vault is IVault, VaultAdapter, VaultAccount, VaultPosition, Ownable {
     event Vault_PositionAdded(uint256 indexed positionId_, bytes amount_);
@@ -20,9 +19,9 @@ contract Vault is IVault, VaultAdapter, VaultAccount, VaultPosition, Ownable {
     }
 
     function addPosition(bytes memory amount_, address parentAddress_) external onlyRouter {
-        bytes memory subTotal = _deposit(amount_);
-        uint256 id = _createPosition(_createAccount(msg.sender, parentAddress_), subTotal);
+        bytes memory shares = _deposit(msg.sender, amount_);
+        uint256 id = _createPosition(_createAccount(msg.sender, parentAddress_), shares);
 
-        emit Vault_PositionAdded(id, subTotal);
+        emit Vault_PositionAdded(id, shares);
     }
 }

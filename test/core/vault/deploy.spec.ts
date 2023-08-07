@@ -1,14 +1,17 @@
 import { expect } from 'chai'
-import { loadFixture, vault } from '../../fixtures'
-import { FAKE_STRATEGY } from '../../helpers/address'
+import { loadFixture, ethers, vault } from '../../fixtures'
 
 describe('Vault', () => {
   describe('Deploy', () => {
     it('should set strategy on deploy', async function () {
-      const { vaultContract } = await loadFixture(vault.deployVaultFixture)
+      const FakeStrategy = await ethers.getContractFactory('FakeStrategy')
+      const fakeStrategyContract = await FakeStrategy.deploy()
+      const fakeStrategyAddress = await fakeStrategyContract.getAddress()
+
+      const { vaultContract } = await loadFixture(vault.deployVaultFixture.bind(this, fakeStrategyAddress))
       const strategyAddress = await vaultContract.strategy()
 
-      expect(strategyAddress).to.equal(FAKE_STRATEGY)
+      expect(strategyAddress).to.equal(fakeStrategyAddress)
     })
   })
 })
