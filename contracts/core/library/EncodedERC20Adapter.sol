@@ -13,7 +13,7 @@ abstract contract EncodedERC20Adapter {
 
     function _deposit(address depositor_, bytes memory amount_) internal virtual returns (bytes memory) {
         uint256[] memory amounts = amount_._toAmounts();
-        address[] memory addressess = _decodeAssetsAddresses();
+        address[] memory addressess = assets()._toAddresses();
 
         for (uint256 i = 0; i < addressess.length; i++) {
             IERC20(addressess[i]).safeTransferFrom(depositor_, address(this), amounts[i]);
@@ -24,7 +24,7 @@ abstract contract EncodedERC20Adapter {
 
     // function _withdraw(address requisitor_, bytes memory amount_) internal virtual returns (bytes memory) {
     //     uint256[] memory amounts = amount_._toAmounts();
-    //     address[] memory addressess = _decodeAssetsAddresses();
+    //     address[] memory addressess = assets()._toAddresses();
 
     //     for (uint256 i = 0; i < addressess.length; i++) {
     //         IERC20(addressess[i]).safeTransfer(requisitor_, amounts[i]);
@@ -35,20 +35,12 @@ abstract contract EncodedERC20Adapter {
 
     function _safeApprove(address spender_, bytes memory amount_) internal virtual returns (bytes memory) {
         uint256[] memory amounts = amount_._toAmounts();
-        address[] memory addressess = _decodeAssetsAddresses();
+        address[] memory addressess = assets()._toAddresses();
 
         for (uint256 i = 0; i < addressess.length; i++) {
             IERC20(addressess[i]).safeApprove(spender_, amounts[i]);
         }
 
         return amount_;
-    }
-
-    function _decodeAssetAmount(bytes memory amount_) private pure returns (uint256[] memory) {
-        return amount_._toAmounts();
-    }
-
-    function _decodeAssetsAddresses() private view returns (address[] memory) {
-        return assets()._toAddresses();
     }
 }

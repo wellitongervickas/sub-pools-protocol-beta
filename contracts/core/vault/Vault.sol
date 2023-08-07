@@ -19,7 +19,6 @@ contract Vault is IVault, VaultAdapter, VaultAccount, VaultPosition, Ownable {
     }
 
     function addPosition(bytes memory amount_, address parentAddress_) external onlyRouter {
-        /// todo: charge protocol fees
         bytes memory remainingShares = _deposit(msg.sender, amount_);
         uint256 id = _createPosition(_createAccount(msg.sender, parentAddress_), remainingShares);
 

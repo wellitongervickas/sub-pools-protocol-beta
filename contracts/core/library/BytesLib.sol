@@ -9,8 +9,4 @@ library BytesLib {
     function _toAmounts(bytes memory amounts) internal pure returns (uint256[] memory) {
         return abi.decode(amounts, (uint256[]));
     }
-
-    function _fromAddresses(address[] memory addresses_) internal pure returns (bytes memory) {
-        return abi.encode(addresses_);
-    }
 }
