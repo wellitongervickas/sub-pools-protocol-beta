@@ -1,5 +1,4 @@
 import { ethers } from 'hardhat'
-import coderUtils from '../helpers/coder'
 
 export async function deployVaultFixture(strategyAddress?: string) {
   const accounts = await ethers.getSigners()

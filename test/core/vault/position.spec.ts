@@ -1,12 +1,11 @@
 import { expect } from 'chai'
 import { ethers, loadFixture, vault } from '../../fixtures'
-import coderUtils from '../../helpers/coder'
 import { FAKE_PARENT } from '../../helpers/address'
 
 describe('Vault', () => {
   describe('Position', () => {
     it('should emit Vault_PositionAdded on add position', async function () {
-      const { vaultContract, tokenContract, fakeStrategyAddress } = await loadFixture(vault.deployVaultFixture)
+      const { vaultContract, tokenContract } = await loadFixture(vault.deployVaultFixture)
       const vaultContractAddress = await vaultContract.getAddress()
       const encodedAmount = [100]
       await tokenContract.approve(vaultContractAddress, 100)
@@ -17,9 +16,7 @@ describe('Vault', () => {
     })
 
     it('should create an account', async function () {
-      const { vaultContract, accounts, tokenContract, fakeStrategyAddress } = await loadFixture(
-        vault.deployVaultFixture
-      )
+      const { vaultContract, accounts, tokenContract } = await loadFixture(vault.deployVaultFixture)
       const [manager] = accounts
 
       const vaultContractAddress = await vaultContract.getAddress()
@@ -32,7 +29,7 @@ describe('Vault', () => {
     })
 
     it('should create a position', async function () {
-      const { vaultContract, tokenContract, fakeStrategyAddress } = await loadFixture(vault.deployVaultFixture)
+      const { vaultContract, tokenContract } = await loadFixture(vault.deployVaultFixture)
       const vaultContractAddress = await vaultContract.getAddress()
       const encodedAmount = [100]
       await tokenContract.approve(vaultContractAddress, 100)

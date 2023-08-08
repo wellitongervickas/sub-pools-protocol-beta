@@ -1,7 +1,5 @@
 import { expect } from 'chai'
 import { anyValue, ethers, loadFixture, vaultFactory, token } from '../../fixtures'
-import { FAKE_STRATEGY, createRandomAddress } from '../../helpers/address'
-import coderUtils from '../../helpers/coder'
 
 describe('VaultFactory', () => {
   describe('Build', () => {

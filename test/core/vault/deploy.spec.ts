@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import { loadFixture, ethers, vault, token } from '../../fixtures'
-import coderUtils from '../../helpers/coder'
 
 describe('Vault', () => {
   describe('Deploy', () => {

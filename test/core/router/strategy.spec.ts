@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import { loadFixture, router, anyValue, fakeStrategy, token, ethers } from '../../fixtures'
-import coderUtils from '../../helpers/coder'
 
 describe('Router', () => {
   describe('Strategy', () => {
