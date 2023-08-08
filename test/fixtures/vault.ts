@@ -1,10 +1,9 @@
 import { ethers } from 'hardhat'
+import { loadFixture, token } from '.'
 
 export async function deployVaultFixture(strategyAddress?: string) {
   const accounts = await ethers.getSigners()
-  const supply = '1000000000000000000000000'
-  const Token = await ethers.getContractFactory('Token')
-  const tokenContract = await Token.deploy(supply, 18)
+  const { tokenContract } = await loadFixture(token.deployTokenFixture)
   const tokenAddress = await tokenContract.getAddress()
 
   const FakeStrategy = await ethers.getContractFactory('FakeStrategy')
@@ -23,7 +22,6 @@ export async function deployVaultFixture(strategyAddress?: string) {
     fakeStrategyAddress,
     tokenAddress,
     tokenContract,
-    supply,
   }
 }
 
