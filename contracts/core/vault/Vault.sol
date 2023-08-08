@@ -18,10 +18,12 @@ contract Vault is IVault, VaultAdapter, VaultAccount, VaultPosition, Ownable {
         _;
     }
 
-    function addPosition(uint256[] memory amount_, address parentAddress_) external onlyRouter {
-        uint256[] memory remainingShares = deposit(msg.sender, amount_);
+    function addPosition(uint256[] memory amount_, address parentAddress_) external onlyRouter returns (uint256) {
+        uint256[] memory remainingShares = _deposit(msg.sender, amount_);
         uint256 id = _createPosition(_createAccount(msg.sender, parentAddress_), remainingShares);
 
         emit Vault_PositionAdded(id, remainingShares);
+
+        return id;
     }
 }
