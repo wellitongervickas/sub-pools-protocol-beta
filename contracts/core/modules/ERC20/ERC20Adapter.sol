@@ -3,10 +3,9 @@ pragma solidity ^0.8.9;
 
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import {BytesLib} from '../../library/BytesLib.sol';
 import {IStrategy} from '../../interfaces/strategy/IStrategy.sol';
 
-abstract contract StrategyERC20Adapter {
+abstract contract ERC20Adapter {
     using SafeERC20 for IERC20;
 
     function assets() public view virtual returns (address[] memory) {}

@@ -2,10 +2,10 @@
 pragma solidity =0.8.19;
 
 import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
-import {StrategyERC20Adapter} from '../modules/ERC20/StrategyERC20Adapter.sol';
+import {ERC20Adapter} from '../modules/ERC20/ERC20Adapter.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
-contract VaultAdapter is StrategyERC20Adapter {
+contract VaultAdapter is ERC20Adapter {
     IStrategy public immutable strategy;
 
     constructor(IStrategy strategy_) {

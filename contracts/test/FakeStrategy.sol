@@ -3,16 +3,16 @@ pragma solidity ^0.8.9;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {IStrategy} from '../core/interfaces/strategy/IStrategy.sol';
-import {StrategyERC20Adapter} from '../core/modules/ERC20/StrategyERC20Adapter.sol';
+import {ERC20Adapter} from '../core/modules/ERC20/ERC20Adapter.sol';
 
-contract FakeStrategy is IStrategy, StrategyERC20Adapter, Ownable {
+contract FakeStrategy is IStrategy, ERC20Adapter, Ownable {
     address[] private _assets;
 
     constructor(address[] memory assets_) {
         _assets = assets_;
     }
 
-    function assets() public view override(IStrategy, StrategyERC20Adapter) returns (address[] memory) {
+    function assets() public view override(IStrategy, ERC20Adapter) returns (address[] memory) {
         return _assets;
     }
 
