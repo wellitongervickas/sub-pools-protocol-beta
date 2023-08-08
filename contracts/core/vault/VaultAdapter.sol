@@ -12,11 +12,11 @@ contract VaultAdapter is IStrategy, StrategyERC20Adapter {
         strategy = strategy_;
     }
 
-    function assets() public view override(IStrategy, StrategyERC20Adapter) returns (bytes memory) {
+    function assets() public view override(IStrategy, StrategyERC20Adapter) returns (address[] memory) {
         return strategy.assets();
     }
 
-    function deposit(address depositor_, bytes memory amount_) public override returns (bytes memory) {
+    function deposit(address depositor_, uint256[] memory amount_) public override returns (uint256[] memory) {
         super._deposit(depositor_, amount_);
 
         _safeApprove(address(strategy), amount_);
@@ -24,7 +24,7 @@ contract VaultAdapter is IStrategy, StrategyERC20Adapter {
         return strategy.deposit(address(this), amount_);
     }
 
-    function withdraw(address requisitor_, bytes memory amount_) public override returns (bytes memory) {
+    function withdraw(address requisitor_, uint256[] memory amount_) public override returns (uint256[] memory) {
         super._withdraw(requisitor_, amount_);
         return strategy.withdraw(requisitor_, amount_);
     }

@@ -8,7 +8,7 @@ describe('Vault', () => {
     it('should emit Vault_PositionAdded on add position', async function () {
       const { vaultContract, tokenContract, fakeStrategyAddress } = await loadFixture(vault.deployVaultFixture)
       const vaultContractAddress = await vaultContract.getAddress()
-      const encodedAmount = coderUtils.build([[100]], ['uint256[]'])
+      const encodedAmount = [100]
       await tokenContract.approve(vaultContractAddress, 100)
 
       await expect(vaultContract.addPosition(encodedAmount, FAKE_PARENT))
@@ -23,7 +23,7 @@ describe('Vault', () => {
       const [manager] = accounts
 
       const vaultContractAddress = await vaultContract.getAddress()
-      const encodedAmount = coderUtils.build([[100]], ['uint256[]'])
+      const encodedAmount = [100]
       await tokenContract.approve(vaultContractAddress, 100)
 
       await vaultContract.addPosition(encodedAmount, FAKE_PARENT)
@@ -34,7 +34,7 @@ describe('Vault', () => {
     it('should create a position', async function () {
       const { vaultContract, tokenContract, fakeStrategyAddress } = await loadFixture(vault.deployVaultFixture)
       const vaultContractAddress = await vaultContract.getAddress()
-      const encodedAmount = coderUtils.build([[100]], ['uint256[]'])
+      const encodedAmount = [100]
       await tokenContract.approve(vaultContractAddress, 100)
       await vaultContract.addPosition(encodedAmount, FAKE_PARENT)
 
@@ -46,7 +46,7 @@ describe('Vault', () => {
       const [_, notOwner] = accounts
 
       const vaultContractAddress = await vaultContract.getAddress()
-      const encodedAmount = coderUtils.build([[100]], ['uint256[]'])
+      const encodedAmount = [100]
       await tokenContract.approve(vaultContractAddress, 100)
 
       const notOwnerVault = vaultContract.connect(notOwner) as any

@@ -8,38 +8,28 @@ import {IStrategy} from '../../interfaces/strategy/IStrategy.sol';
 
 abstract contract StrategyERC20Adapter {
     using SafeERC20 for IERC20;
-    using BytesLib for bytes;
 
-    function assets() public view virtual returns (bytes memory) {}
+    function assets() public view virtual returns (address[] memory) {}
 
-    function _deposit(address depositor_, bytes memory amount_) internal virtual returns (bytes memory) {
-        uint256[] memory amounts = amount_._toAmounts();
-        address[] memory addressess = assets()._toAddresses();
-
-        for (uint256 i = 0; i < addressess.length; i++) {
-            IERC20(addressess[i]).safeTransferFrom(depositor_, address(this), amounts[i]);
+    function _deposit(address depositor_, uint256[] memory amount_) internal virtual returns (uint256[] memory) {
+        for (uint256 i = 0; i < assets().length; i++) {
+            IERC20(assets()[i]).safeTransferFrom(depositor_, address(this), amount_[i]);
         }
 
         return amount_;
     }
 
-    function _withdraw(address requisitor_, bytes memory amount_) internal virtual returns (bytes memory) {
-        uint256[] memory amounts = amount_._toAmounts();
-        address[] memory addressess = assets()._toAddresses();
-
-        for (uint256 i = 0; i < addressess.length; i++) {
-            IERC20(addressess[i]).safeTransfer(requisitor_, amounts[i]);
+    function _withdraw(address requisitor_, uint256[] memory amounts_) internal virtual returns (uint256[] memory) {
+        for (uint256 i = 0; i < assets().length; i++) {
+            IERC20(assets()[i]).safeTransfer(requisitor_, amounts_[i]);
         }
 
-        return amount_;
+        return amounts_;
     }
 
-    function _safeApprove(address spender_, bytes memory amount_) public virtual returns (bytes memory) {
-        uint256[] memory amounts = amount_._toAmounts();
-        address[] memory addressess = assets()._toAddresses();
-
-        for (uint256 i = 0; i < addressess.length; i++) {
-            IERC20(addressess[i]).safeApprove(spender_, amounts[i]);
+    function _safeApprove(address spender_, uint256[] memory amount_) public virtual returns (uint256[] memory) {
+        for (uint256 i = 0; i < assets().length; i++) {
+            IERC20(assets()[i]).safeApprove(spender_, amount_[i]);
         }
 
         return amount_;

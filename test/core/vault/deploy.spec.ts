@@ -9,7 +9,7 @@ describe('Vault', () => {
 
       const tokenAddress = await tokenContract.getAddress()
       const FakeStrategy = await ethers.getContractFactory('FakeStrategy')
-      const fakeStrategyContract = await FakeStrategy.deploy(coderUtils.build([[tokenAddress]], ['address[]']))
+      const fakeStrategyContract = await FakeStrategy.deploy([tokenAddress])
 
       const fakeStrategyAddress = await fakeStrategyContract.getAddress()
 

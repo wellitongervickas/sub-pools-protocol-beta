@@ -9,7 +9,7 @@ import {VaultAccount} from './VaultAccount.sol';
 import {VaultPosition} from './VaultPosition.sol';
 
 contract Vault is IVault, VaultAdapter, VaultAccount, VaultPosition, Ownable {
-    event Vault_PositionAdded(uint256 indexed positionId_, bytes amount_);
+    event Vault_PositionAdded(uint256 indexed positionId_, uint256[] amount_);
 
     constructor(IStrategy strategy_) VaultAdapter(strategy_) {}
 
@@ -18,8 +18,8 @@ contract Vault is IVault, VaultAdapter, VaultAccount, VaultPosition, Ownable {
         _;
     }
 
-    function addPosition(bytes memory amount_, address parentAddress_) external onlyRouter {
-        bytes memory remainingShares = deposit(msg.sender, amount_);
+    function addPosition(uint256[] memory amount_, address parentAddress_) external onlyRouter {
+        uint256[] memory remainingShares = deposit(msg.sender, amount_);
         uint256 id = _createPosition(_createAccount(msg.sender, parentAddress_), remainingShares);
 
         emit Vault_PositionAdded(id, remainingShares);
