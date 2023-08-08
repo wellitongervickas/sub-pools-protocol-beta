@@ -6,5 +6,5 @@ interface IStrategy {
 
     function deposit(address _depositor, bytes memory _amount) external returns (bytes memory);
 
-    // function withdraw(address _requisitor, bytes memory _amount) external returns (bytes memory);
+    function withdraw(address _requisitor, bytes memory _amount) external returns (bytes memory);
 }
