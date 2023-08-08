@@ -20,11 +20,13 @@ contract VaultAdapter is ERC20Adapter {
         super._deposit(depositor_, amount_);
 
         _safeApprove(address(strategy), amount_);
+
         return strategy.deposit(address(this), amount_);
     }
 
     function _withdraw(address requisitor_, uint256[] memory amount_) internal override returns (uint256[] memory) {
         super._withdraw(requisitor_, amount_);
+
         return strategy.withdraw(requisitor_, amount_);
     }
 }
