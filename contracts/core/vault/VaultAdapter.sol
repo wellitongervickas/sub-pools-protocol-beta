@@ -10,9 +10,11 @@ import {console} from 'hardhat/console.sol';
 contract VaultAdapter is BaseAdapter {
     IBaseAdapter public immutable adapter;
 
+    error VaultAdapter_DepositFailed();
+
     constructor(IBaseAdapter adapter_) {
         adapter = adapter_;
-        assets = adapter_.getAssets();
+        assetsIn = adapter_.getAssetsIn();
     }
 
     function deposit(address depositor_, uint256[] memory amount_) public virtual override {
@@ -21,5 +23,7 @@ contract VaultAdapter is BaseAdapter {
         );
 
         console.log(success);
+
+        if (!success) revert VaultAdapter_DepositFailed();
     }
 }

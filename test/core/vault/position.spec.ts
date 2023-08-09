@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { ethers, loadFixture, vault } from '../../fixtures'
-import { FAKE_PARENT } from '../../helpers/address'
+import { ethers, loadFixture, vault, token } from '../../fixtures'
+import { createRandomAddress } from '../../helpers/address'
 
 describe('Vault', () => {
   describe('Position', () => {
@@ -18,6 +18,44 @@ describe('Vault', () => {
       await expect(vaultContract.deposit(manager, encodedAmount))
         .to.emit(vaultContract, 'Vault_Deposited')
         .withArgs(1, encodedAmount)
+    })
+
+    it('should transfer tokens to vault the amount of tokens', async function () {
+      const { vaultContract, tokenContract, accounts } = await loadFixture(vault.deployVaultFixture)
+
+      const vaultContractAddress = await vaultContract.getAddress()
+      const manager = accounts[0]
+      const encodedAmount = [100]
+
+      await tokenContract.approve(vaultContractAddress, 100)
+
+      await vaultContract.deposit(manager, encodedAmount)
+
+      expect(await tokenContract.balanceOf(vaultContractAddress)).to.be.equal(100)
+    })
+
+    it.only('should revert if try to deposit to a non-valid adapter', async function () {
+      const { tokenContract, accounts } = await loadFixture(token.deployTokenFixture)
+      const tokenAddress = await tokenContract.getAddress()
+
+      const InvalidStrategy = await ethers.getContractFactory('InvalidStrategy')
+      const invalidStrategyContract = await InvalidStrategy.deploy([tokenAddress])
+      const invalidStrategyAddress = await invalidStrategyContract.getAddress()
+
+      const Vault = await ethers.getContractFactory('Vault')
+
+      const vaultContract = await Vault.deploy(invalidStrategyAddress)
+
+      const vaultContractAddress = await vaultContract.getAddress()
+      const manager = accounts[0]
+      const encodedAmount = [100]
+
+      await tokenContract.approve(vaultContractAddress, 100)
+
+      await expect(vaultContract.deposit(manager, encodedAmount)).to.be.revertedWithCustomError(
+        vaultContract,
+        'VaultAdapter_DepositFailed()'
+      )
     })
 
     it('should create an account', async function () {

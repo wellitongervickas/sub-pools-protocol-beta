@@ -6,11 +6,10 @@ import {BaseAdapter} from '../core/modules/adapters/BaseAdapter.sol';
 import {console} from 'hardhat/console.sol';
 
 contract FakeStrategy is ERC20Adapter {
-    constructor(address[] memory assets_) {
-        assets = assets_;
-    }
+    constructor(address[] memory assetsIn_) ERC20Adapter(assetsIn_) {}
 
     function deposit(address depositor_, uint256[] memory amount_) public override {
-        return super.deposit(depositor_, amount_);
+        console.log('aquiw');
+        return _deposit(depositor_, amount_);
     }
 }
