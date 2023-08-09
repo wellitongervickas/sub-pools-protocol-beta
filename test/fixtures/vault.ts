@@ -13,7 +13,7 @@ export async function deployVaultFixture(strategyAddress?: string) {
   const Vault = await ethers.getContractFactory('Vault')
   const vaultContract = await Vault.deploy(strategyAddress || fakeStrategyAddress)
 
-  await fakeStrategyContract.transferOwnership(await vaultContract.getAddress())
+  // await fakeStrategyContract.transferOwnership(await vaultContract.getAddress())
 
   return {
     accounts,

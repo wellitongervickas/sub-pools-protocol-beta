@@ -12,7 +12,7 @@ contract VaultAdapter is ERC20Adapter {
         strategy = strategy_;
     }
 
-    function assets() public view override returns (address[] memory) {
+    function assets() public view virtual override returns (address[] memory) {
         return strategy.assets();
     }
 
