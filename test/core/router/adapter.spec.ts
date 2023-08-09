@@ -2,13 +2,13 @@ import { expect } from 'chai'
 import { loadFixture, router, anyValue, fakeStrategy, token, ethers } from '../../fixtures'
 
 describe('Router', () => {
-  describe('Strategy', () => {
-    it('should emit Router_RequestStrategyVault on request', async function () {
+  describe('Adapter', () => {
+    it('should emit Router_RequestAdapterVault on request', async function () {
       const { fakeStrategyAddress } = await loadFixture(fakeStrategy.deployFakeStrategyFixture)
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-      await expect(routerContract.requestStrategyVault(fakeStrategyAddress))
-        .to.emit(routerContract, 'Router_RequestStrategyVault')
+      await expect(routerContract.requestAdapterVault(fakeStrategyAddress))
+        .to.emit(routerContract, 'Router_RequestAdapterVault')
         .withArgs(fakeStrategyAddress, anyValue)
     })
 
@@ -16,7 +16,7 @@ describe('Router', () => {
       const { fakeStrategyAddress } = await loadFixture(fakeStrategy.deployFakeStrategyFixture)
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-      const tx = await routerContract.requestStrategyVault(fakeStrategyAddress)
+      const tx = await routerContract.requestAdapterVault(fakeStrategyAddress)
       const receipt = await tx.wait()
 
       const vaultAddress = receipt.logs[3].args[1]
@@ -28,29 +28,29 @@ describe('Router', () => {
       const { fakeStrategyAddress } = await loadFixture(fakeStrategy.deployFakeStrategyFixture)
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-      await routerContract.requestStrategyVault(fakeStrategyAddress)
+      await routerContract.requestAdapterVault(fakeStrategyAddress)
 
-      expect(await routerContract.isStrategyTrusted(fakeStrategyAddress)).to.be.false
+      expect(await routerContract.isAdapterTrusted(fakeStrategyAddress)).to.be.false
     })
 
     it('should set strategy as trusted', async function () {
       const { fakeStrategyAddress } = await loadFixture(fakeStrategy.deployFakeStrategyFixture)
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-      await routerContract.requestStrategyVault(fakeStrategyAddress)
-      await routerContract.trustStrategy(fakeStrategyAddress, true)
+      await routerContract.requestAdapterVault(fakeStrategyAddress)
+      await routerContract.trustAdapter(fakeStrategyAddress, true)
 
-      expect(await routerContract.isStrategyTrusted(fakeStrategyAddress)).to.be.true
+      expect(await routerContract.isAdapterTrusted(fakeStrategyAddress)).to.be.true
     })
 
-    it('should emit RouterManager_StrategyTrust on trust strategy', async function () {
+    it('should emit RouterManager_TrustAdapter on trust strategy', async function () {
       const { fakeStrategyAddress } = await loadFixture(fakeStrategy.deployFakeStrategyFixture)
       const { routerContract } = await loadFixture(router.deployRouterFixture)
 
-      await routerContract.requestStrategyVault(fakeStrategyAddress)
+      await routerContract.requestAdapterVault(fakeStrategyAddress)
 
-      await expect(routerContract.trustStrategy(fakeStrategyAddress, true))
-        .to.emit(routerContract, 'RouterManager_StrategyTrust')
+      await expect(routerContract.trustAdapter(fakeStrategyAddress, true))
+        .to.emit(routerContract, 'RouterManager_TrustAdapter')
         .withArgs(fakeStrategyAddress, true)
     })
 
@@ -60,10 +60,10 @@ describe('Router', () => {
       const { routerContract, accounts } = await loadFixture(router.deployRouterFixture)
       const [, hacker] = accounts
 
-      await routerContract.requestStrategyVault(fakeStrategyAddress)
+      await routerContract.requestAdapterVault(fakeStrategyAddress)
       const hackerRouter = routerContract.connect(hacker) as any
 
-      await expect(hackerRouter.trustStrategy(fakeStrategyAddress, true)).to.be.revertedWithCustomError(
+      await expect(hackerRouter.trustAdapter(fakeStrategyAddress, true)).to.be.revertedWithCustomError(
         hackerRouter,
         'Manager_Invalid()'
       )

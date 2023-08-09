@@ -9,14 +9,13 @@ contract VaultAccount {
 
     struct Account {
         uint256 id;
-        address parentAddress;
     }
 
     mapping(address => Account) private _accounts;
 
-    function _createAccount(address accountAddress_, address parentAddress_) internal returns (uint256) {
+    function _createAccount(address accountAddress_) internal returns (uint256) {
         uint256 id = _createID();
-        _accounts[accountAddress_] = Account({id: id, parentAddress: parentAddress_});
+        _accounts[accountAddress_] = Account({id: id});
 
         return id;
     }

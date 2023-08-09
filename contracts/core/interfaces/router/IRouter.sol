@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {IStrategy} from '../strategy/IStrategy.sol';
+import {IBaseAdapter} from '../adapters/IBaseAdapter.sol';
 
 interface IRouter {
     event Router_NodeCreated(address nodeAddress_);
     event Router_NodeJoined(address parentAddress_, address nodeAddress_);
-    event Router_RequestStrategyVault(IStrategy strategy_, address vaultAddress_);
+    event Router_RequestAdapterVault(IBaseAdapter adapter_, address vaultAddress_);
 
     error Router_OnlyTrustedNode();
 
@@ -14,5 +14,5 @@ interface IRouter {
 
     function joinNode(address parentNodeAddress_, address[] memory invitedAddresses_) external returns (address);
 
-    function requestStrategyVault(IStrategy strategy_) external returns (address);
+    function requestAdapterVault(IBaseAdapter adapter_) external returns (address);
 }

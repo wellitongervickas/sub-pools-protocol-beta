@@ -3,27 +3,26 @@ pragma solidity =0.8.19;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {IVault} from '../interfaces/vault/IVault.sol';
-import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
+import {IBaseAdapter} from '../interfaces/adapters/IBaseAdapter.sol';
 import {VaultAdapter} from './VaultAdapter.sol';
 import {VaultAccount} from './VaultAccount.sol';
 import {VaultPosition} from './VaultPosition.sol';
 
 contract Vault is IVault, VaultAdapter, VaultAccount, VaultPosition, Ownable {
-    event Vault_PositionAdded(uint256 indexed positionId_, uint256[] amount_);
+    event Vault_Deposited(uint256 indexed positionId_, uint256[] amount_);
 
-    constructor(IStrategy strategy_) VaultAdapter(strategy_) {}
+    constructor(IBaseAdapter adapter_) VaultAdapter(adapter_) {}
 
     modifier onlyRouter() {
         _checkOwner();
         _;
     }
 
-    function addPosition(uint256[] memory amount_, address parentAddress_) external onlyRouter returns (uint256) {
-        uint256[] memory remainingShares = _deposit(msg.sender, amount_);
-        uint256 id = _createPosition(_createAccount(msg.sender, parentAddress_), remainingShares);
+    function deposit(address depositor_, uint256[] memory amount_) public override onlyRouter {
+        super.deposit(depositor_, amount_);
 
-        emit Vault_PositionAdded(id, remainingShares);
+        uint256 id = _createPosition(_createAccount(depositor_), amount_);
 
-        return id;
+        emit Vault_Deposited(id, amount_);
     }
 }

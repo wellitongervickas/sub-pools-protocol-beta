@@ -3,7 +3,7 @@ import { loadFixture, ethers, vault, token } from '../../fixtures'
 
 describe('Vault', () => {
   describe('Deploy', () => {
-    it('should set strategy on deploy', async function () {
+    it('should set adapter on deploy', async function () {
       const { tokenContract } = await loadFixture(token.deployTokenFixture)
 
       const tokenAddress = await tokenContract.getAddress()
@@ -13,9 +13,10 @@ describe('Vault', () => {
       const fakeStrategyAddress = await fakeStrategyContract.getAddress()
 
       const { vaultContract } = await loadFixture(vault.deployVaultFixture.bind(this, fakeStrategyAddress))
-      const strategyAddress = await vaultContract.strategy()
 
-      expect(strategyAddress).to.equal(fakeStrategyAddress)
+      const adapterAddress = await vaultContract.adapter()
+
+      expect(adapterAddress).to.equal(fakeStrategyAddress)
     })
   })
 })

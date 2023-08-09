@@ -7,15 +7,15 @@ import {INode} from '../interfaces/node/INode.sol';
 import {INodeFactory} from '../interfaces/node/INodeFactory.sol';
 import {IVaultFactory} from '../interfaces/vault/IVaultFactory.sol';
 import {IVault} from '../interfaces/vault/IVault.sol';
-import {IStrategy} from '../interfaces/strategy/IStrategy.sol';
+import {IBaseAdapter} from '../interfaces/adapters/IBaseAdapter.sol';
 
 contract RouterManager is IRouterManager, Manager {
     INodeFactory public override nodeFactory;
     IVaultFactory public override vaultFactory;
 
     mapping(INode => bool) private _nodes;
-    mapping(IStrategy => bool) private _strategies;
-    mapping(IStrategy => IVault) private _vaults;
+    mapping(IBaseAdapter => bool) private _adapters;
+    mapping(IBaseAdapter => IVault) private _vaults;
 
     constructor(INodeFactory nodeFactory_, IVaultFactory vaultFactory_) Manager(msg.sender) {
         _updateNodeFactory(nodeFactory_);
@@ -59,37 +59,37 @@ contract RouterManager is IRouterManager, Manager {
         return _nodes[node_];
     }
 
-    function _buildVault(IStrategy strategy_) internal returns (address) {
-        IVault vault = vaultFactory.build(strategy_);
+    function _buildVault(IBaseAdapter adapter_) internal returns (address) {
+        IVault vault = vaultFactory.build(adapter_);
 
-        _registryStrategy(strategy_);
-        _registryVault(strategy_, vault);
+        _registryAdapter(adapter_);
+        _registryVault(adapter_, vault);
 
         return address(vault);
     }
 
-    function _registryStrategy(IStrategy strategy_) private {
-        _setStrategyTrust(strategy_, false);
+    function _registryAdapter(IBaseAdapter adapter_) private {
+        _setAdapterTrust(adapter_, false);
     }
 
-    function _setStrategyTrust(IStrategy strategy_, bool isTrusted_) private {
-        _strategies[strategy_] = isTrusted_;
+    function _setAdapterTrust(IBaseAdapter adapter_, bool isTrusted_) private {
+        _adapters[adapter_] = isTrusted_;
     }
 
-    function trustStrategy(IStrategy strategy_, bool isTrusted_) external override onlyManager(address(this)) {
-        _setStrategyTrust(strategy_, isTrusted_);
-        emit IRouterManager.RouterManager_StrategyTrust(strategy_, isTrusted_);
+    function trustAdapter(IBaseAdapter adapter_, bool isTrusted_) external override onlyManager(address(this)) {
+        _setAdapterTrust(adapter_, isTrusted_);
+        emit IRouterManager.RouterManager_TrustAdapter(adapter_, isTrusted_);
     }
 
-    function _registryVault(IStrategy strategy_, IVault vault_) private {
-        _vaults[strategy_] = vault_;
+    function _registryVault(IBaseAdapter adapter_, IVault vault_) private {
+        _vaults[adapter_] = vault_;
     }
 
-    function vaults(IStrategy strategy_) public view override returns (IVault) {
-        return _vaults[strategy_];
+    function vaults(IBaseAdapter adapter_) public view override returns (IVault) {
+        return _vaults[adapter_];
     }
 
-    function isStrategyTrusted(IStrategy strategyAddress_) public view override returns (bool) {
-        return _strategies[strategyAddress_];
+    function isAdapterTrusted(IBaseAdapter adapterAddress_) public view override returns (bool) {
+        return _adapters[adapterAddress_];
     }
 }
