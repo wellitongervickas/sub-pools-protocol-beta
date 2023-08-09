@@ -34,7 +34,7 @@ describe('Vault', () => {
       expect(await tokenContract.balanceOf(vaultContractAddress)).to.be.equal(100)
     })
 
-    it.only('should revert if try to deposit to a non-valid adapter', async function () {
+    it('should revert if try to deposit to a non-valid adapter', async function () {
       const { tokenContract, accounts } = await loadFixture(token.deployTokenFixture)
       const tokenAddress = await tokenContract.getAddress()
 
@@ -43,7 +43,6 @@ describe('Vault', () => {
       const invalidStrategyAddress = await invalidStrategyContract.getAddress()
 
       const Vault = await ethers.getContractFactory('Vault')
-
       const vaultContract = await Vault.deploy(invalidStrategyAddress)
 
       const vaultContractAddress = await vaultContract.getAddress()
@@ -51,7 +50,6 @@ describe('Vault', () => {
       const encodedAmount = [100]
 
       await tokenContract.approve(vaultContractAddress, 100)
-
       await expect(vaultContract.deposit(manager, encodedAmount)).to.be.revertedWithCustomError(
         vaultContract,
         'VaultAdapter_DepositFailed()'

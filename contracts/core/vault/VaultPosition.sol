@@ -5,13 +5,13 @@ import '@openzeppelin/contracts/utils/Counters.sol';
 
 contract VaultPosition {
     struct Position {
-        uint256[] balance;
+        uint256[] shares;
     }
 
     mapping(uint256 => Position) private _positions;
 
-    function _createPosition(uint256 id_, uint256[] memory balance_) internal returns (uint256) {
-        _positions[id_] = Position({balance: balance_});
+    function _createPosition(uint256 id_, uint256[] memory amount_) internal returns (uint256) {
+        _positions[id_] = Position({shares: amount_});
 
         return id_;
     }

@@ -9,7 +9,6 @@ contract FakeStrategy is ERC20Adapter {
     constructor(address[] memory assetsIn_) ERC20Adapter(assetsIn_) {}
 
     function deposit(address depositor_, uint256[] memory amount_) public override {
-        console.log('aquiw');
         return _deposit(depositor_, amount_);
     }
 }

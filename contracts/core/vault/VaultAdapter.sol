@@ -22,8 +22,6 @@ contract VaultAdapter is BaseAdapter {
             abi.encodeWithSelector(IBaseAdapter.deposit.selector, depositor_, amount_)
         );
 
-        console.log(success);
-
         if (!success) revert VaultAdapter_DepositFailed();
     }
 }
