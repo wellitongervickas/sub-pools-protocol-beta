@@ -17,6 +17,7 @@ contract VaultAdapter is BaseAdapter {
         assetsIn = adapter_.getAssetsIn();
     }
 
+    /// Todo: Adapter on FakeStrategy instead of vault
     function deposit(address depositor_, uint256[] memory amount_) public virtual override {
         (bool success, ) = address(adapter).delegatecall(
             abi.encodeWithSelector(IBaseAdapter.deposit.selector, depositor_, amount_)
