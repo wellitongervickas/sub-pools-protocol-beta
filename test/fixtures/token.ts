@@ -19,12 +19,12 @@ export const DEFAULT_PROPS: IDeployTokenFixtureProps = {
   decimals: DEFAULT_DECIMALS,
 }
 
-export async function deployTokenFixture({
-  initialSupply,
-  symbol,
-  name,
-  decimals,
-}: IDeployTokenFixtureProps = DEFAULT_PROPS) {
+export async function deployTokenFixture(props: IDeployTokenFixtureProps) {
+  const { initialSupply, name, symbol, decimals } = {
+    ...DEFAULT_PROPS,
+    ...props,
+  }
+
   const accounts = await ethers.getSigners()
   const Token = await ethers.getContractFactory('Token')
   const tokenContract = await Token.deploy(initialSupply, name, symbol, decimals)

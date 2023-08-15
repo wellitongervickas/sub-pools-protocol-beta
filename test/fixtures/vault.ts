@@ -1,33 +1,26 @@
-import { ethers } from 'hardhat'
+import { ethers, loadFixture } from './'
 import { createRandomAddress } from '../helpers/address'
-import { IDeployTokenFixtureProps, DEFAULT_PROPS as DEFAULT_PROPS_TOKEN } from './token'
+import token, { IDeployTokenFixtureProps, DEFAULT_PROPS as DEFAULT_PROPS_TOKEN } from './token'
 
 export type IDeployVaultFixtureProps = Partial<IDeployTokenFixtureProps> & {
   registry?: string
 }
 
 export const DEFAULT_PROPS: IDeployVaultFixtureProps = {
+  ...DEFAULT_PROPS_TOKEN,
   registry: createRandomAddress(),
 }
 
 export async function deployVaultFixture(props: IDeployVaultFixtureProps) {
-  const { initialSupply, name, symbol, decimals, registry } = {
+  const { registry, ...tokenProps } = {
     ...DEFAULT_PROPS,
     ...props,
   }
 
   const accounts = await ethers.getSigners()
-  const Token = await ethers.getContractFactory('Token')
-
-  const tokenContract = await Token.deploy(
-    initialSupply || DEFAULT_PROPS_TOKEN.initialSupply,
-    name || DEFAULT_PROPS_TOKEN.name,
-    symbol || DEFAULT_PROPS_TOKEN.symbol,
-    decimals || DEFAULT_PROPS_TOKEN.decimals
-  )
+  const { tokenContract } = await loadFixture(token.deployTokenFixture.bind(null, tokenProps))
 
   const tokenAddress = await tokenContract.getAddress()
-
   const Vault = await ethers.getContractFactory('Vault')
   const vaultContract = await Vault.deploy(tokenAddress, registry)
   const vaultAddress = await vaultContract.getAddress()
