@@ -8,7 +8,6 @@ describe('Vault', () => {
       const name = 'vUSDC'
 
       const { vaultContract } = await loadFixture(vault.deployVaultFixture.bind(this, { name }))
-
       const vaultName = await vaultContract.name()
 
       expect(vaultName).to.equal(name)
