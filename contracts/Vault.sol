@@ -26,6 +26,4 @@ contract Vault is ERC4626, Ownable {
     function redeem(uint256 shares, address receiver, address owner) public override onlyOwner returns (uint256) {
         return super.redeem(shares, receiver, owner);
     }
-
-    /// todo: transfer (onylOwner)
 }
