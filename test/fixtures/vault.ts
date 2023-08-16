@@ -18,7 +18,7 @@ export async function deployVaultFixture(props?: IDeployVaultFixtureProps) {
 
   const tokenAddress = await tokenContract.getAddress()
   const Vault = await ethers.getContractFactory('Vault')
-  const vaultContract = await Vault.deploy(tokenAddress)
+  const vaultContract = await Vault.deploy(tokenAddress, tokenProps.name, tokenProps.symbol)
   const vaultAddress = await vaultContract.getAddress()
 
   return { accounts, vaultContract, vaultAddress, tokenContract, tokenAddress }
