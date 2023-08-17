@@ -8,5 +8,10 @@ describe('Registry', () => {
       const vaultFactory = await registryContract.vaultFactory()
       expect(vaultFactory).to.equal(vaultFactoryAddress)
     })
+
+    it('should set registry manager on deploy', async function () {
+      const { registryContract, accounts } = await loadFixture(registry.deployRegistryFixture)
+      expect(await registryContract.hasRoleManager(accounts[0].address)).to.be.true
+    })
   })
 })
