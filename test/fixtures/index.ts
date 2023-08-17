@@ -5,3 +5,4 @@ export { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 export { ethers, loadFixture, time }
 export { default as token } from './token'
 export { default as vault } from './vault'
+export { default as vaultFactory } from './vaultFactory'

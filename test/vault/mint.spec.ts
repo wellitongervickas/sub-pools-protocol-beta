@@ -4,16 +4,16 @@ import { loadFixture, vault } from '../fixtures'
 describe('Vault', () => {
   describe('Mint', () => {
     it('should receive shares on mint', async function () {
-      const expectedShares = '1000000000000000000'
+      const expectedAssets = '1000000000000000000'
 
       const { vaultContract, vaultAddress, tokenContract, accounts } = await loadFixture(vault.deployVaultFixture)
       const [, receiver] = accounts
 
-      await tokenContract.approve(vaultAddress, expectedShares)
-      await vaultContract.mint(expectedShares, receiver.address)
+      await tokenContract.approve(vaultAddress, expectedAssets)
+      await vaultContract.mint(expectedAssets, receiver.address)
 
       const shares = await vaultContract.balanceOf(receiver.address)
-      expect(shares).to.be.equal(expectedShares)
+      expect(shares).to.be.equal(expectedAssets)
     })
 
     it('should revert try to mint without being the owner', async function () {
