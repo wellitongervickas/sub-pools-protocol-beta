@@ -22,6 +22,7 @@ contract Registry is AccessControl {
 
     error Registry_OnlyManager();
     error Registry_VaultAlreadyTrusted(address vaultAddress_);
+    error Registry_VaultNotExist(address vaultAddress_);
     error Registry_VaultAlreadyExists(address vaultAddress_);
 
     constructor(VaultFactory vaultFactory_, address manager_) {
@@ -47,7 +48,7 @@ contract Registry is AccessControl {
         string memory name_,
         string memory symbol_
     ) public returns (address vaultAddress_) {
-        if (isVault(asset_)) revert Registry_VaultAlreadyExists(vault[asset_].vaultAddress);
+        if (hasAssetVault(asset_)) revert Registry_VaultAlreadyExists(vault[asset_].vaultAddress);
 
         vaultAddress_ = vaultFactory.createVault(msg.sender, asset_, name_, symbol_);
 
@@ -62,13 +63,14 @@ contract Registry is AccessControl {
 
     function trustVault(IERC20 asset_) public onlyManager {
         if (isVaultTrusted(asset_)) revert Registry_VaultAlreadyTrusted(vault[asset_].vaultAddress);
+        if (!hasAssetVault(asset_)) revert Registry_VaultNotExist(vault[asset_].vaultAddress);
 
         vault[asset_].isTrusted = true;
 
         emit Registry_VaultTrusted(asset_);
     }
 
-    function isVault(IERC20 asset_) public view returns (bool) {
+    function hasAssetVault(IERC20 asset_) public view returns (bool) {
         return vault[asset_].vaultAddress != address(0);
     }
 
