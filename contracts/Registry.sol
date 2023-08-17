@@ -47,7 +47,7 @@ contract Registry is AccessControl {
         string memory name_,
         string memory symbol_
     ) public returns (address vaultAddress_) {
-        if (vault[asset_].vaultAddress != address(0)) revert Registry_VaultAlreadyExists(vault[asset_].vaultAddress);
+        if (isVault(asset_)) revert Registry_VaultAlreadyExists(vault[asset_].vaultAddress);
 
         vaultAddress_ = vaultFactory.createVault(msg.sender, asset_, name_, symbol_);
 
@@ -55,10 +55,6 @@ contract Registry is AccessControl {
 
         _setupVault(asset_, vaultAddress_);
     }
-
-    // function vault(IERC20 asset_) public view returns (bool) {
-    //     return vault[asset_].vaultAddress;
-    // }
 
     function _setupVault(IERC20 asset_, address vaultAddress_) private {
         vault[asset_] = Vault({vaultAddress: vaultAddress_, isTrusted: false});
@@ -68,7 +64,12 @@ contract Registry is AccessControl {
         if (isVaultTrusted(asset_)) revert Registry_VaultAlreadyTrusted(vault[asset_].vaultAddress);
 
         vault[asset_].isTrusted = true;
+
         emit Registry_VaultTrusted(asset_);
+    }
+
+    function isVault(IERC20 asset_) public view returns (bool) {
+        return vault[asset_].vaultAddress != address(0);
     }
 
     function isVaultTrusted(IERC20 asset_) public view returns (bool) {

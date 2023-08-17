@@ -14,10 +14,9 @@ contract VaultFactory {
         string memory symbol_
     ) public returns (address vaultAddress_) {
         Vault vault = new Vault(asset_, name_, symbol_);
-        vaultAddress_ = address(vault);
-
         vault.transferOwnership(owner_);
 
+        vaultAddress_ = address(vault);
         emit VaultFactory_created(vaultAddress_, msg.sender);
     }
 }

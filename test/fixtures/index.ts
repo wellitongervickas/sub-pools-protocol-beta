@@ -6,3 +6,4 @@ export { ethers, loadFixture, time }
 export { default as token } from './token'
 export { default as vault } from './vault'
 export { default as vaultFactory } from './vaultFactory'
+export { default as registry } from './registry'

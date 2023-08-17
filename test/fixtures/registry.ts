@@ -1,6 +1,6 @@
 import { ethers, vaultFactory, loadFixture } from './'
 
-export async function deployVaultFactoryFixture() {
+export async function deployRegistryFixture() {
   const { vaultFactoryAddress } = await loadFixture(vaultFactory.deployVaultFactoryFixture)
   const accounts = await ethers.getSigners()
   const Registry = await ethers.getContractFactory('Registry')
@@ -11,7 +11,7 @@ export async function deployVaultFactoryFixture() {
 }
 
 const fixtures = {
-  deployVaultFactoryFixture,
+  deployRegistryFixture,
 }
 
 export default fixtures
