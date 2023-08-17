@@ -2,8 +2,8 @@ import { expect } from 'chai'
 import { loadFixture, vault } from '../fixtures'
 
 describe('Vault', () => {
-  describe('Withdraw', () => {
-    it('should receive shares on withdraw', async function () {
+  describe('Redeem', () => {
+    it('should receive shares on redeem', async function () {
       const expectedShares = '1000000000000000000'
 
       const { vaultContract, vaultAddress, tokenContract, accounts } = await loadFixture(vault.deployVaultFixture)
@@ -15,7 +15,7 @@ describe('Vault', () => {
       const receiverVaultContract = vaultContract.connect(receiver) as any
       await receiverVaultContract.approve(owner, expectedShares)
 
-      await vaultContract.withdraw(expectedShares, receiver.address, receiver.address)
+      await vaultContract.redeem(expectedShares, receiver.address, receiver.address)
 
       const shares = await tokenContract.balanceOf(receiver.address)
       expect(shares).to.be.equal(expectedShares)
@@ -27,7 +27,7 @@ describe('Vault', () => {
 
       const receiverVaultContract = vaultContract.connect(receiver) as any
 
-      await expect(receiverVaultContract.withdraw('0', receiver.address, receiver.address)).to.be.revertedWith(
+      await expect(receiverVaultContract.redeem('0', receiver.address, receiver.address)).to.be.revertedWith(
         'Ownable: caller is not the owner'
       )
     })

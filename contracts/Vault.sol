@@ -12,32 +12,18 @@ contract Vault is ERC4626, Ownable {
     }
 
     function deposit(uint256 assets, address receiver) public override onlyOwner returns (uint256) {
-        return _depositToReceiver(assets, receiver);
+        return super.deposit(assets, receiver);
     }
 
-    function _depositToReceiver(uint256 assets, address receiver) private returns (uint256) {
-        require(assets <= maxDeposit(receiver), 'ERC4626: deposit more than max');
-
-        uint256 shares = previewDeposit(assets);
-        _deposit(receiver, receiver, assets, shares);
-
-        return shares;
+    function mint(uint256 shares, address receiver) public override onlyOwner returns (uint256) {
+        return super.mint(shares, receiver);
     }
-
-    function mint(uint256 shares, address receiver) public override returns (uint256) {}
 
     function withdraw(uint256 assets, address receiver, address owner) public override onlyOwner returns (uint256) {
-        return _withdrawToReceiver(assets, receiver, owner);
+        return super.withdraw(assets, receiver, owner);
     }
 
-    function _withdrawToReceiver(uint256 assets, address receiver, address owner) private returns (uint256) {
-        require(assets <= maxWithdraw(owner), 'ERC4626: withdraw more than max');
-
-        uint256 shares = previewWithdraw(assets);
-        _withdraw(receiver, receiver, owner, assets, shares);
-
-        return shares;
+    function redeem(uint256 shares, address receiver, address owner) public override onlyOwner returns (uint256) {
+        return super.redeem(shares, receiver, owner);
     }
-
-    function redeem(uint256 shares, address receiver, address owner) public override returns (uint256) {}
 }
