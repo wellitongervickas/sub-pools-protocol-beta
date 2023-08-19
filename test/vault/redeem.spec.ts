@@ -3,7 +3,7 @@ import { loadFixture, vault } from '../fixtures'
 
 describe('Vault', () => {
   describe('Redeem', () => {
-    it.skip('should receive shares on redeem', async function () {
+    it('should receive shares on redeem', async function () {
       const expectedAssets = '1000000000000000000'
 
       const { vaultContract, vaultAddress, tokenContract, accounts } = await loadFixture(vault.deployVaultFixture)

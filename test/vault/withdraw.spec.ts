@@ -3,7 +3,7 @@ import { loadFixture, vault } from '../fixtures'
 
 describe('Vault', () => {
   describe('Withdraw', () => {
-    it.skip('should receive shares on withdraw', async function () {
+    it('should receive shares on withdraw', async function () {
       const expectedShares = '1000000000000000000'
 
       const { vaultContract, vaultAddress, tokenContract, accounts } = await loadFixture(vault.deployVaultFixture)
