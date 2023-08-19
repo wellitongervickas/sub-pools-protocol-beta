@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.21;
 
-import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {Vault} from './Vault.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 
-contract Node is Ownable {
+contract Node {
     Vault[] private _vaultsIn;
 
     struct Position {
@@ -25,7 +24,7 @@ contract Node is Ownable {
         return _vaultsIn[index_];
     }
 
-    function createPosition(uint256[] memory amount_, address depositor_) public onlyOwner returns (uint32 positionId) {
+    function createPosition(uint256[] memory amount_, address depositor_) public returns (uint32 positionId) {
         _depositVaultShares(amount_, depositor_);
 
         positionId = 1;

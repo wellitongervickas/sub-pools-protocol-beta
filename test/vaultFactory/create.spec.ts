@@ -1,16 +1,16 @@
 import { expect } from 'chai'
-import { loadFixture, vaultFactory, token, anyValue } from '../fixtures'
+import { loadFixture, vaultFactory, token } from '../fixtures'
 
 describe('VaultFactory', () => {
   describe('Create', () => {
     it('should emit VaultFactory_created on create', async function () {
       const { tokenAddress } = await loadFixture(token.deployTokenFixture)
-      const { vaultFactoryContract, accounts } = await loadFixture(vaultFactory.deployVaultFactoryFixture)
-      const [owner] = accounts
+      const { vaultFactoryContract } = await loadFixture(vaultFactory.deployVaultFactoryFixture)
 
-      await expect(vaultFactoryContract.createVault(owner.address, tokenAddress, 'Vault USDC', 'vUSDC'))
-        .to.emit(vaultFactoryContract, 'VaultFactory_created')
-        .withArgs(anyValue, owner.address)
+      await expect(vaultFactoryContract.createVault(tokenAddress, 'Vault USDC', 'vUSDC')).to.emit(
+        vaultFactoryContract,
+        'VaultFactory_created'
+      )
     })
   })
 })

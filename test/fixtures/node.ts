@@ -7,13 +7,12 @@ export async function deployNodeFixture(props?: IDeployNodeFixtureProps) {
   const defaultProps = { ...DEFAULT_PROPS, ...props }
 
   const accounts = await ethers.getSigners()
-  const [owner] = accounts
   const { tokenAddress, tokenContract } = await loadFixture(token.deployTokenFixture)
   const { vaultFactoryContract, vaultFactoryAddress } = await loadFixture(vaultFactory.deployVaultFactoryFixture)
 
-  const tx = await vaultFactoryContract.createVault(owner.address, tokenAddress, defaultProps.name, defaultProps.symbol)
+  const tx = await vaultFactoryContract.createVault(tokenAddress, defaultProps.name, defaultProps.symbol)
   const receipt = await tx.wait()
-  const [vaultAddress] = receipt.logs[2].args
+  const [vaultAddress] = receipt.logs[0].args
   const vaultContract = await ethers.getContractAt('Vault', vaultAddress)
 
   const Node = await ethers.getContractFactory('Node')
