@@ -17,7 +17,7 @@ describe('Node', () => {
         await vaultContract.deposit(amount, depositor)
         await vaultContract.approve(nodeAddress, amount)
 
-        await nodeContract.createPosition(amount, depositor)
+        await nodeContract.createPosition([amount], depositor)
 
         const nodeAssetsBalance = await tokenContract.balanceOf(nodeAddress)
         expect(nodeAssetsBalance).to.equal(amount)
@@ -38,7 +38,7 @@ describe('Node', () => {
 
         const hackerNodeContract = nodeContract.connect(hacker) as any
 
-        await expect(hackerNodeContract.createPosition(amount, depositor)).to.be.revertedWith(
+        await expect(hackerNodeContract.createPosition([amount], depositor)).to.be.revertedWith(
           'Ownable: caller is not the owner'
         )
       })
