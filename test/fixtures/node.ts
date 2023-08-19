@@ -1,0 +1,38 @@
+import { ethers, loadFixture, vaultFactory } from './'
+import token, { IDeployTokenFixtureProps, DEFAULT_PROPS } from './token'
+
+export type IDeployNodeFixtureProps = IDeployTokenFixtureProps
+
+export async function deployNodeFixture(props?: IDeployNodeFixtureProps) {
+  const defaultProps = { ...DEFAULT_PROPS, ...props }
+
+  const accounts = await ethers.getSigners()
+  const [owner] = accounts
+  const { tokenAddress, tokenContract } = await loadFixture(token.deployTokenFixture)
+  const { vaultFactoryContract, vaultFactoryAddress } = await loadFixture(vaultFactory.deployVaultFactoryFixture)
+
+  const tx = await vaultFactoryContract.createVault(owner.address, tokenAddress, defaultProps.name, defaultProps.symbol)
+  const receipt = await tx.wait()
+  const [vaultAddress] = receipt.logs[2].args
+
+  const Node = await ethers.getContractFactory('Node')
+  const nodeContract = await Node.deploy([vaultAddress])
+  const nodeAddress = await nodeContract.getAddress()
+
+  return {
+    accounts,
+    nodeContract,
+    vaultFactoryContract,
+    tokenContract,
+    vaultFactoryAddress,
+    vaultAddress,
+    tokenAddress,
+    nodeAddress,
+  }
+}
+
+const fixtures = {
+  deployNodeFixture,
+}
+
+export default fixtures

@@ -12,11 +12,11 @@ contract VaultFactory {
         IERC20 asset_,
         string memory name_,
         string memory symbol_
-    ) public returns (address vaultAddress_) {
+    ) public returns (address vaultAddress) {
         Vault vault = new Vault(asset_, name_, symbol_);
         vault.transferOwnership(owner_);
 
-        vaultAddress_ = address(vault);
-        emit VaultFactory_created(vaultAddress_, msg.sender);
+        vaultAddress = address(vault);
+        emit VaultFactory_created(vaultAddress, msg.sender);
     }
 }
