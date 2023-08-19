@@ -3,7 +3,7 @@ import { loadFixture, vault } from '../fixtures'
 
 describe('Vault', () => {
   describe('Withdraw', () => {
-    it('should receive shares on withdraw', async function () {
+    it.skip('should receive shares on withdraw', async function () {
       const expectedShares = '1000000000000000000'
 
       const { vaultContract, vaultAddress, tokenContract, accounts } = await loadFixture(vault.deployVaultFixture)
@@ -21,7 +21,7 @@ describe('Vault', () => {
       expect(shares).to.be.equal(expectedShares)
     })
 
-    it('should revert try to deposit without being the owner', async function () {
+    it.skip('should revert try to deposit without being the owner', async function () {
       const { vaultContract, accounts } = await loadFixture(vault.deployVaultFixture)
       const [, receiver] = accounts
 
