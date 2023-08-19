@@ -12,9 +12,7 @@ contract VaultFactory {
         string memory name_,
         string memory symbol_
     ) public returns (address vaultAddress) {
-        Vault vault = new Vault(asset_, name_, symbol_);
-
-        vaultAddress = address(vault);
+        vaultAddress = address(new Vault(asset_, name_, symbol_));
         emit VaultFactory_created(vaultAddress);
     }
 }
