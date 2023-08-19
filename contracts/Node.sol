@@ -7,13 +7,6 @@ import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 contract Node {
     Vault[] private _vaultsIn;
 
-    struct Position {
-        address depositor;
-        uint256[] balance;
-    }
-
-    mapping(address => Position) private _positions;
-
     event Node_PositionCreated(uint32 positionId_, address depositor_, uint256[] amount_);
 
     constructor(Vault[] memory vaultsIn_) {
