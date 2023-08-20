@@ -42,7 +42,7 @@ describe('Node', () => {
       })
     })
 
-    describe('Remove', () => {
+    describe('Decrease', () => {
       it('should emit Node_PositionRemoved', async function () {
         const amount = '1000000000000000000'
 
@@ -58,7 +58,7 @@ describe('Node', () => {
 
         await nodeContract.createPosition([amount], depositor)
 
-        await expect(nodeContract.removePosition([amount], depositor))
+        await expect(nodeContract.decreasePosition([amount], depositor))
           .to.emit(nodeContract, 'Node_PositionRemoved')
           .withArgs([amount], depositor.address)
       })
@@ -77,7 +77,7 @@ describe('Node', () => {
         await vaultContract.approve(nodeAddress, amount)
 
         await nodeContract.createPosition([amount], depositor)
-        await nodeContract.removePosition([amount], depositor)
+        await nodeContract.decreasePosition([amount], depositor)
 
         const [, [positionBalance]] = await nodeContract.position(depositor.address)
 
@@ -98,7 +98,7 @@ describe('Node', () => {
         await vaultContract.approve(nodeAddress, amount)
 
         await nodeContract.createPosition([amount], depositor)
-        await nodeContract.removePosition([amount], depositor)
+        await nodeContract.decreasePosition([amount], depositor)
 
         const depositorBalance = await vaultContract.balanceOf(depositor.address)
         expect(depositorBalance).to.equal(amount)

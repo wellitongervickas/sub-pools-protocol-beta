@@ -36,7 +36,6 @@ contract Node {
 
     function createPosition(uint256[] memory amount_, address depositor_) external {
         _withdrawVaultAssets(amount_, depositor_);
-
         _createPosition(depositor_, amount_);
 
         emit Node_PositionCreated(amount_, depositor_);
@@ -60,14 +59,14 @@ contract Node {
         }
     }
 
-    function removePosition(uint256[] memory amount_, address receiver_) external {
-        _removePosition(amount_, receiver_);
+    function decreasePosition(uint256[] memory amount_, address receiver_) external {
+        _decreasePosition(amount_, receiver_);
         _depositVaultAssets(amount_, receiver_);
 
         emit Node_PositionRemoved(amount_, receiver_);
     }
 
-    function _removePosition(uint256[] memory amount_, address receiver_) private {
+    function _decreasePosition(uint256[] memory amount_, address receiver_) private {
         uint256[] storage amount = _position[receiver_].amount;
 
         for (uint8 index = 0; index < amount_.length; index++) {
