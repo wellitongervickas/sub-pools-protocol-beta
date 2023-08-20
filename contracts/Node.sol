@@ -35,25 +35,13 @@ contract Node {
     }
 
     function createPosition(uint256[] memory amount_, address depositor_) external {
-        _withdrawVaultAssets(amount_, depositor_);
+        _withdrawVaultInAssets(amount_, depositor_);
         _createPosition(depositor_, amount_);
 
         emit Node_PositionCreated(amount_, depositor_);
     }
 
-    function _increasePositionId() private returns (uint32) {
-        return _latestPositionId += 1;
-    }
-
-    function _createPositionId() private returns (uint32 positionId) {
-        positionId = _increasePositionId();
-    }
-
-    function _createPosition(address owner_, uint256[] memory amount_) private returns (Position memory) {
-        return _position[owner_] = Position({id: _createPositionId(), amount: amount_});
-    }
-
-    function _withdrawVaultAssets(uint256[] memory amount_, address depositor_) private {
+    function _withdrawVaultInAssets(uint256[] memory amount_, address depositor_) private {
         for (uint8 index = 0; index < _vaultsIn.length; index++) {
             Vault vaultIn_ = vaultIn(index);
             _receiveFrom(vaultIn_, amount_[index], depositor_);
@@ -64,9 +52,25 @@ contract Node {
         vault_.withdraw(amount_, address(this), depositor_);
     }
 
+    function _createPosition(address owner_, uint256[] memory amount_) private returns (Position memory) {
+        return _position[owner_] = Position({id: _createPositionId(), amount: amount_});
+    }
+
+    function _createPositionId() private returns (uint32 positionId) {
+        positionId = _increasePositionId();
+    }
+
+    function _increasePositionId() private returns (uint32) {
+        return _latestPositionId += 1;
+    }
+
+    function position(address owner_) external view returns (Position memory) {
+        return _position[owner_];
+    }
+
     function decreasePosition(uint256[] memory amount_, address receiver_) external {
         _decreasePosition(amount_, receiver_);
-        _depositVaultAssets(amount_, receiver_);
+        _depositVaultOutAssets(amount_, receiver_);
 
         emit Node_PositionDecreased(amount_, receiver_);
     }
@@ -79,7 +83,7 @@ contract Node {
         }
     }
 
-    function _depositVaultAssets(uint256[] memory amount_, address receiver_) private {
+    function _depositVaultOutAssets(uint256[] memory amount_, address receiver_) private {
         for (uint8 index = 0; index < _vaultsIn.length; index++) {
             Vault vaultOut_ = vaultOut(index);
 
@@ -95,9 +99,5 @@ contract Node {
 
     function _depositTo(Vault vault_, uint256 amount_, address receiver_) private {
         vault_.deposit(amount_, receiver_);
-    }
-
-    function position(address owner_) external view returns (Position memory) {
-        return _position[owner_];
     }
 }
