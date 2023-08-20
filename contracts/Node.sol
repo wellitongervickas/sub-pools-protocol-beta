@@ -19,7 +19,7 @@ contract Node {
     mapping(address => Position) private _position;
 
     event Node_PositionCreated(uint256[] amount_, address depositor_);
-    event Node_PositionRemoved(uint256[] amount_, address receiver_);
+    event Node_PositionDecreased(uint256[] amount_, address receiver_);
 
     constructor(Vault[] memory vaultsIn_, Vault[] memory vaultsOut_) {
         _vaultsIn = vaultsIn_;
@@ -55,15 +55,20 @@ contract Node {
 
     function _withdrawVaultAssets(uint256[] memory amount_, address depositor_) private {
         for (uint8 index = 0; index < _vaultsIn.length; index++) {
-            vaultIn(index).withdraw(amount_[index], address(this), depositor_);
+            Vault vaultIn_ = vaultIn(index);
+            _receiveFrom(vaultIn_, amount_[index], depositor_);
         }
+    }
+
+    function _receiveFrom(Vault vault_, uint256 amount_, address depositor_) private {
+        vault_.withdraw(amount_, address(this), depositor_);
     }
 
     function decreasePosition(uint256[] memory amount_, address receiver_) external {
         _decreasePosition(amount_, receiver_);
         _depositVaultAssets(amount_, receiver_);
 
-        emit Node_PositionRemoved(amount_, receiver_);
+        emit Node_PositionDecreased(amount_, receiver_);
     }
 
     function _decreasePosition(uint256[] memory amount_, address receiver_) private {
@@ -78,12 +83,18 @@ contract Node {
         for (uint8 index = 0; index < _vaultsIn.length; index++) {
             Vault vaultOut_ = vaultOut(index);
 
-            IERC20 token = IERC20(address(vaultOut_.asset()));
-
-            SafeERC20.safeApprove(token, address(vaultOut_), amount_[index]);
-
-            vaultOut_.deposit(amount_[index], receiver_);
+            _approveVaultsOutAssets(vaultOut_, amount_[index]);
+            _depositTo(vaultOut_, amount_[index], receiver_);
         }
+    }
+
+    function _approveVaultsOutAssets(Vault vault, uint256 amount_) private {
+        IERC20 token = IERC20(address(vault.asset()));
+        SafeERC20.safeApprove(token, address(vault), amount_);
+    }
+
+    function _depositTo(Vault vault_, uint256 amount_, address receiver_) private {
+        vault_.deposit(amount_, receiver_);
     }
 
     function position(address owner_) external view returns (Position memory) {

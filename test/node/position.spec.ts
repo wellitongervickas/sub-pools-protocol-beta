@@ -43,7 +43,7 @@ describe('Node', () => {
     })
 
     describe('Decrease', () => {
-      it('should emit Node_PositionRemoved', async function () {
+      it('should emit Node_PositionDecreased', async function () {
         const amount = '1000000000000000000'
 
         const { nodeContract, accounts, tokenContract, vaultContract, vaultAddress, nodeAddress } = await loadFixture(
@@ -59,7 +59,7 @@ describe('Node', () => {
         await nodeContract.createPosition([amount], depositor)
 
         await expect(nodeContract.decreasePosition([amount], depositor))
-          .to.emit(nodeContract, 'Node_PositionRemoved')
+          .to.emit(nodeContract, 'Node_PositionDecreased')
           .withArgs([amount], depositor.address)
       })
 
