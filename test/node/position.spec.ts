@@ -13,8 +13,11 @@ describe('Node', () => {
 
         const [depositor] = accounts
 
+        // deposit to vault
         await tokenContract.approve(vaultAddress, amount)
         await vaultContract.deposit(amount, depositor)
+
+        // approve node to spend vault assets
         await vaultContract.approve(nodeAddress, amount)
 
         await expect(nodeContract.createPosition([amount], depositor))
