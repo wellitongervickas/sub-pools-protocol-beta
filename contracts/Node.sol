@@ -44,11 +44,11 @@ contract Node {
     function _withdrawVaultInAssets(uint256[] memory amount_, address depositor_) private {
         for (uint8 index = 0; index < _vaultsIn.length; index++) {
             Vault vaultIn_ = vaultIn(index);
-            _receiveFrom(vaultIn_, amount_[index], depositor_);
+            _receiveFromVault(vaultIn_, amount_[index], depositor_);
         }
     }
 
-    function _receiveFrom(Vault vault_, uint256 amount_, address depositor_) private {
+    function _receiveFromVault(Vault vault_, uint256 amount_, address depositor_) private {
         vault_.withdraw(amount_, address(this), depositor_);
     }
 
@@ -87,17 +87,17 @@ contract Node {
         for (uint8 index = 0; index < _vaultsIn.length; index++) {
             Vault vaultOut_ = vaultOut(index);
 
-            _approveVaultsOutAssets(vaultOut_, amount_[index]);
-            _depositTo(vaultOut_, amount_[index], receiver_);
+            _approveVaultOutAssets(vaultOut_, amount_[index]);
+            _depositToVault(vaultOut_, amount_[index], receiver_);
         }
     }
 
-    function _approveVaultsOutAssets(Vault vault, uint256 amount_) private {
+    function _approveVaultOutAssets(Vault vault, uint256 amount_) private {
         IERC20 token = IERC20(address(vault.asset()));
         SafeERC20.safeApprove(token, address(vault), amount_);
     }
 
-    function _depositTo(Vault vault_, uint256 amount_, address receiver_) private {
+    function _depositToVault(Vault vault_, uint256 amount_, address receiver_) private {
         vault_.deposit(amount_, receiver_);
     }
 }
