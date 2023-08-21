@@ -5,7 +5,7 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {Vault} from './Vault.sol';
 
 contract VaultFactory {
-    event VaultFactory_created(address vaultAddress_);
+    event VaultFactory_Created(address vaultAddress_);
 
     function createVault(
         IERC20 asset_,
@@ -13,6 +13,6 @@ contract VaultFactory {
         string memory symbol_
     ) public returns (address vaultAddress) {
         vaultAddress = address(new Vault(asset_, name_, symbol_));
-        emit VaultFactory_created(vaultAddress);
+        emit VaultFactory_Created(vaultAddress);
     }
 }
