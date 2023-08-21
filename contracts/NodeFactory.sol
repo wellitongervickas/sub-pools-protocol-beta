@@ -9,6 +9,7 @@ contract NodeFactory {
 
     function createNode(Vault[] memory vaultsIn_, Vault[] memory vaultsOut_) public returns (address nodeAddress) {
         nodeAddress = address(new Node(vaultsIn_, vaultsOut_));
+
         emit NodeFactory_Created(nodeAddress);
     }
 }
