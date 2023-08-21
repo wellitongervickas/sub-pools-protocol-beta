@@ -20,7 +20,8 @@ contract Node {
 
     event Node_PositionCreated(uint256[] amount_, address depositor_);
     event Node_PositionDecreased(uint256[] amount_, address receiver_);
-    event Node_PositionIncreased(uint256[] amount_, address receiver_);
+    event Node_PositionIncreased(uint256[] amount_, address depositor_);
+    event Node_PositionRemoved(uint256[] amount_, address receiver_);
 
     constructor(Vault[] memory vaultsIn_, Vault[] memory vaultsOut_) {
         _vaultsIn = vaultsIn_;
@@ -115,5 +116,18 @@ contract Node {
         for (uint8 index = 0; index < amount_.length; index++) {
             amount[index] += amount_[index];
         }
+    }
+
+    function removePosition(address receiver_) external {
+        Position memory position_ = _position[receiver_];
+
+        _depositVaultOutAssets(position_.amount, receiver_);
+        _removePosition(receiver_);
+
+        emit Node_PositionRemoved(position_.amount, receiver_);
+    }
+
+    function _removePosition(address receiver_) private {
+        delete _position[receiver_];
     }
 }

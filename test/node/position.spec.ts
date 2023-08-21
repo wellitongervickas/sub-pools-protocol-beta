@@ -167,5 +167,67 @@ describe('Node', () => {
         expect(nodeBalance).to.equal(amountTotal)
       })
     })
+
+    describe('Remove', () => {
+      it('should emit Node_PositionRemoved', async function () {
+        const amount = '1000000000000000000'
+
+        const { nodeContract, accounts, tokenContract, vaultContract, vaultAddress, nodeAddress } = await loadFixture(
+          node.deployNodeFixture
+        )
+
+        const [depositor] = accounts
+
+        await tokenContract.approve(vaultAddress, amount)
+        await vaultContract.deposit(amount, depositor)
+        await vaultContract.approve(nodeAddress, amount)
+
+        await nodeContract.createPosition([amount], depositor)
+
+        await expect(nodeContract.removePosition(depositor))
+          .to.emit(nodeContract, 'Node_PositionRemoved')
+          .withArgs([amount], depositor.address)
+      })
+
+      it('should remove position', async function () {
+        const amount = '1000000000000000000'
+
+        const { nodeContract, accounts, tokenContract, vaultContract, vaultAddress, nodeAddress } = await loadFixture(
+          node.deployNodeFixture
+        )
+
+        const [depositor] = accounts
+
+        await tokenContract.approve(vaultAddress, amount)
+        await vaultContract.deposit(amount, depositor)
+        await vaultContract.approve(nodeAddress, amount)
+
+        await nodeContract.createPosition([amount], depositor)
+        await nodeContract.removePosition(depositor)
+
+        const [positionId] = await nodeContract.position(depositor.address)
+        expect(positionId).to.equal(0)
+      })
+
+      it('should receive shares from vault', async function () {
+        const amount = '1000000000000000000'
+
+        const { nodeContract, accounts, tokenContract, vaultContract, vaultAddress, nodeAddress } = await loadFixture(
+          node.deployNodeFixture
+        )
+
+        const [depositor] = accounts
+
+        await tokenContract.approve(vaultAddress, amount)
+        await vaultContract.deposit(amount, depositor)
+        await vaultContract.approve(nodeAddress, amount)
+
+        await nodeContract.createPosition([amount], depositor)
+        await nodeContract.removePosition(depositor)
+
+        const depositorBalance = await vaultContract.balanceOf(depositor.address)
+        expect(depositorBalance).to.equal(amount)
+      })
+    })
   })
 })
