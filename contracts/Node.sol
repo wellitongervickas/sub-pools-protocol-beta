@@ -6,8 +6,8 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 
 contract Node {
-    Vault[] private _vaultsIn;
-    Vault[] private _vaultsOut;
+    Vault[] private _vaultIn;
+    Vault[] private _vaultOut;
 
     struct Position {
         uint32 id;
@@ -23,28 +23,28 @@ contract Node {
     event Node_PositionIncreased(uint256[] amount_, address depositor_);
     event Node_PositionRemoved(uint256[] amount_, address receiver_);
 
-    constructor(Vault[] memory vaultsIn_, Vault[] memory vaultsOut_) {
-        _vaultsIn = vaultsIn_;
-        _vaultsOut = vaultsOut_;
+    constructor(Vault[] memory vaultIn_, Vault[] memory vaultOut_) {
+        _vaultIn = vaultIn_;
+        _vaultOut = vaultOut_;
     }
 
     function vaultIn(uint8 index_) public view returns (Vault) {
-        return _vaultsIn[index_];
+        return _vaultIn[index_];
     }
 
     function vaultOut(uint8 index_) public view returns (Vault) {
-        return _vaultsOut[index_];
+        return _vaultOut[index_];
     }
 
     function createPosition(uint256[] memory amount_, address depositor_) external {
-        _withdrawVaultInAssets(amount_, depositor_);
+        _receiveVaultInAssets(amount_, depositor_);
         _createPosition(depositor_, amount_);
 
         emit Node_PositionCreated(amount_, depositor_);
     }
 
-    function _withdrawVaultInAssets(uint256[] memory amount_, address depositor_) private {
-        for (uint8 index = 0; index < _vaultsIn.length; index++) {
+    function _receiveVaultInAssets(uint256[] memory amount_, address depositor_) private {
+        for (uint8 index = 0; index < _vaultIn.length; index++) {
             Vault vaultIn_ = vaultIn(index);
             _receiveFromVault(vaultIn_, amount_[index], depositor_);
         }
@@ -72,7 +72,7 @@ contract Node {
 
     function decreasePosition(uint256[] memory amount_, address receiver_) external {
         _decreasePosition(amount_, receiver_);
-        _depositVaultOutAssets(amount_, receiver_);
+        _sendVaultOutAssets(amount_, receiver_);
 
         emit Node_PositionDecreased(amount_, receiver_);
     }
@@ -85,8 +85,8 @@ contract Node {
         }
     }
 
-    function _depositVaultOutAssets(uint256[] memory amount_, address receiver_) private {
-        for (uint8 index = 0; index < _vaultsIn.length; index++) {
+    function _sendVaultOutAssets(uint256[] memory amount_, address receiver_) private {
+        for (uint8 index = 0; index < _vaultIn.length; index++) {
             Vault vaultOut_ = vaultOut(index);
 
             _approveVaultOutAssets(vaultOut_, amount_[index]);
@@ -104,7 +104,7 @@ contract Node {
     }
 
     function increasePosition(uint256[] memory amount_, address depositor_) external {
-        _withdrawVaultInAssets(amount_, depositor_);
+        _receiveVaultInAssets(amount_, depositor_);
         _increasePosition(amount_, depositor_);
 
         emit Node_PositionIncreased(amount_, depositor_);
@@ -121,7 +121,7 @@ contract Node {
     function removePosition(address receiver_) external {
         Position memory position_ = _position[receiver_];
 
-        _depositVaultOutAssets(position_.amount, receiver_);
+        _sendVaultOutAssets(position_.amount, receiver_);
         _removePosition(receiver_);
 
         emit Node_PositionRemoved(position_.amount, receiver_);
