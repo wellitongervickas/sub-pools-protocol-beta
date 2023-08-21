@@ -1,18 +1,18 @@
 import { ethers, vaultFactory, nodeFactory, loadFixture } from './'
 
-export async function deployRouterFixture() {
+export async function deployRegistryFixture() {
   const { nodeFactoryContract, nodeFactoryAddress } = await loadFixture(nodeFactory.deployNodeFactoryFixture)
   const { vaultFactoryAddress, vaultFactoryContract } = await loadFixture(vaultFactory.deployVaultFactoryFixture)
 
   const accounts = await ethers.getSigners()
-  const Router = await ethers.getContractFactory('Router')
-  const routerContract = await Router.deploy(nodeFactoryAddress, vaultFactoryAddress)
-  const routerAddress = await routerContract.getAddress()
+  const Registry = await ethers.getContractFactory('Registry')
+  const registryContract = await Registry.deploy(nodeFactoryAddress, vaultFactoryAddress)
+  const registryAddress = await registryContract.getAddress()
 
   return {
     accounts,
-    routerContract,
-    routerAddress,
+    registryContract,
+    registryAddress,
     nodeFactoryContract,
     vaultFactoryAddress,
     nodeFactoryAddress,
@@ -21,7 +21,7 @@ export async function deployRouterFixture() {
 }
 
 const fixtures = {
-  deployRouterFixture,
+  deployRegistryFixture,
 }
 
 export default fixtures
