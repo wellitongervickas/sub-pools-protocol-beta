@@ -20,6 +20,7 @@ contract Node {
 
     event Node_PositionCreated(uint256[] amount_, address depositor_);
     event Node_PositionDecreased(uint256[] amount_, address receiver_);
+    event Node_PositionIncreased(uint256[] amount_, address receiver_);
 
     constructor(Vault[] memory vaultsIn_, Vault[] memory vaultsOut_) {
         _vaultsIn = vaultsIn_;
@@ -99,5 +100,20 @@ contract Node {
 
     function _depositToVault(Vault vault_, uint256 amount_, address receiver_) private {
         vault_.deposit(amount_, receiver_);
+    }
+
+    function increasePosition(uint256[] memory amount_, address depositor_) external {
+        _withdrawVaultInAssets(amount_, depositor_);
+        _increasePosition(amount_, depositor_);
+
+        emit Node_PositionIncreased(amount_, depositor_);
+    }
+
+    function _increasePosition(uint256[] memory amount_, address receiver_) private {
+        uint256[] storage amount = _position[receiver_].amount;
+
+        for (uint8 index = 0; index < amount_.length; index++) {
+            amount[index] += amount_[index];
+        }
     }
 }
