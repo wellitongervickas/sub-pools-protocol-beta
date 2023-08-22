@@ -2,7 +2,7 @@ import { ethers } from '../fixtures'
 
 const abiCoder = ethers.AbiCoder.defaultAbiCoder()
 
-export const id = (functionSignature: string) => {
+export const getFunctionSignature = (functionSignature: string) => {
   return ethers.id(functionSignature).slice(0, 10)
 }
 
@@ -17,7 +17,7 @@ export const decode = (args: string, types: any[]) => {
 const coderUtils = {
   encode,
   decode,
-  id,
+  getFunctionSignature,
 }
 
 export default coderUtils
