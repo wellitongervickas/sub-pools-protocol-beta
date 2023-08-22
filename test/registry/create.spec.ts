@@ -29,8 +29,6 @@ describe('Registry', () => {
         rewardsBalanceSelector: rewardsBalanceEncodedSelector,
       }
 
-      console.log(adapter)
-
       await expect(registryContract.createAdapter(adapter)).to.emit(registryContract, 'Registry_AdapterCreated')
     })
   })
