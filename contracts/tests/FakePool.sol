@@ -25,11 +25,15 @@ contract FakePool {
         tokenB.safeTransferFrom(msg.sender, address(this), amountB_);
     }
 
-    function tokenABalance() external view returns (uint256) {
+    function tokenBalance() external view returns (uint256, uint256) {
+        return (_tokenABalance(), _tokenBBalance());
+    }
+
+    function _tokenABalance() private view returns (uint256) {
         return tokenA.balanceOf(address(this));
     }
 
-    function tokenBBalance() external view returns (uint256) {
+    function _tokenBBalance() private view returns (uint256) {
         return tokenB.balanceOf(address(this));
     }
 
@@ -41,12 +45,16 @@ contract FakePool {
         tokenOut.safeTransferFrom(msg.sender, address(this), amount_);
     }
 
-    function rewardsBalance() external view returns (uint256) {
-        return tokenOut.balanceOf(address(this));
-    }
-
     function harvest(uint256 amount_) external {
         _harvestRewardsToken(amount_);
+    }
+
+    function rewardsBalance() external view returns (uint256) {
+        return _tokenOutBalance();
+    }
+
+    function _tokenOutBalance() private view returns (uint256) {
+        return tokenOut.balanceOf(address(this));
     }
 
     function _harvestRewardsToken(uint256 amount_) private {
