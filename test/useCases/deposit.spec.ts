@@ -1,3 +1,4 @@
+import { expect } from 'chai'
 import { ethers } from '../fixtures'
 import coderUtils from '../helpers/coder'
 
@@ -31,23 +32,23 @@ describe('UseCase: Deposit', () => {
       // Deploy Registry
       const Registry = await ethers.getContractFactory('Registry')
       const registryContract = await Registry.deploy()
-      const registryAddress = await registryContract.getAddress()
+      // const registryAddress = await registryContract.getAddress()
 
-      // // Create vault
+      //  1 - Create vault
       const vaultAName = 'v' + DEFAULT_NAME_A
       const vaultASymbol = 'v' + DEFAULT_SYMBOL_A
       const vaultTx = await registryContract.createVault(tokenAddress, vaultAName, vaultASymbol)
       const vaultTxReceipt = await vaultTx.wait()
       const [vaultAddress] = vaultTxReceipt.logs[0].args
 
-      // Create adapter
+      //  2- Create adapter
       const adapterTx = await registryContract.createAdapter(fakePoolAdapterAddress)
       const adapterTxReceipt = await adapterTx.wait()
       const [adapterId] = adapterTxReceipt.logs[0].args
 
       const adapterTarget = await registryContract.getAdapter(adapterId)
 
-      // // Create Node
+      // 3 - Create Node
       const nodeTx = await registryContract.createNode(adapterTarget)
       const nodeTxReceipt = await nodeTx.wait()
       const [nodeAddress] = nodeTxReceipt.logs[0].args
@@ -55,25 +56,16 @@ describe('UseCase: Deposit', () => {
       const vaultContract = await ethers.getContractAt('Vault', vaultAddress)
       const nodeContract = await ethers.getContractAt('Node', nodeAddress)
 
-      // Deposit to vault
+      // 4 - Deposit to vault
       await tokenContract.approve(vaultAddress, depositAmount)
       await vaultContract.deposit(depositAmount, owner.address)
 
-      // Deposit to node
+      // 5 - Deposit to node
       await vaultContract.approve(nodeAddress, depositAmount)
       const encodedPayload = coderUtils.encode([[depositAmount], owner.address], ['uint256[]', 'address'])
       await nodeContract.deposit(encodedPayload)
 
-      // console.log('===============')
-      // console.log('real token address', tokenAddress)
-      console.log('node balance', await tokenContract.balanceOf(nodeAddress))
-      // console.log('fake pool address', fakePoolAddress)
-      // const externalAdapterBalance = await tokenContract.balanceOf(fakePoolAddress)
-
-      //   const expectedValues = {
-      //     targetBalance: depositAmount,
-      //     positionBalance: [depositAmount],
-      //   }
+      expect(await tokenContract.balanceOf(fakePoolAddress)).to.equal(depositAmount)
     })
   })
 })

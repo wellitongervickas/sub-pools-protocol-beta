@@ -10,8 +10,6 @@ import 'hardhat/console.sol';
 contract FakePoolAdapter is BaseAdapter {
     using SafeERC20 for IERC20;
 
-    IERC20[] private _assetsIn;
-
     constructor(address target_) {
         target = target_;
         _assetsIn = [FakePool(target).tokenA()];
@@ -29,7 +27,7 @@ contract FakePoolAdapter is BaseAdapter {
     }
 
     function _approveTarget(uint256 amount_) private {
-        assetsIn()[0].safeApprove(target, amount_);
+        _assetsIn[0].safeApprove(target, amount_);
     }
 
     function _openPosition(uint256 amount_) private {

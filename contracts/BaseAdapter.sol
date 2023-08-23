@@ -5,6 +5,7 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 abstract contract BaseAdapter {
     address public immutable target;
+    IERC20[] internal _assetsIn;
 
     function assetsIn() public virtual returns (IERC20[] memory) {}
 
