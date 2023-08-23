@@ -15,12 +15,10 @@ contract FakePoolAdapter is BaseAdapter {
         _assetsIn = [FakePool(target).tokenA()];
     }
 
-    function assetsIn() public view override returns (IERC20[] memory) {
-        return _assetsIn;
-    }
-
     function deposit(bytes memory data) public override {
         uint256[] memory amount = abi.decode(data, (uint256[]));
+
+        console.log('amount[0]: %s', amount[0]);
 
         _approveTarget(amount[0]);
         _openPosition(amount[0]);

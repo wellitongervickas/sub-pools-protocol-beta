@@ -7,7 +7,9 @@ abstract contract BaseAdapter {
     address public immutable target;
     IERC20[] internal _assetsIn;
 
-    function assetsIn() public virtual returns (IERC20[] memory) {}
+    function assetsIn() public virtual returns (IERC20[] memory) {
+        return _assetsIn;
+    }
 
     function deposit(bytes memory data) public virtual {}
 }

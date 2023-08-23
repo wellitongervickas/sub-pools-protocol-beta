@@ -35,10 +35,6 @@ contract Node is BaseAdapter {
         _setupAdapterAssetsVault();
     }
 
-    function assetsIn() public view override returns (IERC20[] memory) {
-        return _assetsIn;
-    }
-
     function _setupAdapterAssetsVault() private {
         for (uint8 index = 0; index < _assetsIn.length; index++) {
             _vaultsIn.push(registry.getVault(_assetsIn[index]));
@@ -66,9 +62,7 @@ contract Node is BaseAdapter {
     }
 
     function _depositTo(uint256[] memory amount_) private {
-        address(target).functionDelegateCall(
-            abi.encodeWithSelector(BaseAdapter.deposit.selector, abi.encode(amount_, address(this)))
-        );
+        address(target).functionDelegateCall(abi.encodeWithSelector(BaseAdapter.deposit.selector, abi.encode(amount_)));
     }
 
     function _createPosition(address owner_, uint256[] memory amount_) private returns (Position memory) {
