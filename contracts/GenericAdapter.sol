@@ -14,9 +14,6 @@ contract GenericAdapter is BaseAdapter {
     bytes4 private immutable _functionSelector;
 
     constructor(address target_, IERC20[] memory assetsIn_, bytes4 functionSelector_) {
-        console.log('expected: ');
-        console.logBytes4(bytes4(keccak256(bytes('openPosition(uint256,bool)'))));
-
         target = target_;
         _assetsIn = assetsIn_;
         _functionSelector = functionSelector_;
