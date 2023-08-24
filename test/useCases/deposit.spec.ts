@@ -10,7 +10,6 @@ export const DEFAULT_DECIMALS_A = 18
 describe('UseCase: Deposit', () => {
   it('should deposit to adapter target', async function () {
     const [owner] = await ethers.getSigners()
-    const target = ethers.Wallet.createRandom()
     const depositAmount = '1000000000000000000'
 
     // Deploy Registry

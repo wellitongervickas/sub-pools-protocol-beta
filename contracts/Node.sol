@@ -48,8 +48,10 @@ contract Node is BaseAdapter {
         );
 
         _receiveFrom(amounts_, depositor_);
-        _approveTarget(amounts_);
+
+        _approveAdapterTarget(amounts_);
         _depositTo(adapterData_);
+
         _createPosition(depositor_, amounts_);
 
         emit Node_PositionCreated(amounts_, depositor_);
@@ -61,7 +63,7 @@ contract Node is BaseAdapter {
         }
     }
 
-    function _approveTarget(uint256[] memory amounts_) private {
+    function _approveAdapterTarget(uint256[] memory amounts_) private {
         for (uint8 index = 0; index < _assetsIn.length; index++) {
             _assetsIn[index].safeApprove(BaseAdapter(target).target(), amounts_[index]);
         }
