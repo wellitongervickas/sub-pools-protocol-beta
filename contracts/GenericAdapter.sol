@@ -19,10 +19,6 @@ contract GenericAdapter is BaseAdapter {
         _functionSelector = functionSelector_;
     }
 
-    function assetsIn() public view override returns (IERC20[] memory) {
-        return _assetsIn;
-    }
-
     function deposit(bytes memory data) public override {
         address(target).functionCall(abi.encodePacked(_functionSelector, data));
     }
