@@ -47,29 +47,29 @@ contract Node is BaseAdapter {
             (uint256[], address, bytes)
         );
 
-        _receiveFrom(amounts_, depositor_);
+        _withdrawFromVault(amounts_, depositor_);
 
-        _approveAdapterTarget(amounts_);
-        _depositTo(adapterData_);
+        _approveAssetsToTarget(amounts_);
+        _depositAssetsToTarget(adapterData_);
 
         _createPosition(depositor_, amounts_);
 
         emit Node_PositionCreated(amounts_, depositor_);
     }
 
-    function _receiveFrom(uint256[] memory amounts_, address depositor_) private {
+    function _withdrawFromVault(uint256[] memory amounts_, address depositor_) private {
         for (uint8 index = 0; index < _vaultsIn.length; index++) {
             Vault(_vaultsIn[index]).withdraw(amounts_[index], address(this), depositor_);
         }
     }
 
-    function _approveAdapterTarget(uint256[] memory amounts_) private {
+    function _approveAssetsToTarget(uint256[] memory amounts_) private {
         for (uint8 index = 0; index < _assetsIn.length; index++) {
             _assetsIn[index].safeApprove(BaseAdapter(target).target(), amounts_[index]);
         }
     }
 
-    function _depositTo(bytes memory adapterData_) private {
+    function _depositAssetsToTarget(bytes memory adapterData_) private {
         address(target).functionDelegateCall(abi.encodeWithSelector(BaseAdapter.deposit.selector, adapterData_));
     }
 
