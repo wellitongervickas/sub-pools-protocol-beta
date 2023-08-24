@@ -51,8 +51,8 @@ contract Registry {
         return assets[asset_];
     }
 
-    function createNode(address target) public returns (address nodeAddress) {
-        nodeAddress = address(new Node(target, this));
+    function createNode(address adapter_) public returns (address nodeAddress) {
+        nodeAddress = address(new Node(adapter_, this));
         emit Registry_NodeCreated(nodeAddress);
     }
 }

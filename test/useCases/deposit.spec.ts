@@ -13,6 +13,10 @@ describe('UseCase: Deposit', () => {
     const target = ethers.Wallet.createRandom()
     const depositAmount = '1000000000000000000'
 
+    // Deploy Registry
+    const Registry = await ethers.getContractFactory('Registry')
+    const registryContract = await Registry.deploy()
+
     // Deploy Token 1
     const Token = await ethers.getContractFactory('Token')
     const tokenContract = await Token.deploy(DEFAULT_SUPPLY_A, DEFAULT_NAME_A, DEFAULT_SYMBOL_A, DEFAULT_DECIMALS_A)
@@ -23,15 +27,16 @@ describe('UseCase: Deposit', () => {
     const fakePoolContract = await FakePool.deploy(tokenAddress)
     const fakePoolAddress = await fakePoolContract.getAddress()
 
-    // Deploy Fake Pool Adapter
-    const FakePoolAdapter = await ethers.getContractFactory('FakePoolAdapter')
-    const fakePoolAdapterContract = await FakePoolAdapter.deploy(fakePoolAddress)
-    const fakePoolAdapterAddress = await fakePoolAdapterContract.getAddress()
+    // return
+    const GenericAdapter = await ethers.getContractFactory('GenericAdapter')
 
-    // Deploy Registry
-    const Registry = await ethers.getContractFactory('Registry')
-    const registryContract = await Registry.deploy()
-    // const registryAddress = await registryContract.getAddress()
+    const genericAdapterContract = await GenericAdapter.deploy(
+      fakePoolAddress,
+      [tokenAddress],
+      FakePool.interface.getFunction('openPosition')?.selector
+    )
+
+    const genericAdapterAddress = await genericAdapterContract.getAddress()
 
     //  1 - Create vault
     const vaultAName = 'v' + DEFAULT_NAME_A
@@ -41,7 +46,7 @@ describe('UseCase: Deposit', () => {
     const [vaultAddress] = vaultTxReceipt.logs[0].args
 
     //  2- Create adapter
-    const adapterTx = await registryContract.createAdapter(fakePoolAdapterAddress)
+    const adapterTx = await registryContract.createAdapter(genericAdapterAddress)
     const adapterTxReceipt = await adapterTx.wait()
     const [adapterId] = adapterTxReceipt.logs[0].args
 
@@ -52,8 +57,11 @@ describe('UseCase: Deposit', () => {
     const nodeTxReceipt = await nodeTx.wait()
     const [nodeAddress] = nodeTxReceipt.logs[0].args
 
+    // contract instances
     const vaultContract = await ethers.getContractAt('Vault', vaultAddress)
     const nodeContract = await ethers.getContractAt('Node', nodeAddress)
+
+    // =========================== Starts here =============================
 
     // 4 - Deposit to vault
     await tokenContract.approve(vaultAddress, depositAmount)
@@ -61,7 +69,15 @@ describe('UseCase: Deposit', () => {
 
     // 5 - Deposit to node
     await vaultContract.approve(nodeAddress, depositAmount)
-    const encodedPayload = coderUtils.encode([[depositAmount], owner.address], ['uint256[]', 'address'])
+
+    // payload to target
+    const adapterData = coderUtils.encode([depositAmount, true], ['uint256', 'bool'])
+
+    const encodedPayload = coderUtils.encode(
+      [[depositAmount], owner.address, adapterData],
+      ['uint256[]', 'address', 'bytes']
+    )
+
     await nodeContract.deposit(encodedPayload)
 
     expect(await tokenContract.balanceOf(fakePoolAddress)).to.equal(depositAmount)

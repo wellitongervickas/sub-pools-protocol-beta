@@ -9,16 +9,18 @@ contract FakePool {
     using SafeERC20 for IERC20;
     IERC20 public tokenA;
 
+    bool isDepositedSuccess;
+
     event Deposit(uint256 amount_, address depositor_);
 
     constructor(IERC20 tokenA_) {
         tokenA = tokenA_;
     }
 
-    function openPosition(uint256 amount_) public {
-        console.log('amount[0]: %s', amount_);
-
+    function openPosition(uint256 amount_, bool isDepositedSuccess_) public {
+        isDepositedSuccess = isDepositedSuccess_;
         tokenA.safeTransferFrom(msg.sender, address(this), amount_);
+
         emit Deposit(amount_, msg.sender);
     }
 }
