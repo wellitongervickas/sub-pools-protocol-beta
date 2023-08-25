@@ -3,7 +3,7 @@ pragma solidity =0.8.21;
 
 import {Counters} from '@openzeppelin/contracts/utils/Counters.sol';
 import {BaseAdapter} from './BaseAdapter.sol';
-import {Vault} from './Vault.sol';
+import {Vault} from '../Vault.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {Node} from './Node.sol';
 
