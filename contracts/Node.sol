@@ -27,5 +27,10 @@ contract Node {
         }
 
         address(adapter.targetAddress).functionCall(abi.encodePacked(adapter.functionSelector, data));
+
+        for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
+            Vault vault = adapter.vaultsIn[i];
+            IERC20(vault.asset()).approve(adapter.targetAddress, 0);
+        }
     }
 }
