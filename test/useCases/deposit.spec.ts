@@ -7,78 +7,82 @@ export const DEFAULT_NAME_A = 'Wrapped Bitcoin'
 export const DEFAULT_SYMBOL_A = 'WBTC'
 export const DEFAULT_DECIMALS_A = 18
 
+export const DEFAULT_SUPPLY_B = '1000000000000000000000000'
+export const DEFAULT_NAME_B = 'Wrapped Ether'
+export const DEFAULT_SYMBOL_B = 'WETH'
+export const DEFAULT_DECIMALS_B = 18
+
 describe('UseCase: Deposit', () => {
-  it('should deposit to adapter target', async function () {
+  it('should deposit to adapter', async function () {
     const [owner] = await ethers.getSigners()
     const depositAmount = '1000000000000000000'
 
-    // Deploy Registry
-    const Registry = await ethers.getContractFactory('Registry')
-    const registryContract = await Registry.deploy()
+    // Deploy Token A
+    const TokenA = await ethers.getContractFactory('Token')
+    const tokenAContract = await TokenA.deploy(DEFAULT_SUPPLY_A, DEFAULT_NAME_A, DEFAULT_SYMBOL_A, DEFAULT_DECIMALS_A)
+    const tokenAAddress = await tokenAContract.getAddress()
 
-    // Deploy Token 1
-    const Token = await ethers.getContractFactory('Token')
-    const tokenContract = await Token.deploy(DEFAULT_SUPPLY_A, DEFAULT_NAME_A, DEFAULT_SYMBOL_A, DEFAULT_DECIMALS_A)
-    const tokenAddress = await tokenContract.getAddress()
+    // Deploy Token B
+    const TokenB = await ethers.getContractFactory('Token')
+    const tokenBContract = await TokenB.deploy(DEFAULT_SUPPLY_B, DEFAULT_NAME_B, DEFAULT_SYMBOL_B, DEFAULT_DECIMALS_B)
+    const tokenBAddress = await tokenBContract.getAddress()
 
-    //Deploy Fake Pool
-    const FakePool = await ethers.getContractFactory('FakePool')
-    const fakePoolContract = await FakePool.deploy(tokenAddress)
-    const fakePoolAddress = await fakePoolContract.getAddress()
+    // Deploy Example Target
+    const ExampleTarget = await ethers.getContractFactory('ExampleTarget')
+    const exampleTargetContract = await ExampleTarget.deploy([tokenAAddress, tokenBAddress])
+    const exampleTargetAddress = await exampleTargetContract.getAddress()
 
-    // return
-    const GenericAdapter = await ethers.getContractFactory('GenericAdapter')
+    // Deploy Vault A
+    const VaultA = await ethers.getContractFactory('Vault')
+    const vaultAContract = await VaultA.deploy(tokenAAddress, DEFAULT_NAME_A, DEFAULT_SYMBOL_A)
+    const vaultAAddress = await vaultAContract.getAddress()
 
-    const genericAdapterContract = await GenericAdapter.deploy(
-      fakePoolAddress,
-      [tokenAddress],
-      FakePool.interface.getFunction('openPosition')?.selector
+    // Deploy Vault B
+    const VaultB = await ethers.getContractFactory('Vault')
+    const vaultBContract = await VaultB.deploy(tokenBAddress, DEFAULT_NAME_B, DEFAULT_SYMBOL_B)
+    const vaultBAddress = await vaultBContract.getAddress()
+
+    // Deposit shares Vault A using Token A
+    await tokenAContract.approve(vaultAAddress, depositAmount)
+    await vaultAContract.deposit(depositAmount, owner.address)
+
+    // Deposit shares Vault B using Token B
+    await tokenBContract.approve(vaultBAddress, depositAmount)
+    await vaultBContract.deposit(depositAmount, owner.address)
+
+    // Deploy router
+    const Router = await ethers.getContractFactory('Router')
+    const routerContract = await Router.deploy()
+    const routerAddress = await routerContract.getAddress()
+
+    // Create adapter
+    const adapterSettings = {
+      targetAddress: exampleTargetAddress,
+      vaultsIn: [vaultAAddress, vaultBAddress],
+      functionSelector: ExampleTarget.interface.getFunction('openPosition')?.selector,
+    }
+
+    const tx = await routerContract.createAdapter(
+      adapterSettings.targetAddress,
+      adapterSettings.vaultsIn,
+      adapterSettings.functionSelector
     )
+    const receipt = await tx.wait()
+    const [adapterId] = receipt.logs[0].args
 
-    const genericAdapterAddress = await genericAdapterContract.getAddress()
+    // Approve vault A,B to router
+    await vaultAContract.approve(routerAddress, depositAmount)
+    await vaultBContract.approve(routerAddress, depositAmount)
 
-    //  1 - Create vault
-    const vaultAName = 'v' + DEFAULT_NAME_A
-    const vaultASymbol = 'v' + DEFAULT_SYMBOL_A
-    const vaultTx = await registryContract.createVault(tokenAddress, vaultAName, vaultASymbol)
-    const vaultTxReceipt = await vaultTx.wait()
-    const [vaultAddress] = vaultTxReceipt.logs[0].args
+    // Position settings
+    const amounts = [depositAmount, depositAmount]
 
-    //  2- Create adapter
-    const adapterTx = await registryContract.createAdapter(genericAdapterAddress)
-    const adapterTxReceipt = await adapterTx.wait()
-    const [adapterId] = adapterTxReceipt.logs[0].args
+    const adapterData = coderUtils.encode([amounts], ['uint256[]'])
 
-    const adapterTarget = await registryContract.getAdapter(adapterId)
+    // Open position using router
+    await routerContract.openPosition(adapterId, amounts, adapterData)
 
-    // 3 - Create Node
-    const nodeTx = await registryContract.createNode(adapterTarget)
-    const nodeTxReceipt = await nodeTx.wait()
-    const [nodeAddress] = nodeTxReceipt.logs[0].args
-
-    // contract instances
-    const vaultContract = await ethers.getContractAt('Vault', vaultAddress)
-    const nodeContract = await ethers.getContractAt('Node', nodeAddress)
-
-    // =========================== Starts here =============================
-
-    // 4 - Deposit to vault
-    await tokenContract.approve(vaultAddress, depositAmount)
-    await vaultContract.deposit(depositAmount, owner.address)
-
-    // 5 - Deposit to node
-    await vaultContract.approve(nodeAddress, depositAmount)
-
-    // payload to target
-    const adapterData = coderUtils.encode([depositAmount, true], ['uint256', 'bool'])
-
-    const encodedPayload = coderUtils.encode(
-      [[depositAmount], owner.address, adapterData],
-      ['uint256[]', 'address', 'bytes']
-    )
-
-    await nodeContract.deposit(encodedPayload)
-
-    expect(await tokenContract.balanceOf(fakePoolAddress)).to.equal(depositAmount)
+    expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositAmount)
+    expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositAmount)
   })
 })

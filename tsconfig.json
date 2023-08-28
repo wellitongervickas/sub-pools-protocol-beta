@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "outDir": "dist",
-    "typeRoots": ["./typechain", "./node_modules/@types"],
+    "typeRoots": ["./typechain", "./node_modules/@types"]
   },
   "include": ["./test"],
   "files": ["./hardhat.config.ts"]
