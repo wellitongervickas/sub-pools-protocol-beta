@@ -33,6 +33,9 @@ contract Node {
     }
 
     function deposit(uint256[] memory amount_, address owner_, bytes memory data_) external {
+        ///@dev harvest before update position
+        harvest(owner_);
+
         _deposit(amount_, data_);
 
         if (_position[owner_].id > 0) {
@@ -97,11 +100,17 @@ contract Node {
     }
 
     function withdraw(uint256[] memory amount_, address owner_, bytes memory data_) external {
+        // Vaults out
         _callWithdrawSelector(data_);
         _decreasePositionAmount(amount_, owner_);
         _approveVaultToSpend(amount_);
         _depositAmountToVault(amount_, owner_);
         _removeVaultSpendApproval();
+
+        // Vaults profit
+        _approveVaultToSpendProfit();
+        _depositAmountProfitToVault(owner_);
+        _removeVaultProfitSpendApproval();
     }
 
     function _callWithdrawSelector(bytes memory data_) private {
@@ -133,11 +142,12 @@ contract Node {
         }
     }
 
-    function harvest(address owner_) external {
+    function harvest(address owner_) public {
         _callHarvestSelector();
 
         _approveVaultToSpendProfit();
         _depositAmountProfitToVault(owner_);
+        _removeVaultProfitSpendApproval();
     }
 
     function _callHarvestSelector() private {
@@ -158,6 +168,12 @@ contract Node {
         for (uint256 i = 0; i < adapter.vaultsProfit.length; i++) {
             Vault vault = adapter.vaultsProfit[i];
             vault.deposit(IERC20(adapter.vaultsProfit[i].asset()).balanceOf(address(this)), owner_);
+        }
+    }
+
+    function _removeVaultProfitSpendApproval() private {
+        for (uint256 i = 0; i < adapter.vaultsProfit.length; i++) {
+            _approveAssetAmounToSpender(adapter.vaultsProfit[i].asset(), address(adapter.vaultsProfit[i]), 0);
         }
     }
 }
