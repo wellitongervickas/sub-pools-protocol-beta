@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import { ethers } from '../fixtures'
 import coderUtils from '../helpers/coder'
+import { getLogArgs } from '../helpers/logs'
 
 export const DEFAULT_SUPPLY_A = '1000000000000000000000000'
 export const DEFAULT_NAME_A = 'Wrapped Bitcoin'
@@ -60,14 +61,18 @@ describe('UseCase: Increase Position', () => {
     const adapterSettings = {
       targetAddress: exampleTargetAddress,
       vaultsIn: [vaultAAddress, vaultBAddress],
-      functionSelector: ExampleTarget.interface.getFunction('openPosition')?.selector,
+      vaultsOut: [vaultAAddress, vaultBAddress],
+      depositFunctionSignature: ExampleTarget.interface.getFunction('openPosition')?.selector,
+      decreasePositionFunctionSignature: ExampleTarget.interface.getFunction('withdraw')?.selector,
     }
-
     const tx = await routerContract.createAdapter(
       adapterSettings.targetAddress,
       adapterSettings.vaultsIn,
-      adapterSettings.functionSelector
+      adapterSettings.vaultsOut,
+      adapterSettings.depositFunctionSignature,
+      adapterSettings.decreasePositionFunctionSignature
     )
+
     const receipt = await tx.wait()
     const [adapterId] = receipt.logs[0].args
 
@@ -83,7 +88,7 @@ describe('UseCase: Increase Position', () => {
     // Open position using router
     const tx1 = await routerContract.openPosition(adapterId, amounts, adapterData)
     const receipt1 = await tx1.wait()
-    const [nodeAddress] = receipt1.logs[18].args
+    const [nodeAddress] = getLogArgs(receipt1.logs)
 
     // Increase position using router
     await routerContract.increasePosition(nodeAddress, amounts, adapterData)
