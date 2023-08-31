@@ -87,6 +87,6 @@ describe('UseCase: Open Position', () => {
     await routerContract.openPosition(adapterId, amounts, adapterData)
 
     expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositAmount)
-    expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositAmount)
+    expect(await tokenBContract.balanceOf(exampleTargetAddress)).to.equal(depositAmount)
   })
 })

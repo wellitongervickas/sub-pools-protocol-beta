@@ -82,21 +82,23 @@ describe('UseCase: Decrease Position', () => {
 
     // Position settings
     const amounts = [depositAmount, depositAmount]
+    const decreaseAmounts = [depositTotal, depositTotal]
 
-    const adapterData = coderUtils.encode([amounts], ['uint256[]'])
+    const adapterDataDeposit = coderUtils.encode([amounts], ['uint256[]'])
+    const adapterDataWithdraw = coderUtils.encode([decreaseAmounts], ['uint256[]'])
 
     // Open position using router
-    const tx1 = await routerContract.openPosition(adapterId, amounts, adapterData)
+    const tx1 = await routerContract.openPosition(adapterId, amounts, adapterDataDeposit)
     const receipt1 = await tx1.wait()
     const [nodeAddress] = getLogArgs(receipt1.logs)
 
     // Increase position using router
-    await routerContract.increasePosition(nodeAddress, amounts, adapterData)
+    await routerContract.increasePosition(nodeAddress, amounts, adapterDataDeposit)
 
     // Decrease position using router
-    await routerContract.decreasePosition(nodeAddress, amounts, adapterData)
+    await routerContract.decreasePosition(nodeAddress, decreaseAmounts, adapterDataWithdraw)
 
-    expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositAmount)
-    expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositAmount)
+    expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(0)
+    expect(await tokenBContract.balanceOf(exampleTargetAddress)).to.equal(0)
   })
 })

@@ -94,6 +94,6 @@ describe('UseCase: Increase Position', () => {
     await routerContract.increasePosition(nodeAddress, amounts, adapterData)
 
     expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositTotal)
-    expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositTotal)
+    expect(await tokenBContract.balanceOf(exampleTargetAddress)).to.equal(depositTotal)
   })
 })
