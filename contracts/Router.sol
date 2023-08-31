@@ -56,40 +56,47 @@ contract Router {
         _currentAdapterId.increment();
     }
 
-    function openPosition(bytes32 adapterId, uint256[] memory amount, bytes memory data) external returns (Node node) {
+    function openPosition(
+        bytes32 adapterId,
+        uint256[] memory amount_,
+        bytes memory data_
+    ) external returns (Node node) {
         Adapter memory adapter = adapters[adapterId];
         node = new Node(adapter);
 
-        _transferAssetsToNode(node, amount, data);
+        _transferAssetsToNode(node, amount_);
+
+        node.deposit(amount_, msg.sender, data_);
 
         emit Router_PositionOpened(node, adapterId);
     }
 
-    function increasePosition(Node node, uint256[] memory amount, bytes memory data) external {
-        _transferAssetsToNode(node, amount, data);
-
-        emit Router_PositionIncreased(node, amount);
-    }
-
-    function _transferAssetsToNode(Node node, uint256[] memory amount_, bytes memory data_) private {
+    function _transferAssetsToNode(Node node, uint256[] memory amount_) private {
         Adapter memory adapter = node.getAdapter();
 
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
             Vault vault = adapter.vaultsIn[i];
             vault.safeTransferFrom(msg.sender, address(node), amount_[i]);
         }
-
-        node.deposit(amount_, msg.sender, data_);
     }
 
-    function decreasePosition(Node node, uint256[] memory amount, bytes memory data) external {
-        node.withdraw(amount, msg.sender, data);
+    function increasePosition(Node node_, uint256[] memory amount_, bytes memory data_) external {
+        _transferAssetsToNode(node_, amount_);
 
-        emit Router_PositionDecreased(node, amount);
+        node_.deposit(amount_, msg.sender, data_);
+
+        emit Router_PositionIncreased(node_, amount_);
     }
 
-    function harvest(Node node) external {
-        node.harvest(msg.sender);
-        emit Router_PositionHarvested(node);
+    function decreasePosition(Node node_, uint256[] memory amount_, bytes memory data_) external {
+        node_.withdraw(amount_, msg.sender, data_);
+
+        emit Router_PositionDecreased(node_, amount_);
+    }
+
+    function harvest(Node node_) external {
+        node_.harvest(msg.sender);
+
+        emit Router_PositionHarvested(node_);
     }
 }
