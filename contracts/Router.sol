@@ -16,8 +16,10 @@ contract Router {
         address targetAddress;
         Vault[] vaultsIn;
         Vault[] vaultsOut;
+        Vault[] vaultsProfit;
         bytes4 depositFunctionSignature;
         bytes4 withdrawFunctionSignature;
+        bytes4 harvestFunctionSignature;
     }
 
     mapping(bytes32 => Adapter) public adapters;
@@ -26,13 +28,16 @@ contract Router {
     event Router_PositionOpened(Node nodeAddress_, bytes32 adapterId_);
     event Router_PositionIncreased(Node nodeAddress_, uint256[] amount_);
     event Router_PositionDecreased(Node nodeAddress_, uint256[] amount_);
+    event Router_PositionHarvested(Node nodeAddress_);
 
     function createAdapter(
         address targetAddress,
         Vault[] memory vaultsIn,
         Vault[] memory vaultsOut,
+        Vault[] memory vaultsProfit,
         bytes4 depositFunctionSignature_,
-        bytes4 withdrawFunctionSignature_
+        bytes4 withdrawFunctionSignature_,
+        bytes4 harvestFunctionSignature_
     ) external returns (bytes32 id) {
         id = keccak256(abi.encodePacked(targetAddress, _currentAdapterId.current()));
 
@@ -40,8 +45,10 @@ contract Router {
             targetAddress,
             vaultsIn,
             vaultsOut,
+            vaultsProfit,
             depositFunctionSignature_,
-            withdrawFunctionSignature_
+            withdrawFunctionSignature_,
+            harvestFunctionSignature_
         );
 
         emit Router_AdapterCreated(id);
@@ -79,5 +86,10 @@ contract Router {
         node.withdraw(amount, msg.sender, data);
 
         emit Router_PositionDecreased(node, amount);
+    }
+
+    function harvest(Node node) external {
+        node.harvest(msg.sender);
+        emit Router_PositionHarvested(node);
     }
 }

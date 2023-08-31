@@ -2,6 +2,11 @@ import { expect } from 'chai'
 import { ethers } from '../fixtures'
 import coderUtils from '../helpers/coder'
 
+export const DEFAULT_SUPPLY = '1000000000000000000000000'
+export const DEFAULT_NAME = 'Meme Coin'
+export const DEFAULT_SYMBOL = 'MMCN'
+export const DEFAULT_DECIMALS = 18
+
 export const DEFAULT_SUPPLY_A = '1000000000000000000000000'
 export const DEFAULT_NAME_A = 'Wrapped Bitcoin'
 export const DEFAULT_SYMBOL_A = 'WBTC'
@@ -17,6 +22,11 @@ describe('UseCase: Open Position', () => {
     const [owner] = await ethers.getSigners()
     const depositAmount = '1000000000000000000'
 
+    // Deploy Token Output
+    const Token = await ethers.getContractFactory('Token')
+    const tokenContract = await Token.deploy(DEFAULT_SUPPLY, DEFAULT_NAME, DEFAULT_SYMBOL, DEFAULT_DECIMALS)
+    const tokenAddress = await tokenContract.getAddress()
+
     // Deploy Token A
     const TokenA = await ethers.getContractFactory('Token')
     const tokenAContract = await TokenA.deploy(DEFAULT_SUPPLY_A, DEFAULT_NAME_A, DEFAULT_SYMBOL_A, DEFAULT_DECIMALS_A)
@@ -29,8 +39,13 @@ describe('UseCase: Open Position', () => {
 
     // Deploy Example Target
     const ExampleTarget = await ethers.getContractFactory('ExampleTarget')
-    const exampleTargetContract = await ExampleTarget.deploy([tokenAAddress, tokenBAddress])
+    const exampleTargetContract = await ExampleTarget.deploy([tokenAAddress, tokenBAddress], tokenAddress)
     const exampleTargetAddress = await exampleTargetContract.getAddress()
+
+    // Deploy Vault
+    const Vault = await ethers.getContractFactory('Vault')
+    const vaultContract = await Vault.deploy(tokenAddress, DEFAULT_NAME, DEFAULT_SYMBOL)
+    const vaultAddress = await vaultContract.getAddress()
 
     // Deploy Vault A
     const VaultA = await ethers.getContractFactory('Vault')
@@ -60,15 +75,19 @@ describe('UseCase: Open Position', () => {
       targetAddress: exampleTargetAddress,
       vaultsIn: [vaultAAddress, vaultBAddress],
       vaultsOut: [vaultAAddress, vaultBAddress],
+      vaultsProfit: [vaultAddress],
       depositFunctionSignature: ExampleTarget.interface.getFunction('deposit')?.selector,
-      decreasePositionFunctionSignature: ExampleTarget.interface.getFunction('withdraw')?.selector,
+      withdrawFunctionSignature: ExampleTarget.interface.getFunction('withdraw')?.selector,
+      harvestFunctionSignature: ExampleTarget.interface.getFunction('harvest')?.selector,
     }
     const tx = await routerContract.createAdapter(
       adapterSettings.targetAddress,
       adapterSettings.vaultsIn,
       adapterSettings.vaultsOut,
+      adapterSettings.vaultsProfit,
       adapterSettings.depositFunctionSignature,
-      adapterSettings.decreasePositionFunctionSignature
+      adapterSettings.withdrawFunctionSignature,
+      adapterSettings.harvestFunctionSignature
     )
 
     const receipt = await tx.wait()

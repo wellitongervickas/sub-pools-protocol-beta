@@ -18,11 +18,12 @@ export const DEFAULT_NAME_B = 'Wrapped Ether'
 export const DEFAULT_SYMBOL_B = 'WETH'
 export const DEFAULT_DECIMALS_B = 18
 
-describe('UseCase: Increase Position', () => {
-  it('should increase position in adapter', async function () {
+describe('UseCase: Harvest Position', () => {
+  it('should harvest position in adapter', async function () {
     const [owner] = await ethers.getSigners()
     const depositAmount = '1000000000000000000'
     const depositTotal = '2000000000000000000'
+    const harvestTotal = '1000000000000000000'
 
     // Deploy Token Output
     const Token = await ethers.getContractFactory('Token')
@@ -101,18 +102,23 @@ describe('UseCase: Increase Position', () => {
 
     // Position settings
     const amounts = [depositAmount, depositAmount]
+    const decreaseAmounts = [depositTotal, depositTotal]
 
-    const adapterData = coderUtils.encode([amounts], ['uint256[]'])
+    const adapterDataDeposit = coderUtils.encode([amounts], ['uint256[]'])
+    const adapterDataWithdraw = coderUtils.encode([decreaseAmounts], ['uint256[]'])
 
     // Open position using router
-    const tx1 = await routerContract.openPosition(adapterId, amounts, adapterData)
+    const tx1 = await routerContract.openPosition(adapterId, amounts, adapterDataDeposit)
     const receipt1 = await tx1.wait()
     const [nodeAddress] = getLogArgs(receipt1.logs)
 
     // Increase position using router
-    await routerContract.increasePosition(nodeAddress, amounts, adapterData)
+    await routerContract.increasePosition(nodeAddress, amounts, adapterDataDeposit)
 
-    expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositTotal)
-    expect(await tokenBContract.balanceOf(exampleTargetAddress)).to.equal(depositTotal)
+    // Decrease position using router
+    await tokenContract.transfer(exampleTargetAddress, harvestTotal)
+    await routerContract.harvest(nodeAddress)
+
+    expect(await vaultContract.balanceOf(owner.address)).to.equal(harvestTotal)
   })
 })

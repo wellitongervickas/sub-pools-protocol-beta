@@ -7,12 +7,15 @@ import 'hardhat/console.sol';
 
 contract ExampleTarget {
     using SafeERC20 for IERC20;
+
     IERC20[] public tokens;
+    IERC20 public tokenOutput;
 
     event Deposit(uint256[] amount_, address depositor_);
 
-    constructor(IERC20[] memory tokens_) {
+    constructor(IERC20[] memory tokens_, IERC20 tokenOutput_) {
         tokens = tokens_;
+        tokenOutput = tokenOutput_;
     }
 
     function deposit(uint256[] memory amount_) public {
@@ -27,5 +30,9 @@ contract ExampleTarget {
         for (uint256 i = 0; i < tokens.length; i++) {
             tokens[i].safeTransfer(msg.sender, amount_[i]);
         }
+    }
+
+    function harvest() public {
+        tokenOutput.safeTransfer(msg.sender, tokenOutput.balanceOf(address(this)));
     }
 }

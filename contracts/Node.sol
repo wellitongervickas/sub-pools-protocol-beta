@@ -68,14 +68,14 @@ contract Node {
         IERC20(asset_).approve(spender_, amount_);
     }
 
+    function _callDepositSelector(bytes memory data_) private {
+        address(adapter.targetAddress).functionCall(abi.encodePacked(adapter.depositFunctionSignature, data_));
+    }
+
     function _removeAdapterSpendApproval() private {
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
             _approveAssetAmounToSpender(adapter.vaultsIn[i].asset(), adapter.targetAddress, 0);
         }
-    }
-
-    function _callDepositSelector(bytes memory data_) private {
-        address(adapter.targetAddress).functionCall(abi.encodePacked(adapter.depositFunctionSignature, data_));
     }
 
     function _createPosition(address owner_, uint256[] memory amounts_) private returns (Position memory) {
@@ -130,6 +130,33 @@ contract Node {
     function _removeVaultSpendApproval() private {
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
             _approveAssetAmounToSpender(adapter.vaultsIn[i].asset(), address(adapter.vaultsIn[i]), 0);
+        }
+    }
+
+    function harvest(address owner_) external {
+        _callHarvestSelector();
+        _approveVaultToSpendProfit();
+        _depositAmountProfitToVault(owner_);
+    }
+
+    function _callHarvestSelector() private {
+        address(adapter.targetAddress).functionCall(abi.encodePacked(adapter.harvestFunctionSignature));
+    }
+
+    function _approveVaultToSpendProfit() private {
+        for (uint256 i = 0; i < adapter.vaultsProfit.length; i++) {
+            _approveAssetAmounToSpender(
+                adapter.vaultsProfit[i].asset(),
+                address(adapter.vaultsProfit[i]),
+                1000000000000000000
+            );
+        }
+    }
+
+    function _depositAmountProfitToVault(address owner_) private {
+        for (uint256 i = 0; i < adapter.vaultsProfit.length; i++) {
+            Vault vault = adapter.vaultsProfit[i];
+            vault.deposit(1000000000000000000, owner_);
         }
     }
 }
