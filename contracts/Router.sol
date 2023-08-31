@@ -53,18 +53,18 @@ contract Router {
         Adapter memory adapter = adapters[adapterId];
         node = new Node(adapter);
 
-        _depositAssetsToNode(node, amount, data);
+        _transferAssetsToNode(node, amount, data);
 
         emit Router_PositionOpened(node, adapterId);
     }
 
     function increasePosition(Node node, uint256[] memory amount, bytes memory data) external {
-        _depositAssetsToNode(node, amount, data);
+        _transferAssetsToNode(node, amount, data);
 
         emit Router_PositionIncreased(node, amount);
     }
 
-    function _depositAssetsToNode(Node node, uint256[] memory amount_, bytes memory data_) private {
+    function _transferAssetsToNode(Node node, uint256[] memory amount_, bytes memory data_) private {
         Adapter memory adapter = node.getAdapter();
 
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {

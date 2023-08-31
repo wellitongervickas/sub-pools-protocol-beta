@@ -45,33 +45,32 @@ contract Node {
     }
 
     function _deposit(uint256[] memory amount_, bytes memory data_) private {
-        _withdrawAssetsFromVaults(amount_);
-
-        _addAdapterSpendApproval(amount_);
-
+        _withdrawAmountFromVault(amount_);
+        _approveAdapterToSpend(amount_);
         _callDepositSelector(data_);
-
         _removeAdapterSpendApproval();
     }
 
-    function _withdrawAssetsFromVaults(uint256[] memory amount_) private {
+    function _withdrawAmountFromVault(uint256[] memory amount_) private {
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
             Vault vault = adapter.vaultsIn[i];
             vault.withdraw(amount_[i], address(this), address(this));
         }
     }
 
-    function _addAdapterSpendApproval(uint256[] memory amount_) private {
+    function _approveAdapterToSpend(uint256[] memory amount_) private {
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
-            Vault vault = adapter.vaultsIn[i];
-            IERC20(vault.asset()).approve(adapter.targetAddress, amount_[i]);
+            _approveAssetAmounToSpender(adapter.vaultsIn[i].asset(), adapter.targetAddress, amount_[i]);
         }
+    }
+
+    function _approveAssetAmounToSpender(address asset_, address spender_, uint256 amount_) private {
+        IERC20(asset_).approve(spender_, amount_);
     }
 
     function _removeAdapterSpendApproval() private {
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
-            Vault vault = adapter.vaultsIn[i];
-            IERC20(vault.asset()).approve(adapter.targetAddress, 0);
+            _approveAssetAmounToSpender(adapter.vaultsIn[i].asset(), adapter.targetAddress, 0);
         }
     }
 
@@ -100,8 +99,9 @@ contract Node {
     function withdraw(uint256[] memory amount_, address owner_, bytes memory data_) external {
         _callWithdrawSelector(data_);
         _decreasePositionAmount(amount_, owner_);
-        _addVaultSpendApproval(amount_);
-        _depositAssetsFromVaults(amount_, owner_);
+        _approveVaultToSpend(amount_);
+        _depositAmountToVault(amount_, owner_);
+        _removeVaultSpendApproval();
     }
 
     function _callWithdrawSelector(bytes memory data_) private {
@@ -114,17 +114,22 @@ contract Node {
         }
     }
 
-    function _depositAssetsFromVaults(uint256[] memory amount_, address owner_) private {
+    function _approveVaultToSpend(uint256[] memory amount_) private {
+        for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
+            _approveAssetAmounToSpender(adapter.vaultsIn[i].asset(), address(adapter.vaultsIn[i]), amount_[i]);
+        }
+    }
+
+    function _depositAmountToVault(uint256[] memory amount_, address owner_) private {
         for (uint256 i = 0; i < adapter.vaultsOut.length; i++) {
             Vault vault = adapter.vaultsOut[i];
             vault.deposit(amount_[i], owner_);
         }
     }
 
-    function _addVaultSpendApproval(uint256[] memory amount_) private {
+    function _removeVaultSpendApproval() private {
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
-            Vault vault = adapter.vaultsIn[i];
-            IERC20(vault.asset()).approve(address(vault), amount_[i]);
+            _approveAssetAmounToSpender(adapter.vaultsIn[i].asset(), address(adapter.vaultsIn[i]), 0);
         }
     }
 }

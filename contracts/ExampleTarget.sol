@@ -15,7 +15,7 @@ contract ExampleTarget {
         tokens = tokens_;
     }
 
-    function openPosition(uint256[] memory amount_) public {
+    function deposit(uint256[] memory amount_) public {
         for (uint256 i = 0; i < tokens.length; i++) {
             tokens[i].safeTransferFrom(msg.sender, address(this), amount_[i]);
         }

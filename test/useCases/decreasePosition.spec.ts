@@ -62,7 +62,7 @@ describe('UseCase: Decrease Position', () => {
       targetAddress: exampleTargetAddress,
       vaultsIn: [vaultAAddress, vaultBAddress],
       vaultsOut: [vaultAAddress, vaultBAddress],
-      depositFunctionSignature: ExampleTarget.interface.getFunction('openPosition')?.selector,
+      depositFunctionSignature: ExampleTarget.interface.getFunction('deposit')?.selector,
       decreasePositionFunctionSignature: ExampleTarget.interface.getFunction('withdraw')?.selector,
     }
     const tx = await routerContract.createAdapter(
