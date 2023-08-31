@@ -32,7 +32,11 @@ contract ExampleTarget {
         }
     }
 
+    function rewardsBalanceOf() public view returns (uint256) {
+        return tokenOutput.balanceOf(address(this));
+    }
+
     function harvest() public {
-        tokenOutput.safeTransfer(msg.sender, tokenOutput.balanceOf(address(this)));
+        tokenOutput.safeTransfer(msg.sender, rewardsBalanceOf());
     }
 }

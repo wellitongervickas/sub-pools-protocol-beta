@@ -102,10 +102,7 @@ describe('UseCase: Harvest Position', () => {
 
     // Position settings
     const amounts = [depositAmount, depositAmount]
-    const decreaseAmounts = [depositTotal, depositTotal]
-
     const adapterDataDeposit = coderUtils.encode([amounts], ['uint256[]'])
-    const adapterDataWithdraw = coderUtils.encode([decreaseAmounts], ['uint256[]'])
 
     // Open position using router
     const tx1 = await routerContract.openPosition(adapterId, amounts, adapterDataDeposit)

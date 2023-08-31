@@ -135,6 +135,7 @@ contract Node {
 
     function harvest(address owner_) external {
         _callHarvestSelector();
+
         _approveVaultToSpendProfit();
         _depositAmountProfitToVault(owner_);
     }
@@ -148,7 +149,7 @@ contract Node {
             _approveAssetAmounToSpender(
                 adapter.vaultsProfit[i].asset(),
                 address(adapter.vaultsProfit[i]),
-                1000000000000000000
+                IERC20(adapter.vaultsProfit[i].asset()).balanceOf(address(this))
             );
         }
     }
@@ -156,7 +157,7 @@ contract Node {
     function _depositAmountProfitToVault(address owner_) private {
         for (uint256 i = 0; i < adapter.vaultsProfit.length; i++) {
             Vault vault = adapter.vaultsProfit[i];
-            vault.deposit(1000000000000000000, owner_);
+            vault.deposit(IERC20(adapter.vaultsProfit[i].asset()).balanceOf(address(this)), owner_);
         }
     }
 }
