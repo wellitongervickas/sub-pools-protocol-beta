@@ -20,8 +20,9 @@ contract Router {
 
     mapping(bytes32 => Adapter) public adapters;
 
-    event Router_AdapterCreated(bytes32 id);
-    event Router_PositionOpened(address nodeAddress, bytes32 adapterId);
+    event Router_AdapterCreated(bytes32 id_);
+    event Router_PositionOpened(address nodeAddress_, bytes32 adapterId_);
+    event Router_PositionIncreased(address nodeAddress_, uint256[] amount_);
 
     function createAdapter(
         address targetAddress,
@@ -43,20 +44,30 @@ contract Router {
         bytes memory data
     ) external returns (address nodeAddress) {
         Adapter memory adapter = adapters[adapterId];
-
         Node node = new Node(adapter);
-
         nodeAddress = address(node);
 
-        Vault[] memory vaultsIn = adapter.vaultsIn;
-
-        for (uint256 i = 0; i < vaultsIn.length; i++) {
-            Vault vault = vaultsIn[i];
+        for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
+            Vault vault = adapter.vaultsIn[i];
             vault.safeTransferFrom(msg.sender, nodeAddress, amount[i]);
         }
 
-        node.deposit(amount, msg.sender, data);
+        node.openPosition(amount, msg.sender, data);
 
         emit Router_PositionOpened(nodeAddress, adapterId);
+    }
+
+    function increasePosition(address nodeAddress, uint256[] memory amount, bytes memory data) external {
+        Node node = Node(nodeAddress);
+        Adapter memory adapter = node.getAdapter();
+
+        for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
+            Vault vault = adapter.vaultsIn[i];
+            vault.safeTransferFrom(msg.sender, nodeAddress, amount[i]);
+        }
+
+        node.increasePosition(amount, msg.sender, data);
+
+        emit Router_PositionIncreased(nodeAddress, amount);
     }
 }

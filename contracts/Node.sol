@@ -22,13 +22,26 @@ contract Node {
 
     mapping(address => Position) private _position;
 
-    event Node_PositionCreated(uint256[] amounts_, address depositor_);
+    event Node_PositionOpened(uint256[] amounts_, address owner_);
+    event Node_PositionIncreased(uint256[] amounts_, address owner_);
 
     constructor(Router.Adapter memory adapter_) {
         adapter = adapter_;
     }
 
-    function deposit(uint256[] memory amount_, address depositor_, bytes memory data_) external {
+    function getAdapter() external view returns (Router.Adapter memory) {
+        return adapter;
+    }
+
+    /** should be called once? */
+    function openPosition(uint256[] memory amount_, address owner_, bytes memory data_) external {
+        _deposit(amount_, data_);
+        _createPosition(owner_, amount_);
+
+        emit Node_PositionOpened(amount_, owner_);
+    }
+
+    function _deposit(uint256[] memory amount_, bytes memory data_) private {
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
             Vault vault = adapter.vaultsIn[i];
 
@@ -38,15 +51,6 @@ contract Node {
         }
 
         address(adapter.targetAddress).functionCall(abi.encodePacked(adapter.functionSelector, data_));
-
-        _createPosition(depositor_, amount_);
-
-        emit Node_PositionCreated(amount_, depositor_);
-
-        for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
-            Vault vault = adapter.vaultsIn[i];
-            IERC20(vault.asset()).approve(adapter.targetAddress, 0);
-        }
     }
 
     function _createPosition(address owner_, uint256[] memory amounts_) private returns (Position memory) {
@@ -59,5 +63,18 @@ contract Node {
 
     function _increasePositionId() private returns (uint32) {
         return _latestPositionId += 1;
+    }
+
+    function increasePosition(uint256[] memory amount_, address owner_, bytes memory data_) external {
+        _deposit(amount_, data_);
+        _increasePositionAmount(amount_, owner_);
+
+        emit Node_PositionIncreased(amount_, owner_);
+    }
+
+    function _increasePositionAmount(uint256[] memory amount_, address owner_) private {
+        for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
+            _position[owner_].amounts[i] += amount_[i];
+        }
     }
 }

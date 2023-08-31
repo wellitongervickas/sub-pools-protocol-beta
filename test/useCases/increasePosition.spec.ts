@@ -12,10 +12,11 @@ export const DEFAULT_NAME_B = 'Wrapped Ether'
 export const DEFAULT_SYMBOL_B = 'WETH'
 export const DEFAULT_DECIMALS_B = 18
 
-describe('UseCase: Deposit', () => {
-  it('should deposit to adapter', async function () {
+describe('UseCase: Increase Position', () => {
+  it('should increase position in adapter', async function () {
     const [owner] = await ethers.getSigners()
     const depositAmount = '1000000000000000000'
+    const depositTotal = '2000000000000000000'
 
     // Deploy Token A
     const TokenA = await ethers.getContractFactory('Token')
@@ -43,12 +44,12 @@ describe('UseCase: Deposit', () => {
     const vaultBAddress = await vaultBContract.getAddress()
 
     // Deposit shares Vault A using Token A
-    await tokenAContract.approve(vaultAAddress, depositAmount)
-    await vaultAContract.deposit(depositAmount, owner.address)
+    await tokenAContract.approve(vaultAAddress, depositTotal)
+    await vaultAContract.deposit(depositTotal, owner.address)
 
     // Deposit shares Vault B using Token B
-    await tokenBContract.approve(vaultBAddress, depositAmount)
-    await vaultBContract.deposit(depositAmount, owner.address)
+    await tokenBContract.approve(vaultBAddress, depositTotal)
+    await vaultBContract.deposit(depositTotal, owner.address)
 
     // Deploy router
     const Router = await ethers.getContractFactory('Router')
@@ -71,8 +72,8 @@ describe('UseCase: Deposit', () => {
     const [adapterId] = receipt.logs[0].args
 
     // Approve vault A,B to router
-    await vaultAContract.approve(routerAddress, depositAmount)
-    await vaultBContract.approve(routerAddress, depositAmount)
+    await vaultAContract.approve(routerAddress, depositTotal)
+    await vaultBContract.approve(routerAddress, depositTotal)
 
     // Position settings
     const amounts = [depositAmount, depositAmount]
@@ -80,9 +81,14 @@ describe('UseCase: Deposit', () => {
     const adapterData = coderUtils.encode([amounts], ['uint256[]'])
 
     // Open position using router
-    await routerContract.openPosition(adapterId, amounts, adapterData)
+    const tx1 = await routerContract.openPosition(adapterId, amounts, adapterData)
+    const receipt1 = await tx1.wait()
+    const [nodeAddress] = receipt1.logs[18].args
 
-    expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositAmount)
-    expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositAmount)
+    // Increase position using router
+    await routerContract.increasePosition(nodeAddress, amounts, adapterData)
+
+    expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositTotal)
+    expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositTotal)
   })
 })
