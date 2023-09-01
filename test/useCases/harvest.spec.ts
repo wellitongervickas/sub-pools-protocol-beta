@@ -75,7 +75,7 @@ describe('UseCase: Harvest Position', () => {
 
     // Create adapter
     const adapterSettings = {
-      targetAddress: exampleTargetAddress,
+      targetIn: exampleTargetAddress,
       vaultsIn: [vaultAAddress, vaultBAddress],
       vaultsOut: [vaultAAddress, vaultBAddress],
       vaultsProfit: [vaultAddress],
@@ -84,7 +84,7 @@ describe('UseCase: Harvest Position', () => {
       harvestFunctionSignature: ExampleTarget.interface.getFunction('harvest')?.selector,
     }
     const tx = await routerContract.createAdapter(
-      adapterSettings.targetAddress,
+      adapterSettings.targetIn,
       adapterSettings.vaultsIn,
       adapterSettings.vaultsOut,
       adapterSettings.vaultsProfit,
@@ -105,7 +105,7 @@ describe('UseCase: Harvest Position', () => {
     const adapterDataDeposit = coderUtils.encode([amounts], ['uint256[]'])
 
     // Open position using router
-    const tx1 = await routerContract.openPosition(adapterId, amounts, adapterDataDeposit)
+    const tx1 = await routerContract.initializeAdapter(adapterId, amounts, adapterDataDeposit)
     const receipt1 = await tx1.wait()
     const [nodeAddress] = getLogArgs(receipt1.logs)
 

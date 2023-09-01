@@ -72,7 +72,7 @@ describe('UseCase: Open Position', () => {
 
     // Create adapter
     const adapterSettings = {
-      targetAddress: exampleTargetAddress,
+      targetIn: exampleTargetAddress,
       vaultsIn: [vaultAAddress, vaultBAddress],
       vaultsOut: [vaultAAddress, vaultBAddress],
       vaultsProfit: [vaultAddress],
@@ -81,7 +81,7 @@ describe('UseCase: Open Position', () => {
       harvestFunctionSignature: ExampleTarget.interface.getFunction('harvest')?.selector,
     }
     const tx = await routerContract.createAdapter(
-      adapterSettings.targetAddress,
+      adapterSettings.targetIn,
       adapterSettings.vaultsIn,
       adapterSettings.vaultsOut,
       adapterSettings.vaultsProfit,
@@ -103,7 +103,7 @@ describe('UseCase: Open Position', () => {
     const adapterData = coderUtils.encode([amounts], ['uint256[]'])
 
     // Open position using router
-    await routerContract.openPosition(adapterId, amounts, adapterData)
+    await routerContract.initializeAdapter(adapterId, amounts, adapterData)
 
     expect(await tokenAContract.balanceOf(exampleTargetAddress)).to.equal(depositAmount)
     expect(await tokenBContract.balanceOf(exampleTargetAddress)).to.equal(depositAmount)

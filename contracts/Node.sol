@@ -33,12 +33,9 @@ contract Node {
     }
 
     function deposit(uint256[] memory amount_, address owner_, bytes memory data_) external {
-        ///@dev harvest before update position
-        harvest(owner_);
-
         _deposit(amount_, data_);
 
-        if (_position[owner_].id > 0) {
+        if (hasPosition(owner_)) {
             _increasePositionAmount(amount_, owner_);
         } else {
             _createPosition(owner_, amount_);
@@ -48,36 +45,39 @@ contract Node {
     }
 
     function _deposit(uint256[] memory amount_, bytes memory data_) private {
-        _withdrawAmountFromVault(amount_);
-        _approveAdapterToSpend(amount_);
-        _callDepositSelector(data_);
-        _removeAdapterSpendApproval();
+        _receiveAssetsIn(amount_);
+        _approveAssetsInToTargetIn(amount_);
+        _callTargetInDeposit(data_);
+        _removeTargetInAssetsInApproval();
     }
 
-    function _withdrawAmountFromVault(uint256[] memory amount_) private {
+    function hasPosition(address owner_) public view returns (bool) {
+        return _position[owner_].id > 0;
+    }
+
+    function _receiveAssetsIn(uint256[] memory amount_) private {
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
-            Vault vault = adapter.vaultsIn[i];
-            vault.withdraw(amount_[i], address(this), address(this));
+            adapter.vaultsIn[i].withdraw(amount_[i], address(this), address(this));
         }
     }
 
-    function _approveAdapterToSpend(uint256[] memory amount_) private {
+    function _approveAssetsInToTargetIn(uint256[] memory amount_) private {
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
-            _approveAssetAmounToSpender(adapter.vaultsIn[i].asset(), adapter.targetAddress, amount_[i]);
+            _approveSpenderAssetAmount(adapter.vaultsIn[i].asset(), adapter.targetIn, amount_[i]);
         }
     }
 
-    function _approveAssetAmounToSpender(address asset_, address spender_, uint256 amount_) private {
+    function _approveSpenderAssetAmount(address asset_, address spender_, uint256 amount_) private {
         IERC20(asset_).approve(spender_, amount_);
     }
 
-    function _callDepositSelector(bytes memory data_) private {
-        address(adapter.targetAddress).functionCall(abi.encodePacked(adapter.depositFunctionSignature, data_));
+    function _callTargetInDeposit(bytes memory data_) private {
+        address(adapter.targetIn).functionCall(abi.encodePacked(adapter.depositFunctionSignature, data_));
     }
 
-    function _removeAdapterSpendApproval() private {
+    function _removeTargetInAssetsInApproval() private {
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
-            _approveAssetAmounToSpender(adapter.vaultsIn[i].asset(), adapter.targetAddress, 0);
+            _approveSpenderAssetAmount(adapter.vaultsIn[i].asset(), adapter.targetIn, 0);
         }
     }
 
@@ -94,30 +94,28 @@ contract Node {
     }
 
     function _increasePositionAmount(uint256[] memory amount_, address owner_) private {
+        harvest(owner_);
+
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
             _position[owner_].amounts[i] += amount_[i];
         }
     }
 
     function withdraw(uint256[] memory amount_, address owner_, bytes memory data_) external {
-        // Vaults out
-        _callWithdrawSelector(data_);
+        _callAdapterWithdraw(data_);
         _decreasePositionAmount(amount_, owner_);
         _approveVaultToSpend(amount_);
         _depositAmountToVault(amount_, owner_);
         _removeVaultSpendApproval();
-
-        // Vaults profit
-        _approveVaultToSpendProfit();
-        _depositAmountProfitToVault(owner_);
-        _removeVaultProfitSpendApproval();
     }
 
-    function _callWithdrawSelector(bytes memory data_) private {
-        address(adapter.targetAddress).functionCall(abi.encodePacked(adapter.withdrawFunctionSignature, data_));
+    function _callAdapterWithdraw(bytes memory data_) private {
+        address(adapter.targetIn).functionCall(abi.encodePacked(adapter.withdrawFunctionSignature, data_));
     }
 
     function _decreasePositionAmount(uint256[] memory amount_, address owner_) private {
+        harvest(owner_);
+
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
             _position[owner_].amounts[i] -= amount_[i];
         }
@@ -125,7 +123,7 @@ contract Node {
 
     function _approveVaultToSpend(uint256[] memory amount_) private {
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
-            _approveAssetAmounToSpender(adapter.vaultsIn[i].asset(), address(adapter.vaultsIn[i]), amount_[i]);
+            _approveSpenderAssetAmount(adapter.vaultsIn[i].asset(), address(adapter.vaultsIn[i]), amount_[i]);
         }
     }
 
@@ -138,7 +136,7 @@ contract Node {
 
     function _removeVaultSpendApproval() private {
         for (uint256 i = 0; i < adapter.vaultsIn.length; i++) {
-            _approveAssetAmounToSpender(adapter.vaultsIn[i].asset(), address(adapter.vaultsIn[i]), 0);
+            _approveSpenderAssetAmount(adapter.vaultsIn[i].asset(), address(adapter.vaultsIn[i]), 0);
         }
     }
 
@@ -151,12 +149,12 @@ contract Node {
     }
 
     function _callHarvestSelector() private {
-        address(adapter.targetAddress).functionCall(abi.encodePacked(adapter.harvestFunctionSignature));
+        address(adapter.targetIn).functionCall(abi.encodePacked(adapter.harvestFunctionSignature));
     }
 
     function _approveVaultToSpendProfit() private {
         for (uint256 i = 0; i < adapter.vaultsProfit.length; i++) {
-            _approveAssetAmounToSpender(
+            _approveSpenderAssetAmount(
                 adapter.vaultsProfit[i].asset(),
                 address(adapter.vaultsProfit[i]),
                 IERC20(adapter.vaultsProfit[i].asset()).balanceOf(address(this))
@@ -173,7 +171,7 @@ contract Node {
 
     function _removeVaultProfitSpendApproval() private {
         for (uint256 i = 0; i < adapter.vaultsProfit.length; i++) {
-            _approveAssetAmounToSpender(adapter.vaultsProfit[i].asset(), address(adapter.vaultsProfit[i]), 0);
+            _approveSpenderAssetAmount(adapter.vaultsProfit[i].asset(), address(adapter.vaultsProfit[i]), 0);
         }
     }
 }

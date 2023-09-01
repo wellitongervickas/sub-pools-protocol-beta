@@ -13,7 +13,7 @@ contract Router {
     Counters.Counter private _currentAdapterId;
 
     struct Adapter {
-        address targetAddress;
+        address targetIn;
         Vault[] vaultsIn;
         Vault[] vaultsOut;
         Vault[] vaultsProfit;
@@ -31,7 +31,7 @@ contract Router {
     event Router_PositionHarvested(Node nodeAddress_);
 
     function createAdapter(
-        address targetAddress,
+        address targetIn,
         Vault[] memory vaultsIn,
         Vault[] memory vaultsOut,
         Vault[] memory vaultsProfit,
@@ -39,10 +39,10 @@ contract Router {
         bytes4 withdrawFunctionSignature_,
         bytes4 harvestFunctionSignature_
     ) external returns (bytes32 id) {
-        id = keccak256(abi.encodePacked(targetAddress, _currentAdapterId.current()));
+        id = keccak256(abi.encodePacked(targetIn, _currentAdapterId.current()));
 
         adapters[id] = Adapter(
-            targetAddress,
+            targetIn,
             vaultsIn,
             vaultsOut,
             vaultsProfit,
@@ -56,7 +56,7 @@ contract Router {
         _currentAdapterId.increment();
     }
 
-    function openPosition(
+    function initializeAdapter(
         bytes32 adapterId,
         uint256[] memory amount_,
         bytes memory data_
