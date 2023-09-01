@@ -5,6 +5,7 @@ contract PositionManager {
     struct Position {
         uint32 id;
         uint256[] amounts;
+        uint256 latestHarvest;
     }
 
     uint32 private _nextPositionId;
@@ -19,8 +20,14 @@ contract PositionManager {
         return _position[owner_].id > 0;
     }
 
-    function _createPosition(address owner_, uint256[] memory amounts_) internal returns (Position memory) {
-        return _position[owner_] = Position({id: _createPositionId(), amounts: amounts_});
+    function _createPosition(address owner_) internal returns (Position memory) {
+        _position[owner_] = Position({
+            id: _createPositionId(),
+            amounts: new uint256[](1),
+            latestHarvest: block.timestamp
+        });
+
+        return getPosition(owner_);
     }
 
     function _createPositionId() private returns (uint32) {
@@ -45,9 +52,12 @@ contract PositionManager {
 
     function _setPosition(uint256[] memory amounts_, address owner_) internal returns (Position memory) {
         if (hasPosition(owner_)) {
-            return _increasePositionAmount(amounts_, owner_);
+            _increasePositionAmount(amounts_, owner_);
+        } else {
+            _createPosition(owner_);
+            _increasePositionAmount(amounts_, owner_);
         }
 
-        return _createPosition(owner_, amounts_);
+        return getPosition(owner_);
     }
 }

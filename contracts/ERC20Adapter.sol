@@ -25,4 +25,14 @@ abstract contract ERC20Adapter {
             tokens_[index].approve(spender_, amounts_[index]);
         }
     }
+
+    function _getTokensBalance(IERC20[] memory tokens_, address account_) internal view returns (uint256[] memory) {
+        uint256[] memory balances = new uint256[](tokens_.length);
+
+        for (uint256 index = 0; index < tokens_.length; index++) {
+            balances[index] = tokens_[index].balanceOf(account_);
+        }
+
+        return balances;
+    }
 }

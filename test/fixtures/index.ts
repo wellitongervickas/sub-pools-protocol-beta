@@ -6,6 +6,6 @@ export { BytesLike } from 'ethers'
 
 export { default as registry } from './registry'
 export { default as router } from './router'
-export { default as account } from './account'
+export { default as node } from './node'
 export { default as token } from './token'
 export { default as stake } from './stake'

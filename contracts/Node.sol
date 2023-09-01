@@ -6,16 +6,16 @@ import {PositionManager} from './PositionManager.sol';
 import {Registry} from './Registry.sol';
 import {Address} from '@openzeppelin/contracts/utils/Address.sol';
 
-contract Account is ERC20Adapter, PositionManager {
+contract Node is ERC20Adapter, PositionManager {
     Registry.Adapter public adapter;
 
     constructor(Registry.Adapter memory adapter_) {
         adapter = adapter_;
     }
 
-    event Account_Deposited(address indexed owner_, uint256[] amounts_);
-    event Account_Withdrawn(address indexed owner_, uint256[] amounts_);
-    event Account_Harvested(address indexed owner_, uint256[] amounts_);
+    event Node_Deposited(address indexed owner_, uint256[] amounts_);
+    event Node_Withdrawn(address indexed owner_, uint256[] amounts_);
+    event Node_Harvested(address indexed owner_, uint256[] amounts_);
 
     function deposit(
         uint256[] memory amounts_,
@@ -26,7 +26,7 @@ contract Account is ERC20Adapter, PositionManager {
         _deposit(amounts_, depositor_, adapterPayload_);
         _setPosition(amounts_, owner_);
 
-        emit Account_Deposited(owner_, amounts_);
+        emit Node_Deposited(owner_, amounts_);
     }
 
     function _deposit(uint256[] memory amounts_, address depositor_, bytes memory adapterPayload_) internal {
@@ -49,7 +49,7 @@ contract Account is ERC20Adapter, PositionManager {
 
         _withdraw(amounts_, receiver_, adapterPayload_);
 
-        emit Account_Withdrawn(owner_, amounts_);
+        emit Node_Withdrawn(owner_, amounts_);
     }
 
     function _withdraw(uint256[] memory amounts_, address receiver_, bytes memory adapterPayload_) internal {
@@ -61,20 +61,20 @@ contract Account is ERC20Adapter, PositionManager {
         Address.functionCall(adapter.targetIn, abi.encodePacked(adapter.withdrawFunction, adapterPayload_));
     }
 
-    function harvest(
-        uint256[] memory amounts_,
-        address receiver_,
-        address owner_,
-        bytes memory adapterPayload_
-    ) external {
-        _harvest(amounts_, receiver_, adapterPayload_);
+    function harvest(address receiver_, address owner_, bytes memory adapterPayload_) external {
+        uint256[] memory amounts = _harvest(receiver_, adapterPayload_);
 
-        emit Account_Harvested(owner_, amounts_);
+        emit Node_Harvested(owner_, amounts);
     }
 
-    function _harvest(uint256[] memory amounts_, address receiver_, bytes memory adapterPayload_) internal {
+    function _harvest(address receiver_, bytes memory adapterPayload_) internal returns (uint256[] memory amounts) {
         _callTargetInHarvest(adapterPayload_);
+
+        uint256[] memory amounts_ = _getTokensBalance(adapter.tokensReward, address(this));
+
         _transferTokensToReceiver(adapter.tokensReward, receiver_, amounts_);
+
+        return amounts;
     }
 
     function _callTargetInHarvest(bytes memory adapterPayload_) private {
