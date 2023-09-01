@@ -11,6 +11,10 @@ contract PositionManager {
 
     mapping(address => Position) private _position;
 
+    function getPosition(address owner_) public view returns (Position memory) {
+        return _position[owner_];
+    }
+
     function hasPosition(address owner_) public view returns (bool) {
         return _position[owner_].id > 0;
     }

@@ -25,6 +25,9 @@ describe('Account: Deposit', () => {
     await accountContract.deposit(amounts, accounts[0].address, adapterData)
 
     const balance = await tokenContract.balanceOf(stakeAddress)
+    const position = await accountContract.getPosition(accounts[0].address)
+
     expect(balance.toString()).to.equal(amount)
+    expect(position.amounts).to.deep.equal(amounts)
   })
 })
