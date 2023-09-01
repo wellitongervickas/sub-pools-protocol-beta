@@ -21,9 +21,8 @@ describe('Account: Deposit', () => {
 
     const amounts = [amount]
     const adapterData = coderUtils.encode([amounts], ['uint256[]'])
-    const depositorAddress = accounts[0].address
 
-    await accountContract.deposit(amounts, depositorAddress, adapterData)
+    await accountContract.deposit(amounts, accounts[0].address, adapterData)
 
     const balance = await tokenContract.balanceOf(stakeAddress)
     expect(balance.toString()).to.equal(amount)

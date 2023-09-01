@@ -7,16 +7,16 @@ abstract contract ERC20Adapter {
     function _receiveTokensFromDepositor(
         IERC20[] memory tokens_,
         address depositor_,
-        uint256[] memory amount_
+        uint256[] memory amounts_
     ) internal {
         for (uint256 index = 0; index < tokens_.length; index++) {
-            tokens_[index].transferFrom(depositor_, address(this), amount_[index]);
+            tokens_[index].transferFrom(depositor_, address(this), amounts_[index]);
         }
     }
 
-    function _approveTokensToSpender(IERC20[] memory tokens_, address spender_, uint256[] memory amount_) internal {
+    function _approveTokensToSpender(IERC20[] memory tokens_, address spender_, uint256[] memory amounts_) internal {
         for (uint256 index = 0; index < tokens_.length; index++) {
-            tokens_[index].approve(spender_, amount_[index]);
+            tokens_[index].approve(spender_, amounts_[index]);
         }
     }
 }
