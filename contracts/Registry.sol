@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.21;
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 contract Registry {
     struct Adapter {
         address targetIn;
+        IERC20[] tokensIn;
+        bytes4 depositFunction;
     }
 
     uint256 private _nextAdapterId;
