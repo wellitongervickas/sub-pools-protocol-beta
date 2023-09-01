@@ -70,9 +70,9 @@ contract Node is ERC20Adapter, PositionManager {
     function _harvest(address receiver_, bytes memory adapterPayload_) internal returns (uint256[] memory amounts) {
         _callTargetInHarvest(adapterPayload_);
 
-        uint256[] memory amounts_ = _getTokensBalance(adapter.tokensReward, address(this));
+        uint256[] memory rewardsAmounts_ = _getTokensBalance(adapter.tokensReward, address(this));
 
-        _transferTokensToReceiver(adapter.tokensReward, receiver_, amounts_);
+        _transferTokensToReceiver(adapter.tokensReward, receiver_, rewardsAmounts_);
 
         return amounts;
     }
