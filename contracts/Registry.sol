@@ -7,6 +7,8 @@ contract Registry {
         address targetIn;
         IERC20[] tokensIn;
         bytes4 depositFunction;
+        IERC20[] tokensOut;
+        bytes4 withdrawFunction;
     }
 
     uint256 private _nextAdapterId;

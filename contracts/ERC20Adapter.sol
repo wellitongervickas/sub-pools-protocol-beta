@@ -14,6 +14,12 @@ abstract contract ERC20Adapter {
         }
     }
 
+    function _transferTokensToReceiver(IERC20[] memory tokens_, address receiver_, uint256[] memory amounts_) internal {
+        for (uint256 index = 0; index < tokens_.length; index++) {
+            tokens_[index].transfer(receiver_, amounts_[index]);
+        }
+    }
+
     function _approveTokensToSpender(IERC20[] memory tokens_, address spender_, uint256[] memory amounts_) internal {
         for (uint256 index = 0; index < tokens_.length; index++) {
             tokens_[index].approve(spender_, amounts_[index]);

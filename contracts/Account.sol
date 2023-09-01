@@ -14,9 +14,15 @@ contract Account is ERC20Adapter, PositionManager {
     }
 
     event Account_Deposited(address indexed owner_, uint256[] amounts_);
+    event Account_Withdrawn(address indexed owner_, uint256[] amounts_);
 
-    function deposit(uint256[] memory amounts_, address owner_, bytes memory adapterPayload_) external {
-        _receiveTokensFromDepositor(adapter.tokensIn, msg.sender, amounts_);
+    function deposit(
+        uint256[] memory amounts_,
+        address depositor_,
+        address owner_,
+        bytes memory adapterPayload_
+    ) external {
+        _receiveTokensFromDepositor(adapter.tokensIn, depositor_, amounts_);
         _approveTokensToSpender(adapter.tokensIn, adapter.targetIn, amounts_);
         _callTargetInDeposit(adapterPayload_);
 
@@ -27,5 +33,23 @@ contract Account is ERC20Adapter, PositionManager {
 
     function _callTargetInDeposit(bytes memory adapterPayload_) private {
         Address.functionCall(adapter.targetIn, abi.encodePacked(adapter.depositFunction, adapterPayload_));
+    }
+
+    function withdraw(
+        uint256[] memory amounts_,
+        address receiver_,
+        address owner_,
+        bytes memory adapterPayload_
+    ) external {
+        _decreasePositionAmount(amounts_, owner_);
+
+        _callTargetInWithdraw(adapterPayload_);
+        _transferTokensToReceiver(adapter.tokensOut, receiver_, amounts_);
+
+        emit Account_Withdrawn(owner_, amounts_);
+    }
+
+    function _callTargetInWithdraw(bytes memory adapterPayload_) private {
+        Address.functionCall(adapter.targetIn, abi.encodePacked(adapter.withdrawFunction, adapterPayload_));
     }
 }

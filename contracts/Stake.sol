@@ -27,11 +27,13 @@ contract Stake {
 
         emit Deposit(amount_, msg.sender);
     }
-    // function withdraw(uint256[] memory amount_) public {
-    //     for (uint256 i = 0; i < tokens.length; i++) {
-    //         tokens[i].safeTransfer(msg.sender, amount_[i]);
-    //     }
-    // }
+
+    function withdraw(uint256[] memory amount_) public {
+        for (uint256 i = 0; i < tokens.length; i++) {
+            tokens[i].safeTransfer(msg.sender, amount_[i]);
+        }
+    }
+
     // function rewardsBalanceOf() public view returns (uint256) {
     //     return tokenOutput.balanceOf(address(this));
     // }
