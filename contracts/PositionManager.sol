@@ -60,4 +60,10 @@ contract PositionManager {
 
         return getPosition(owner_);
     }
+
+    function _setLatestPositionHarvest(address owner_, uint256 latestHarvest_) internal returns (Position memory) {
+        _position[owner_].latestHarvest = latestHarvest_;
+
+        return getPosition(owner_);
+    }
 }
