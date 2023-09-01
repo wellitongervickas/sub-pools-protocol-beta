@@ -9,6 +9,8 @@ contract Registry {
         bytes4 depositFunction;
         IERC20[] tokensOut;
         bytes4 withdrawFunction;
+        IERC20[] tokensReward;
+        bytes4 harvestFunction;
     }
 
     uint256 private _nextAdapterId;

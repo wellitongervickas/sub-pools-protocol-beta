@@ -5,7 +5,7 @@ export async function deployStakeFixture() {
 
   const accounts = await ethers.getSigners()
   const Stake = await ethers.getContractFactory('Stake')
-  const stakeContract = await Stake.deploy([tokenAddress])
+  const stakeContract = await Stake.deploy([tokenAddress], tokenAddress)
   const stakeAddress = await stakeContract.getAddress()
 
   return { accounts, stakeAddress, stakeContract, tokenContract, tokenAddress }

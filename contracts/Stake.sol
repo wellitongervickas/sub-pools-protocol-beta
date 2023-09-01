@@ -9,15 +9,15 @@ contract Stake {
     using SafeERC20 for IERC20;
     IERC20[] public tokens;
 
-    // IERC20 public tokenOutput;
+    IERC20 public tokenOutput;
 
     event Deposit(uint256[] amount_, address depositor_);
+    event Withdraw(uint256[] amount_, address withdrawer_);
+    event Harvest(address harvester_);
 
-    // constructor(IERC20[] memory tokens_, IERC20 tokenOutput_) {
-
-    constructor(IERC20[] memory tokens_) {
+    constructor(IERC20[] memory tokens_, IERC20 tokenOutput_) {
         tokens = tokens_;
-        //     tokenOutput = tokenOutput_;
+        tokenOutput = tokenOutput_;
     }
 
     function deposit(uint256[] memory amount_) public {
@@ -32,12 +32,13 @@ contract Stake {
         for (uint256 i = 0; i < tokens.length; i++) {
             tokens[i].safeTransfer(msg.sender, amount_[i]);
         }
+
+        emit Withdraw(amount_, msg.sender);
     }
 
-    // function rewardsBalanceOf() public view returns (uint256) {
-    //     return tokenOutput.balanceOf(address(this));
-    // }
-    // function harvest() public {
-    //     tokenOutput.safeTransfer(msg.sender, rewardsBalanceOf());
-    // }
+    function harvest() public {
+        tokenOutput.safeTransfer(msg.sender, tokenOutput.balanceOf(address(this)));
+
+        emit Harvest(msg.sender);
+    }
 }

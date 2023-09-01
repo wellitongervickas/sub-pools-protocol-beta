@@ -12,8 +12,10 @@ describe('Registry', () => {
         targetIn: ethers.ZeroAddress,
         tokensIn: [ethers.ZeroAddress],
         tokensOut: [ethers.ZeroAddress],
+        tokensReward: [ethers.ZeroAddress],
         depositFunction: coderUtils.getFunctionSignature('deposit(uint256[])'),
         withdrawFunction: coderUtils.getFunctionSignature('withdraw(uint256[])'),
+        harvestFunction: coderUtils.getFunctionSignature('harvest()'),
       }
 
       const tx = await registryContract.createAdapter(adapterSetup)
@@ -26,8 +28,10 @@ describe('Registry', () => {
         targetIn: adapter.targetIn,
         tokensIn: adapter.tokensIn,
         tokensOut: adapter.tokensOut,
+        tokensReward: adapter.tokensReward,
         depositFunction: adapter.depositFunction,
         withdrawFunction: adapter.withdrawFunction,
+        harvestFunction: adapter.harvestFunction,
       }).to.deep.equal(adapterSetup)
     })
   })
