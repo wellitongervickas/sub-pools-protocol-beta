@@ -27,9 +27,19 @@ contract PositionManager {
         return _nextPositionId++;
     }
 
-    function _increasePositionAmount(uint256[] memory amount_, address owner_) internal {
+    function _increasePositionAmount(uint256[] memory amount_, address owner_) internal returns (Position memory) {
         for (uint256 i = 0; i < amount_.length; i++) {
             _position[owner_].amounts[i] += amount_[i];
         }
+
+        return getPosition(owner_);
+    }
+
+    function _setPosition(uint256[] memory amounts_, address owner_) internal returns (Position memory) {
+        if (hasPosition(owner_)) {
+            return _increasePositionAmount(amounts_, owner_);
+        }
+
+        return _createPosition(owner_, amounts_);
     }
 }

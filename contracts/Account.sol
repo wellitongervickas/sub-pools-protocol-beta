@@ -13,19 +13,16 @@ contract Account is ERC20Adapter, PositionManager {
         adapter = adapter_;
     }
 
+    event Account_Deposited(address indexed owner_, uint256[] amounts_);
+
     function deposit(uint256[] memory amounts_, address owner_, bytes memory adapterPayload_) external {
         _receiveTokensFromDepositor(adapter.tokensIn, msg.sender, amounts_);
         _approveTokensToSpender(adapter.tokensIn, adapter.targetIn, amounts_);
         _callTargetInDeposit(adapterPayload_);
-        _updatePosition(amounts_, owner_);
-    }
 
-    function _updatePosition(uint256[] memory amounts_, address owner_) internal {
-        if (hasPosition(owner_)) {
-            _increasePositionAmount(amounts_, owner_);
-        } else {
-            _createPosition(owner_, amounts_);
-        }
+        _setPosition(amounts_, owner_);
+
+        emit Account_Deposited(owner_, amounts_);
     }
 
     function _callTargetInDeposit(bytes memory adapterPayload_) private {
